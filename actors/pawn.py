@@ -1,5 +1,6 @@
 import arcade
 import math
+import time
 from actors import laser_beam
 
 SCREEN_WIDTH = 1000
@@ -13,28 +14,33 @@ HALF_PI = math.pi / 2
 
 class Pawn:
     def __init__(self, x, y, mcontrols=None, dcontrols=None, acontrol=None):
+        # Graphical data initialization
         self.radius = 20
         self.radius_squared = self.radius * self.radius
         self.minor_radius = self.radius * 0.5
         self.mod_radius = self.radius * 0.464
 
-        self.health = -100
-        self.laser_damage = 10
-        self.laser_speed = 500
+        # Base-Stats
+        self.speed = 120
+        self.look_speed = 2
         self.max_health = 100
+        self.laser_life = 600
+        self.laser_damage = 10
+        self.laser_speed = 700
+        self.laser_cooldown = 0.1  # measured in seconds
 
+        # Meta initialization
         self.pos = [x, y]
         self.vel = [0, 0]
         self.dir = 0  # radians
+        self.health = -100
         self.rotation = None
-        self.look_speed = 2
+        self.__last_laser__ = time.time()
 
+        # Manual control override initialization
         self.mcontrols = mcontrols
         self.dcontrols = dcontrols
         self.acontrol = acontrol
-
-        self.speed = 100
-        self.laser_life = 600
 
         self.lasers = []
 
@@ -43,6 +49,9 @@ class Pawn:
             self.vel[0] = 0 if x == 0 else 1 if x > 0 else -1
         if y != None:
             self.vel[1] = 0 if y == 0 else 1 if y > 0 else -1
+
+    def laser_on_cooldown(self):
+        return self.__last_laser__ + self.laser_cooldown >= time.time()
 
     def get_lasers(self):
         return self.lasers
@@ -132,8 +141,13 @@ class Pawn:
                 self.rotation = "right"
 
     def attack(self):
+        if self.laser_on_cooldown():
+            return
+
         self.lasers.append(laser_beam.LaserBeam(
             [self.pos[0], self.pos[1]], self.dir, self.laser_life, self.laser_damage, self.laser_speed))
+
+        self.__last_laser__ = time.time()
 
     def draw_lasers(self):
         for laser in self.lasers:
