@@ -1,6 +1,6 @@
 import arcade
 import math
-import laser_beam
+from actors import laser_beam
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
@@ -110,8 +110,6 @@ class Pawn:
         for laser in self.lasers:
             if laser.update() != False:
                 keep.append(laser)
-            else:
-                print("removing this laser")
 
         self.lasers = keep
 
@@ -141,10 +139,10 @@ class Pawn:
     def rotate(self):
         if self.rotation == "right":
             # Look to right
-            self.dir -= 0.05  # radians
+            self.dir -= 0.02  # radians
         elif self.rotation == "left":
             # Look to left
-            self.dir += 0.05  # radians
+            self.dir += 0.02  # radians
 
         self.dir = self.dir % (2 * math.pi)
 

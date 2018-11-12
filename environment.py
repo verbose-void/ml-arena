@@ -1,5 +1,6 @@
 import arcade
-import pawn
+import sys
+from actors import pawn
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
@@ -43,11 +44,11 @@ class Environment(arcade.Window):
 if __name__ == "__main__":
     rightPawn = pawn.Pawn(SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2)
 
-    leftPawn = pawn.Pawn(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2,
-                         (arcade.key.A, arcade.key.W, arcade.key.D,
-                          arcade.key.S),
-                         (arcade.key.LEFT, arcade.key.RIGHT),
-                         arcade.key.SPACE)
+    playerPawn = pawn.Pawn(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2,
+                           (arcade.key.A, arcade.key.W, arcade.key.D,
+                            arcade.key.S),
+                           (arcade.key.LEFT, arcade.key.RIGHT),
+                           arcade.key.SPACE)
 
-    env = Environment([leftPawn, rightPawn])
+    env = Environment([playerPawn, rightPawn])
     arcade.run()

@@ -1,10 +1,11 @@
 import math
-import pawn
 import arcade
 
-SPEED = 5
+SPEED = 25
 LENGTH = 20
 WIDTH = 3
+SCREEN_WIDTH = 1000
+SCREEN_HEIGHT = 600
 
 
 class LaserBeam:
@@ -16,10 +17,10 @@ class LaserBeam:
         self.pos[0] += math.cos(self.dir) * SPEED
         self.pos[1] += math.sin(self.dir) * SPEED
 
-        if self.pos[0] > pawn.SCREEN_WIDTH or self.pos[0] < 0:
+        if self.pos[0] > SCREEN_WIDTH or self.pos[0] < 0:
             return False
 
-        if self.pos[1] > pawn.SCREEN_HEIGHT or self.pos[1] < 0:
+        if self.pos[1] > SCREEN_HEIGHT or self.pos[1] < 0:
             return False
 
     def draw(self):
