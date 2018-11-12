@@ -61,16 +61,16 @@ class Environment(arcade.Window):
         return super().on_key_release(symbol, modifiers)
 
 
+def default_player_pawn():
+    return pawn.Pawn(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2, (arcade.key.A, arcade.key.W, arcade.key.D, arcade.key.S), (arcade.key.LEFT, arcade.key.RIGHT), arcade.key.SPACE)
+
+
+def default_mindless_pawn():
+    out = pawn.Pawn(SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2)
+    out.dir = math.pi
+    return out
+
+
 if __name__ == "__main__":
-    rightPawn = pawn.Pawn(SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2)
-    rightPawn.dir = math.pi
-
-    playerPawn = pawn.Pawn(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2,
-                           (arcade.key.A, arcade.key.W, arcade.key.D,
-                            arcade.key.S),
-                           (arcade.key.LEFT,
-                            arcade.key.RIGHT),
-                           arcade.key.SPACE)
-
-    env = Environment([playerPawn, rightPawn])
+    env = Environment([default_player_pawn(), default_mindless_pawn()])
     arcade.run()
