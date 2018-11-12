@@ -5,6 +5,9 @@ from actors import laser_beam
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 
+HEALTH_BAR_HEIGHT = 20
+HEALTH_BAR_MAX_WIDTH = 60
+
 HALF_PI = math.pi / 2
 
 
@@ -16,6 +19,7 @@ class Pawn:
         self.mod_radius = self.radius * 0.464
 
         self.health = -100
+        self.laser_damage = 10
         self.max_health = 100
 
         self.pos = [x, y]
@@ -45,6 +49,24 @@ class Pawn:
     def look(self, direction):
         self.rotation = "right" if direction == "right" else "left" if direction == "left" else None
 
+    def draw_health_bar(self):
+        x = self.pos[0] - HEALTH_BAR_MAX_WIDTH / 2
+        y = self.pos[1] + self.mod_radius + HEALTH_BAR_HEIGHT
+
+        normal_health = self.health / self.max_health
+
+        color = arcade.color.GREEN
+
+        if normal_health <= 0.2:
+            color = arcade.color.RED
+        elif normal_health <= 0.5:
+            color = arcade.color.YELLOW
+        elif normal_health <= 0.7:
+            color = arcade.color.ORANGE
+
+        arcade.draw_line(x, y, x + (HEALTH_BAR_MAX_WIDTH *
+                                    normal_health), y, color, 5)
+
     def draw(self):
         # Draw body circle
         arcade.draw_circle_filled(
@@ -68,6 +90,8 @@ class Pawn:
                                     self.pos[0] +
                                     rightLeg[0], self.pos[1]+rightLeg[1],
                                     arcade.color.WHITE)
+
+        self.draw_health_bar()
 
     def press(self, key):
         if self.acontrol != None:
@@ -108,7 +132,7 @@ class Pawn:
 
     def attack(self):
         self.lasers.append(laser_beam.LaserBeam(
-            [self.pos[0], self.pos[1]], self.dir, self.laser_life))
+            [self.pos[0], self.pos[1]], self.dir, self.laser_life, self.laser_damage))
 
     def draw_lasers(self):
         for laser in self.lasers:
@@ -168,9 +192,8 @@ class Pawn:
         if isinstance(lasers, (list,)):
             for l in lasers:
                 if self.colliding_with(l):
-                    self.health -= 10
-                    print("Hit! New Health: " + str(self.health))
-                    if self.health < 0:
+                    self.health -= l.get_damage()
+                    if self.health <= 0.1:
                         l.kill(self)
                     else:
                         l.kill(None)

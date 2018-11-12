@@ -9,13 +9,17 @@ SCREEN_HEIGHT = 600
 
 
 class LaserBeam:
-    def __init__(self, pos, direction, life_span):
+    def __init__(self, pos, direction, life_span, damage):
         self.dir = direction
         self.start_pos = [pos[0], pos[1]]
         self.pos = pos
         self.life_span_squared = math.pow(life_span, 2)
         self.killed = None
         self.end_of_life = False
+        self.damage = damage
+
+    def get_damage(self):
+        return self.damage
 
     def kill(self, pawn):
         self.killed = pawn
