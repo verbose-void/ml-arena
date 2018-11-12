@@ -11,3 +11,5 @@ class ShortRangePawn(pawn.Pawn):
         self.speed *= 1.3
         # 60% Laser Life
         self.laser_life *= 0.6
+        # 70% Health
+        self.max_health *= 0.7
