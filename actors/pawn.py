@@ -18,12 +18,14 @@ class Pawn:
         self.vel = [0, 0]
         self.dir = 0  # radians
         self.rotation = None
+        self.look_speed = 0.04
 
         self.mcontrols = mcontrols
         self.dcontrols = dcontrols
         self.acontrol = acontrol
 
         self.speed = 2
+        self.laser_life = 600
 
         self.lasers = []
 
@@ -98,7 +100,7 @@ class Pawn:
 
     def attack(self):
         self.lasers.append(laser_beam.LaserBeam(
-            [self.pos[0], self.pos[1]], self.dir))
+            [self.pos[0], self.pos[1]], self.dir, self.laser_life))
 
     def draw_lasers(self):
         for laser in self.lasers:
@@ -139,10 +141,10 @@ class Pawn:
     def rotate(self):
         if self.rotation == "right":
             # Look to right
-            self.dir -= 0.02  # radians
+            self.dir -= self.look_speed  # radians
         elif self.rotation == "left":
             # Look to left
-            self.dir += 0.02  # radians
+            self.dir += self.look_speed  # radians
 
         self.dir = self.dir % (2 * math.pi)
 
@@ -151,5 +153,16 @@ class Pawn:
         self.pos[0] += (self.vel[0] * self.speed)
         self.pos[1] += (self.vel[1] * self.speed)
 
+        temp = self.radius * 1.2
+
         # X wrapping
-        # if self.pos[0] >
+        if self.pos[0] < -temp:
+            self.pos[0] = SCREEN_WIDTH + temp
+        elif self.pos[0] > SCREEN_WIDTH + temp:
+            self.pos[0] = -temp
+
+        # Y wrapping
+        if self.pos[1] < -temp:
+            self.pos[1] = SCREEN_HEIGHT + temp
+        elif self.pos[1] > SCREEN_HEIGHT + temp:
+            self.pos[1] = -temp
