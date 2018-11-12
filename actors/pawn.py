@@ -20,19 +20,20 @@ class Pawn:
 
         self.health = -100
         self.laser_damage = 10
+        self.laser_speed = 500
         self.max_health = 100
 
         self.pos = [x, y]
         self.vel = [0, 0]
         self.dir = 0  # radians
         self.rotation = None
-        self.look_speed = 0.04
+        self.look_speed = 2
 
         self.mcontrols = mcontrols
         self.dcontrols = dcontrols
         self.acontrol = acontrol
 
-        self.speed = 2
+        self.speed = 100
         self.laser_life = 600
 
         self.lasers = []
@@ -132,18 +133,18 @@ class Pawn:
 
     def attack(self):
         self.lasers.append(laser_beam.LaserBeam(
-            [self.pos[0], self.pos[1]], self.dir, self.laser_life, self.laser_damage))
+            [self.pos[0], self.pos[1]], self.dir, self.laser_life, self.laser_damage, self.laser_speed))
 
     def draw_lasers(self):
         for laser in self.lasers:
             laser.draw()
 
-    def update_lasers(self):
+    def update_lasers(self, delta_time):
         keep = []
         pawns_killed = set()
 
         for laser in self.lasers:
-            if laser.update() != False:
+            if laser.update(delta_time) != False:
                 keep.append(laser)
             elif laser.who_was_killed() != None:
                 pawns_killed.add(laser.who_was_killed())
@@ -174,33 +175,32 @@ class Pawn:
             if i == 0 or i == 1:
                 self.rotation = None
 
-    def rotate(self):
+    def rotate(self, delta_time):
         if self.rotation == "right":
             # Look to right
-            self.dir -= self.look_speed  # radians
+            self.dir -= self.look_speed * delta_time  # radians
         elif self.rotation == "left":
             # Look to left
-            self.dir += self.look_speed  # radians
+            self.dir += self.look_speed * delta_time  # radians
 
         self.dir = self.dir % (2 * math.pi)
 
-    def update(self, lasers):
+    def update(self, lasers, delta_time):
         if self.health <= -100:
             self.health = self.max_health
 
         # Check for laser collisions
-        if isinstance(lasers, (list,)):
-            for l in lasers:
-                if self.colliding_with(l):
-                    self.health -= l.get_damage()
-                    if self.health <= 0.1:
-                        l.kill(self)
-                    else:
-                        l.kill(None)
+        for l in lasers:
+            if self.colliding_with(l):
+                self.health -= l.get_damage()
+                if self.health <= 0.1:
+                    l.kill(self)
+                else:
+                    l.kill(None)
 
-        self.rotate()
-        self.pos[0] += (self.vel[0] * self.speed)
-        self.pos[1] += (self.vel[1] * self.speed)
+        self.rotate(delta_time)
+        self.pos[0] += (self.vel[0] * self.speed) * delta_time
+        self.pos[1] += (self.vel[1] * self.speed) * delta_time
 
         temp = self.radius * 1.2
 

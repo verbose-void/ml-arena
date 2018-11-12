@@ -43,8 +43,8 @@ class Environment(arcade.Window):
     def update(self, delta_time):
         for pawn in self.pawns:
             lasers = self.get_lasers(pawn)
-            pawn.update(lasers)
-            pawns_killed = pawn.update_lasers()
+            pawn.update(lasers, delta_time)
+            pawns_killed = pawn.update_lasers(delta_time)
 
             if len(pawns_killed) > 0:
                 for pawn in pawns_killed:

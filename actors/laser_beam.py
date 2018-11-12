@@ -9,14 +9,16 @@ SCREEN_HEIGHT = 600
 
 
 class LaserBeam:
-    def __init__(self, pos, direction, life_span, damage):
+    def __init__(self, pos, direction, life_span, damage, speed):
         self.dir = direction
         self.start_pos = [pos[0], pos[1]]
         self.pos = pos
+        self.damage = damage
+        self.speed = speed
+
         self.life_span_squared = math.pow(life_span, 2)
         self.killed = None
         self.end_of_life = False
-        self.damage = damage
 
     def get_damage(self):
         return self.damage
@@ -28,12 +30,12 @@ class LaserBeam:
     def who_was_killed(self):
         return self.killed
 
-    def update(self):
+    def update(self, delta_time):
         if self.killed != None or self.end_of_life:
             return False
 
-        self.pos[0] += math.cos(self.dir) * SPEED
-        self.pos[1] += math.sin(self.dir) * SPEED
+        self.pos[0] += math.cos(self.dir) * self.speed * delta_time
+        self.pos[1] += math.sin(self.dir) * self.speed * delta_time
 
         dist_squared = math.pow(
             self.start_pos[0]-self.pos[0], 2) + math.pow(self.start_pos[1]-self.pos[1], 2)
