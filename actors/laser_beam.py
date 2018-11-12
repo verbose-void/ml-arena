@@ -14,8 +14,20 @@ class LaserBeam:
         self.start_pos = [pos[0], pos[1]]
         self.pos = pos
         self.life_span_squared = math.pow(life_span, 2)
+        self.killed = None
+        self.end_of_life = False
+
+    def kill(self, pawn):
+        self.killed = pawn
+        self.end_of_life = True
+
+    def who_was_killed(self):
+        return self.killed
 
     def update(self):
+        if self.killed != None or self.end_of_life:
+            return False
+
         self.pos[0] += math.cos(self.dir) * SPEED
         self.pos[1] += math.sin(self.dir) * SPEED
 
@@ -32,8 +44,10 @@ class LaserBeam:
             return False
 
     def draw(self):
-        endX = self.pos[0] + math.cos(self.dir) * LENGTH
-        endY = self.pos[1] + math.sin(self.dir) * LENGTH
+        hp = self.get_head_position()
 
         arcade.draw_line(self.pos[0], self.pos[1],
-                         endX, endY, arcade.color.RED, WIDTH)
+                         hp[0], hp[1], arcade.color.RED, WIDTH)
+
+    def get_head_position(self):
+        return (self.pos[0] + math.cos(self.dir) * LENGTH, self.pos[1] + math.sin(self.dir) * LENGTH)

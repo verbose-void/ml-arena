@@ -26,10 +26,29 @@ class Environment(arcade.Window):
             pawn.draw_lasers()
             pawn.draw()
 
+    def get_lasers(self, pawn):
+        # Get all lasers that are not owned by the given pawn.
+        lasers = []
+
+        for lpawn in self.pawns:
+            if lpawn != pawn:
+                for l in lpawn.get_lasers():
+                    lasers.append(l)
+
+        return lasers
+
+    def kill_pawn(self, pawn):
+        self.pawns.remove(pawn)
+
     def update(self, delta_time):
         for pawn in self.pawns:
-            pawn.update()
-            pawn.update_lasers()
+            lasers = self.get_lasers(pawn)
+            pawn.update(lasers)
+            pawns_killed = pawn.update_lasers()
+
+            if len(pawns_killed) > 0:
+                for pawn in pawns_killed:
+                    self.kill_pawn(pawn)
 
     def on_key_press(self, symbol, modifiers):
         for pawn in self.pawns:

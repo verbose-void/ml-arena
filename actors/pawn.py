@@ -11,8 +11,12 @@ HALF_PI = math.pi / 2
 class Pawn:
     def __init__(self, x, y, mcontrols=None, dcontrols=None, acontrol=None):
         self.radius = 20
+        self.radius_squared = self.radius * self.radius
         self.minor_radius = self.radius * 0.5
         self.mod_radius = self.radius * 0.464
+
+        self.health = -100
+        self.max_health = 100
 
         self.pos = [x, y]
         self.vel = [0, 0]
@@ -35,10 +39,14 @@ class Pawn:
         if y != None:
             self.vel[1] = 0 if y == 0 else 1 if y > 0 else -1
 
+    def get_lasers(self):
+        return self.lasers
+
     def look(self, direction):
         self.rotation = "right" if direction == "right" else "left" if direction == "left" else None
 
     def draw(self):
+        # Draw body circle
         arcade.draw_circle_filled(
             self.pos[0], self.pos[1], self.mod_radius, arcade.color.WHITE)
 
@@ -108,12 +116,16 @@ class Pawn:
 
     def update_lasers(self):
         keep = []
+        pawns_killed = set()
 
         for laser in self.lasers:
             if laser.update() != False:
                 keep.append(laser)
+            elif laser.who_was_killed() != None:
+                pawns_killed.add(laser.who_was_killed())
 
         self.lasers = keep
+        return pawns_killed
 
     def release(self, key):
         if self.mcontrols == None:
@@ -148,7 +160,21 @@ class Pawn:
 
         self.dir = self.dir % (2 * math.pi)
 
-    def update(self):
+    def update(self, lasers):
+        if self.health <= -100:
+            self.health = self.max_health
+
+        # Check for laser collisions
+        if isinstance(lasers, (list,)):
+            for l in lasers:
+                if self.colliding_with(l):
+                    self.health -= 10
+                    print("Hit! New Health: " + str(self.health))
+                    if self.health < 0:
+                        l.kill(self)
+                    else:
+                        l.kill(None)
+
         self.rotate()
         self.pos[0] += (self.vel[0] * self.speed)
         self.pos[1] += (self.vel[1] * self.speed)
@@ -166,3 +192,11 @@ class Pawn:
             self.pos[1] = SCREEN_HEIGHT + temp
         elif self.pos[1] > SCREEN_HEIGHT + temp:
             self.pos[1] = -temp
+
+    def colliding_with(self, laser):
+        lhp = laser.get_head_position()
+
+        dist_squared = math.pow(
+            self.pos[0]-lhp[0], 2) + math.pow(self.pos[1]-lhp[1], 2)
+
+        return dist_squared < self.radius_squared
