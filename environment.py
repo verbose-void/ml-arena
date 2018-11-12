@@ -1,7 +1,5 @@
 import arcade
-import imp
-
-pawn = imp.load_source("pawn", "actors/pawn.py")
+import pawn
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
@@ -12,6 +10,7 @@ class Environment(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT)
         arcade.set_background_color(arcade.color.BLACK)
         self.pawns = pawns
+        self.lasers = []
 
     def setup(self):
         # Set up your game here
@@ -22,12 +21,13 @@ class Environment(arcade.Window):
 
         # Your drawing code goes here
         for pawn in self.pawns:
+            pawn.draw_lasers()
             pawn.draw()
 
     def update(self, delta_time):
         for pawn in self.pawns:
             pawn.update()
-        pass
+            pawn.update_lasers()
 
     def on_key_press(self, symbol, modifiers):
         for pawn in self.pawns:
@@ -46,7 +46,8 @@ if __name__ == "__main__":
     leftPawn = pawn.Pawn(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2,
                          (arcade.key.A, arcade.key.W, arcade.key.D,
                           arcade.key.S),
-                         (arcade.key.LEFT, arcade.key.RIGHT))
+                         (arcade.key.LEFT, arcade.key.RIGHT),
+                         arcade.key.SPACE)
 
     env = Environment([leftPawn, rightPawn])
     arcade.run()

@@ -1,11 +1,15 @@
 import arcade
 import math
+import laser_beam
+
+SCREEN_WIDTH = 1000
+SCREEN_HEIGHT = 600
 
 HALF_PI = math.pi / 2
 
 
 class Pawn:
-    def __init__(self, x, y, mcontrols=None, dcontrols=None):
+    def __init__(self, x, y, mcontrols=None, dcontrols=None, acontrol=None):
         self.radius = 20
         self.minor_radius = self.radius * 0.5
         self.mod_radius = self.radius * 0.464
@@ -17,8 +21,11 @@ class Pawn:
 
         self.mcontrols = mcontrols
         self.dcontrols = dcontrols
+        self.acontrol = acontrol
 
         self.speed = 2
+
+        self.lasers = []
 
     def move(self, x, y):
         if x != None:
@@ -53,6 +60,11 @@ class Pawn:
                                     arcade.color.WHITE)
 
     def press(self, key):
+        if self.acontrol != None:
+            if key == self.acontrol:
+                self.attack()
+                return
+
         if self.mcontrols == None:
             return
 
@@ -83,6 +95,25 @@ class Pawn:
                 self.rotation = "left"
             elif i == 1:
                 self.rotation = "right"
+
+    def attack(self):
+        self.lasers.append(laser_beam.LaserBeam(
+            [self.pos[0], self.pos[1]], self.dir))
+
+    def draw_lasers(self):
+        for laser in self.lasers:
+            laser.draw()
+
+    def update_lasers(self):
+        keep = []
+
+        for laser in self.lasers:
+            if laser.update() != False:
+                keep.append(laser)
+            else:
+                print("removing this laser")
+
+        self.lasers = keep
 
     def release(self, key):
         if self.mcontrols == None:
@@ -121,3 +152,6 @@ class Pawn:
         self.rotate()
         self.pos[0] += (self.vel[0] * self.speed)
         self.pos[1] += (self.vel[1] * self.speed)
+
+        # X wrapping
+        # if self.pos[0] >
