@@ -2,7 +2,7 @@ import arcade
 import sys
 import math
 from actors import pawn, short_range_pawn, long_range_pawn
-from models import brain
+from models import brain, dynamic_scripting_brain
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
@@ -115,6 +115,17 @@ def default_mindless_pawn():
     return out
 
 
+def dynamic_scripting_pawn():
+    """
+    Generates a pawn with responses pre-programmed.
+    """
+
+    out = pawn.Pawn(dynamic_scripting_brain.DynamicBrain,
+                    SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2)
+    out.dir = 2
+    return out
+
+
 if __name__ == "__main__":
-    env = Environment([default_player_pawn(), default_mindless_pawn()])
+    env = Environment([default_player_pawn(), dynamic_scripting_pawn()])
     arcade.run()
