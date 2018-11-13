@@ -37,7 +37,7 @@ class Pawn:
         # Base-Stats
         self.speed = 120
         self.look_speed = 2
-        self.max_health = 100
+        self.max_health = 800
         self.laser_life = 600
         self.laser_damage = 10
         self.laser_speed = 700
@@ -58,6 +58,13 @@ class Pawn:
 
         self.lasers = []
         self.env = None
+
+    def get_laser_life(self):
+        """
+        @return Returns the pawn's laser's life-span.
+        """
+
+        return self.laser_life
 
     def get_dir(self):
         """
