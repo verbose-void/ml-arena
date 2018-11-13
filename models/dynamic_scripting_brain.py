@@ -1,6 +1,7 @@
 import time
 import math
 import arcade
+import random
 
 
 class DynamicBrain:
@@ -8,10 +9,54 @@ class DynamicBrain:
         self.pawn = pawn
 
     def on_tick(self):
+        pawn = self.pawn
         enemy = self.get_closest_enemy()
+
+        if enemy == None:
+            pawn.move(0, 0)
+            pawn.look(None)
+            return
+
         self.look_towards(enemy.get_pos())
 
+        optimal_dist_sqrd = math.pow(pawn.get_laser_life() * 0.85, 2)
+        dist_sqrd = pawn.dist_squared(enemy.get_pos())
+
+        if dist_sqrd > optimal_dist_sqrd:
+            # MOVE TOWARDS ENEMY
+
+            pos = pawn.get_pos()
+            e_pos = enemy.get_pos()
+
+            vec = [
+                -pos[0]+e_pos[0],
+                -pos[1]+e_pos[1]
+            ]
+
+            pawn.move(vec[0], vec[1])
+            pass
+        else:
+            # INVERSE MOVEMENT
+            if random.random() > dist_sqrd / optimal_dist_sqrd:
+                pawn.attack()
+
+            if round(time.time()) % 2 != 0:
+                e_vel = enemy.get_vel()
+                xv = random.randint(-1, 1)
+                yv = random.randint(-1, 1)
+
+                if xv == 0:
+                    xv = 1
+                if yv == 0:
+                    yv = -1
+
+                pawn.move(xv, yv)
+
     def get_closest_enemy(self):
+        """
+        Returns the closest pawn to the given pawn.
+        """
+
         min_dist = float("inf")
         dist_sqrd = None
         closest = None

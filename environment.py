@@ -115,17 +115,30 @@ def default_mindless_pawn():
     return out
 
 
-def dynamic_scripting_pawn():
+def dynamic_scripting_pawn(x, y):
     """
     Generates a pawn with responses pre-programmed.
     """
 
-    out = pawn.Pawn(dynamic_scripting_brain.DynamicBrain,
-                    SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2)
-    out.dir = 2
+    #out = pawn.Pawn(dynamic_scripting_brain.DynamicBrain, x, y)
+    out = long_range_pawn.LongRangePawn(
+        dynamic_scripting_brain.DynamicBrain, x, y)
+    out.dir = 1
     return out
 
 
-if __name__ == "__main__":
-    env = Environment([default_player_pawn(), dynamic_scripting_pawn()])
+def dynamic_vs_dynamic_game():
+    env = Environment([dynamic_scripting_pawn(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2), dynamic_scripting_pawn(
+        SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2)])
     arcade.run()
+
+
+def player_vs_dynamic_game():
+    env = Environment([default_player_pawn(), dynamic_scripting_pawn(
+        SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2)])
+    arcade.run()
+
+
+if __name__ == "__main__":
+    # player_vs_dynamic_game()
+    dynamic_vs_dynamic_game()
