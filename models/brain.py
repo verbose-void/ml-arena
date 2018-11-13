@@ -1,6 +1,3 @@
-import time
-
-
 class Brain:
     """
     This class acts as an abstract class that allows the injection of predictive models,
