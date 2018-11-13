@@ -10,6 +10,15 @@ SCREEN_HEIGHT = 600
 
 class LaserBeam:
     def __init__(self, pos, direction, life_span, damage, speed):
+        """
+        Laser beam data structure.
+        @param pos Starting position.
+        @param direction Constant heading direction.
+        @param life_span How far the laser will travel until it's deletion.
+        @param damage How much damage will be caused by this laser.
+        @param speed How fast this laser will travel.
+        """
+
         self.dir = direction
         self.start_pos = [pos[0], pos[1]]
         self.pos = pos
@@ -77,6 +86,20 @@ class LaserBeam:
 
         arcade.draw_line(self.pos[0], self.pos[1],
                          hp[0], hp[1], arcade.color.RED, WIDTH)
+
+    def get_dir(self):
+        """
+        @return Returns this laser's heading direction in radians.
+        """
+
+        return self.dir
+
+    def get_speed(self):
+        """
+        @return Returns this laser's speed.
+        """
+
+        return self.speed
 
     def get_head_position(self):
         """

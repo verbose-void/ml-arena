@@ -13,7 +13,21 @@ HALF_PI = math.pi / 2
 
 
 class Pawn:
-    def __init__(self, x, y, mcontrols=None, dcontrols=None, acontrol=None):
+    def __init__(self, brain, x, y, mcontrols=None, dcontrols=None, acontrol=None):
+        """
+        The default pawn type.
+        @param brain The brain is the artificial controller for the pawn.
+        @param x, y Starting position.
+        @param mcontrols A list of movement controls containing arcade.keys for LEFT, UP, RIGHT, & DOWN respectively.
+        @param dcontrols A list of diretional movement controls containing arcade.keys for CLOCKWISE & COUNTER-CLOCKWISE respectively.
+        @param mcontrols An arcade.key that controls the dispatching of lasers (the Pawn.attack(...) method).
+        """
+
+        if brain != None:
+            self.brain = brain(self)
+        else:
+            self.brain = None
+
         # Graphical data initialization
         self.radius = 20
         self.radius_squared = self.radius * self.radius
@@ -43,6 +57,48 @@ class Pawn:
         self.acontrol = acontrol
 
         self.lasers = []
+
+    def get_speed(self):
+        """
+        @return Returns the speed of this pawn.
+        """
+
+        return self.speed
+
+    def get_vel(self):
+        """
+        @return Returns this pawn's velocities (headings)
+        """
+
+        return self.vel
+
+    def get_health(self):
+        """
+        @return Returns this pawn's health value.
+        """
+
+        return self.health
+
+    def set_env(self, env):
+        """
+        Sets the environment containing this pawn.
+        """
+
+        self.env = env
+
+    def get_pawns(self):
+        """
+        @return Returns all pawns in the environment that isn't itself.
+        """
+
+        return self.env.get_pawns(self)
+
+    def get_pos(self):
+        """
+        @return Returns the pawns position.
+        """
+
+        return self.pos
 
     def move(self, x, y):
         """
@@ -242,6 +298,13 @@ class Pawn:
             if i == 0 or i == 1:
                 self.rotation = None
 
+    def get_rotation(self):
+        """
+        @return Returns the pawn's rotational heading.
+        """
+
+        return self.rotation
+
     def rotate(self, delta_time):
         """
         Executes graphical rotation for the given pawn according to the 'look_speed'
@@ -261,6 +324,10 @@ class Pawn:
         """
         Called every update round: handles updates for lasers & pawn position / rotation.
         """
+
+        # Artifical controller decision making process if a brain is contained.
+        if self.brain != None:
+            self.brain.on_tick()
 
         if self.health <= -100:
             self.health = self.max_health
