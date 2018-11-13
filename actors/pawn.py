@@ -57,6 +57,14 @@ class Pawn:
         self.acontrol = acontrol
 
         self.lasers = []
+        self.env = None
+
+    def get_dir(self):
+        """
+        @return Returns the pawn's direction in radians.
+        """
+
+        return self.dir
 
     def get_speed(self):
         """
@@ -366,7 +374,7 @@ class Pawn:
 
         lhp = laser.get_head_position()
 
-        dist_squared = math.pow(
-            self.pos[0]-lhp[0], 2) + math.pow(self.pos[1]-lhp[1], 2)
+        return self.dist_squared(lhp) < self.radius_squared
 
-        return dist_squared < self.radius_squared
+    def dist_squared(self, pos):
+        return math.pow(self.pos[0]-pos[0], 2) + math.pow(self.pos[1]-pos[1], 2)
