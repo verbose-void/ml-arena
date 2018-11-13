@@ -45,21 +45,44 @@ class Pawn:
         self.lasers = []
 
     def move(self, x, y):
+        """
+        Starts movement in the axis changed. Values are normalized to -1, 0, & 1.
+        """
+
         if x != None:
             self.vel[0] = 0 if x == 0 else 1 if x > 0 else -1
         if y != None:
             self.vel[1] = 0 if y == 0 else 1 if y > 0 else -1
 
     def laser_on_cooldown(self):
+        """
+        Checks weather laser usage is on cooldown according to the 'laser_cooldown' field variable.
+        """
+
         return self.__last_laser__ + self.laser_cooldown >= time.time()
 
     def get_lasers(self):
+        """
+        @return Returns all lasers shot by the current pawn.
+        """
+
         return self.lasers
 
     def look(self, direction):
+        """
+        Starts rotation towards 'right' (clockwise) or 'left' (counter-clockwise)
+        @param direction must be of value 'right', 'left', or None. Otherwise, it will be converted to None.
+        """
+
         self.rotation = "right" if direction == "right" else "left" if direction == "left" else None
 
     def draw_health_bar(self):
+        """
+        Displays the pawns health above it's graphical representation.
+        Length is set in the global variable 'HEALTH_BAR_WIDTH'.
+        Height above it's body is set in the global variable 'HEALTH_BAR_HEIGHT'.
+        """
+
         x = self.pos[0] - HEALTH_BAR_MAX_WIDTH / 2
         y = self.pos[1] + self.mod_radius + HEALTH_BAR_HEIGHT
 
@@ -78,11 +101,16 @@ class Pawn:
                                     normal_health), y, color, 5)
 
     def draw(self):
+        """
+        Creates the graphical representation for the pawn using a triangle & circle.
+        Sizing is relative to the radius field variable.
+        """
+
         # Draw body circle
         arcade.draw_circle_filled(
             self.pos[0], self.pos[1], self.mod_radius, arcade.color.WHITE)
 
-        # Draw directional arrow
+        # Get triangle verticies relative to the rotation stored in the field variable 'direction'.
         facing = (math.cos(self.dir) * self.radius,
                   math.sin(self.dir) * self.radius)
 
@@ -94,6 +122,7 @@ class Pawn:
         rightLeg = (math.cos(temp) * self.minor_radius,
                     math.sin(temp) * self.minor_radius)
 
+        # Draw triangle according to the determined verticies.
         arcade.draw_triangle_filled(self.pos[0]+facing[0], self.pos[1]+facing[1],
                                     self.pos[0] +
                                     leftLeg[0], self.pos[1]+leftLeg[1],
@@ -104,6 +133,11 @@ class Pawn:
         self.draw_health_bar()
 
     def press(self, key):
+        """
+        Called when a key is pressed, this method executes the action assigned to a given key
+        in the manual control overrides.
+        """
+
         if self.acontrol != None:
             if key == self.acontrol:
                 self.attack()
@@ -141,6 +175,11 @@ class Pawn:
                 self.rotation = "right"
 
     def attack(self):
+        """
+        Checks if the pawn is on laser cooldown, if not it dispatches a laser from the origin of the
+        graphical representation.
+        """
+
         if self.laser_on_cooldown():
             return
 
@@ -150,10 +189,18 @@ class Pawn:
         self.__last_laser__ = time.time()
 
     def draw_lasers(self):
+        """
+        Draws all of the lasers shot by this pawn.
+        """
+
         for laser in self.lasers:
             laser.draw()
 
     def update_lasers(self, delta_time):
+        """
+        Updates each individual laser this pawn is responsible for.
+        """
+
         keep = []
         pawns_killed = set()
 
@@ -167,6 +214,11 @@ class Pawn:
         return pawns_killed
 
     def release(self, key):
+        """
+        Called when the given key is released. Undoes actions controlled 
+        by the manual control overrides.
+        """
+
         if self.mcontrols == None:
             return
 
@@ -190,6 +242,11 @@ class Pawn:
                 self.rotation = None
 
     def rotate(self, delta_time):
+        """
+        Executes graphical rotation for the given pawn according to the 'look_speed'
+        field variable.
+        """
+
         if self.rotation == "right":
             # Look to right
             self.dir -= self.look_speed * delta_time  # radians
@@ -200,6 +257,10 @@ class Pawn:
         self.dir = self.dir % (2 * math.pi)
 
     def update(self, lasers, delta_time):
+        """
+        Called every update round: handles updates for lasers & pawn position / rotation.
+        """
+
         if self.health <= -100:
             self.health = self.max_health
 
@@ -231,6 +292,10 @@ class Pawn:
             self.pos[1] = -temp
 
     def colliding_with(self, laser):
+        """
+        Collision detection between the calling pawn & the given laser.
+        """
+
         lhp = laser.get_head_position()
 
         dist_squared = math.pow(

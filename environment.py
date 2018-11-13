@@ -14,33 +14,42 @@ class Environment(arcade.Window):
         self.pawns = pawns
         self.lasers = []
 
-    def setup(self):
-        # Set up your game here
-        pass
-
     def on_draw(self):
+        """
+        Called every cycle prior to update.
+        """
+
         arcade.start_render()
 
-        # Your drawing code goes here
         for pawn in self.pawns:
             pawn.draw_lasers()
             pawn.draw()
 
     def get_lasers(self, pawn):
-        # Get all lasers that are not owned by the given pawn.
+        """
+        @return Returns a list of all lasers that are not owned by the given pawn.
+        """
+
         lasers = []
 
         for lpawn in self.pawns:
             if lpawn != pawn:
                 for l in lpawn.get_lasers():
                     lasers.append(l)
-
         return lasers
 
     def kill_pawn(self, pawn):
+        """
+        Removes the given pawn from the players list, effectively killing it.
+        """
+
         self.pawns.remove(pawn)
 
     def update(self, delta_time):
+        """
+        Called every cycle prior to on_draw.
+        """
+
         for pawn in self.pawns:
             lasers = self.get_lasers(pawn)
             pawn.update(lasers, delta_time)
@@ -51,21 +60,37 @@ class Environment(arcade.Window):
                     self.kill_pawn(pawn)
 
     def on_key_press(self, symbol, modifiers):
+        """
+        Called when a key is pressed. Then passed to each pawn to check if it's in their control scheme.
+        """
+
         for pawn in self.pawns:
             pawn.press(symbol)
         return super().on_key_press(symbol, modifiers)
 
     def on_key_release(self, symbol, modifiers):
+        """
+        Called when a key is released. Then passed to each pawn to check if it's in their control scheme.
+        """
+
         for pawn in self.pawns:
             pawn.release(symbol)
         return super().on_key_release(symbol, modifiers)
 
 
 def default_player_pawn():
+    """
+    Generates a default player-controlled pawn with a default controller scheme.
+    """
+
     return pawn.Pawn(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2, (arcade.key.A, arcade.key.W, arcade.key.D, arcade.key.S), (arcade.key.LEFT, arcade.key.RIGHT), arcade.key.SPACE)
 
 
 def default_mindless_pawn():
+    """
+    Generates a stagnant, brainless pawn.
+    """
+
     out = pawn.Pawn(SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2)
     out.dir = math.pi
     return out
