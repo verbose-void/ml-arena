@@ -47,6 +47,7 @@ class LaserBeam:
     def update(self, delta_time):
         """
         Handles updating the laser's position & if it's out of range it will be delted.
+        @return Returns False if this laser should be deleted. (aka went off screen, landed a shot, or went out of range).
         """
 
         if self.killed != None or self.end_of_life:

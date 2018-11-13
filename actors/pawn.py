@@ -199,6 +199,7 @@ class Pawn:
     def update_lasers(self, delta_time):
         """
         Updates each individual laser this pawn is responsible for.
+        @return Returns a list of all pawns that were killed by lasers.
         """
 
         keep = []
