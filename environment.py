@@ -13,11 +13,27 @@ class Environment(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT)
         arcade.set_background_color(arcade.color.BLACK)
 
+        self.starting_data = dict()
+
         for pawn in pawns:
             pawn.set_env(self)
+            self.starting_data[pawn] = (pawn.get_pos(), pawn.get_dir())
 
         self.pawns = pawns
-        self.lasers = []
+        self.dead_pawns = []
+
+    def restart(self):
+        new_pawns = []
+
+        for pawn in self.dead_pawns:
+            new_pawns.append(pawn.reset())
+
+        self.dead_pawns.clear()
+
+        for pawn in self.pawns:
+            new_pawns.append(pawn.reset())
+
+        self.pawns = new_pawns
 
     def on_draw(self):
         """
@@ -63,11 +79,15 @@ class Environment(arcade.Window):
         """
 
         self.pawns.remove(pawn)
+        self.dead_pawns.append(pawn)
 
     def update(self, delta_time):
         """
         Called every cycle prior to on_draw.
         """
+
+        if len(self.pawns) <= 1:
+            self.restart()
 
         for pawn in self.pawns:
             lasers = self.get_lasers(pawn)
@@ -77,6 +97,7 @@ class Environment(arcade.Window):
             if len(pawns_killed) > 0:
                 for pawn in pawns_killed:
                     self.kill_pawn(pawn)
+                    print("Killed a pawn")
 
     def on_key_press(self, symbol, modifiers):
         """
@@ -102,7 +123,7 @@ def default_player_pawn():
     Generates a default player-controlled pawn with a default controller scheme.
     """
 
-    return pawn.Pawn(None, SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2, (arcade.key.A, arcade.key.W, arcade.key.D, arcade.key.S), (arcade.key.LEFT, arcade.key.RIGHT), arcade.key.SPACE)
+    return pawn.Pawn(None, SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2, 0, (arcade.key.A, arcade.key.W, arcade.key.D, arcade.key.S), (arcade.key.LEFT, arcade.key.RIGHT), arcade.key.SPACE)
 
 
 def default_mindless_pawn():
@@ -110,25 +131,24 @@ def default_mindless_pawn():
     Generates a stagnant, brainless pawn.
     """
 
-    out = pawn.Pawn(brain.Brain, SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2)
-    out.dir = math.pi
+    out = pawn.Pawn(brain.Brain, SCREEN_WIDTH *
+                    0.8, SCREEN_HEIGHT / 2, math.pi)
     return out
 
 
-def dynamic_scripting_pawn(x, y):
+def dynamic_scripting_pawn(x, y, rot=math.pi):
     """
     Generates a pawn with responses pre-programmed.
     """
 
-    #out = pawn.Pawn(dynamic_scripting_brain.DynamicBrain, x, y)
+    #out = pawn.Pawn(dynamic_scripting_brain.DynamicBrain, x, y, 1)
     out = long_range_pawn.LongRangePawn(
-        dynamic_scripting_brain.DynamicBrain, x, y)
-    out.dir = 1
+        dynamic_scripting_brain.DynamicBrain, x, y, rot)
     return out
 
 
 def dynamic_vs_dynamic_game():
-    env = Environment([dynamic_scripting_pawn(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2), dynamic_scripting_pawn(
+    env = Environment([dynamic_scripting_pawn(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2, 0), dynamic_scripting_pawn(
         SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2)])
     arcade.run()
 
@@ -139,6 +159,12 @@ def player_vs_dynamic_game():
     arcade.run()
 
 
+def player_vs_mindless():
+    env = Environment([default_player_pawn(), default_mindless_pawn()])
+    arcade.run()
+
+
 if __name__ == "__main__":
+    # player_vs_mindless()
     # player_vs_dynamic_game()
     dynamic_vs_dynamic_game()
