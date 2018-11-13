@@ -13,7 +13,7 @@ HALF_PI = math.pi / 2
 
 
 class Pawn:
-    def __init__(self, brain, x, y, mcontrols=None, dcontrols=None, acontrol=None):
+    def __init__(self, brain, x, y, direc=0, mcontrols=None, dcontrols=None, acontrol=None):
         """
         The default pawn type.
         @param brain The brain is the artificial controller for the pawn.
@@ -22,6 +22,8 @@ class Pawn:
         @param dcontrols A list of diretional movement controls containing arcade.keys for CLOCKWISE & COUNTER-CLOCKWISE respectively.
         @param mcontrols An arcade.key that controls the dispatching of lasers (the Pawn.attack(...) method).
         """
+
+        self.brain_constructor = brain
 
         if brain != None:
             self.brain = brain(self)
@@ -37,7 +39,7 @@ class Pawn:
         # Base-Stats
         self.speed = 120
         self.look_speed = 2
-        self.max_health = 800
+        self.max_health = 100
         self.laser_life = 600
         self.laser_damage = 10
         self.laser_speed = 700
@@ -45,8 +47,10 @@ class Pawn:
 
         # Meta initialization
         self.pos = [x, y]
+        self.start_pos = (x, y)
         self.vel = [0, 0]
-        self.dir = 0  # radians
+        self.dir = direc  # radians
+        self.starting_dir = direc
         self.health = -100
         self.rotation = None
         self.__last_laser__ = time.time()
@@ -58,6 +62,25 @@ class Pawn:
 
         self.lasers = []
         self.env = None
+
+    def reset(self):
+        """
+        Returns a new instance of the same pawn with it's starting values.
+        """
+
+        out = Pawn(
+            self.brain_constructor,
+            self.start_pos[0],
+            self.start_pos[1],
+            self.starting_dir,
+            self.mcontrols,
+            self.dcontrols,
+            self.acontrol
+        )
+
+        out.set_env(self.env)
+
+        return out
 
     def get_laser_life(self):
         """
@@ -351,7 +374,7 @@ class Pawn:
         for l in lasers:
             if self.colliding_with(l):
                 self.health -= l.get_damage()
-                if self.health <= 0.1:
+                if self.health <= 0:
                     l.kill(self)
                 else:
                     l.kill(None)

@@ -2,8 +2,8 @@ from actors import pawn
 
 
 class ShortRangePawn(pawn.Pawn):
-    def __init__(self, brain, x, y, mcontrols=None, dcontrols=None, acontrol=None):
-        super().__init__(brain, x, y, mcontrols, dcontrols, acontrol)
+    def __init__(self, brain, x, y, direc, mcontrols=None, dcontrols=None, acontrol=None):
+        super().__init__(brain, x, y, direc, mcontrols, dcontrols, acontrol)
 
         # Stat Modifiers
 
