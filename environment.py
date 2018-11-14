@@ -110,7 +110,6 @@ class Environment(arcade.Window):
 
         for pawn in self.pawns:
             pawn.press(symbol)
-        return super().on_key_press(symbol, modifiers)
 
     def on_key_release(self, symbol, modifiers):
         """
@@ -187,6 +186,6 @@ def player_vs_mindless():
 
 
 if __name__ == "__main__":
-    # player_vs_mindless()
+    player_vs_mindless()
     # player_vs_dynamic_game()
-    dynamic_vs_dynamic_game()
+    # dynamic_vs_dynamic_game()
