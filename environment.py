@@ -22,10 +22,18 @@ class Environment(arcade.Window):
         self.pawns = pawns
         self.dead_pawns = []
 
+        self.__death_anim_count__ = 100
+
     def restart(self):
         """
         Restarts to beginning game state.
         """
+
+        if self.__death_anim_count__ > 0:
+            self.__death_anim_count__ -= 1
+            return
+
+        self.__death_anim_count__ = 100
 
         new_pawns = []
 
@@ -48,6 +56,9 @@ class Environment(arcade.Window):
 
         for pawn in self.pawns:
             pawn.draw_lasers()
+            pawn.draw()
+
+        for pawn in self.dead_pawns:
             pawn.draw()
 
     def get_lasers(self, pawn):
@@ -101,7 +112,6 @@ class Environment(arcade.Window):
             if len(pawns_killed) > 0:
                 for pawn in pawns_killed:
                     self.kill_pawn(pawn)
-                    print("Killed a pawn")
 
     def on_key_press(self, symbol, modifiers):
         """
@@ -186,6 +196,6 @@ def player_vs_mindless():
 
 
 if __name__ == "__main__":
-    player_vs_mindless()
+    # player_vs_mindless()
     # player_vs_dynamic_game()
-    # dynamic_vs_dynamic_game()
+    dynamic_vs_dynamic_game()
