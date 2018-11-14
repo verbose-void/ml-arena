@@ -38,7 +38,10 @@ class DynamicBrain:
         else:
             # INVERSE MOVEMENT
             if random.random() > dist_sqrd / optimal_dist_sqrd:
-                pawn.attack()
+                if dist_sqrd <= math.pow(pawn.get_short_range_dist(), 2):
+                    pawn.attack("short")
+                else:
+                    pawn.attack("long")
 
             if round(time.time()) % 2 != 0:
                 e_vel = enemy.get_vel()
