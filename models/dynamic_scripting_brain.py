@@ -48,10 +48,8 @@ class DynamicBrain:
                 xv = random.randint(-1, 1)
                 yv = random.randint(-1, 1)
 
-                if xv == 0:
+                if xv == 0 and yv == 0:
                     xv = 1
-                if yv == 0:
-                    yv = -1
 
                 pawn.move(xv, yv)
 
