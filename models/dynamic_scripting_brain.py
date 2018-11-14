@@ -17,10 +17,24 @@ class DynamicBrain:
             pawn.look(None)
             return
 
-        self.look_towards(enemy.get_pos())
-
         optimal_dist_sqrd = math.pow(pawn.get_laser_life() * 0.85, 2)
         dist_sqrd = pawn.dist_squared(enemy.get_pos())
+
+        # Look towards their current position
+        # self.look_towards(enemy.get_pos())
+
+        attack_type = None
+        bias = 100
+
+        if dist_sqrd <= math.pow(pawn.get_short_range_dist(), 2):
+            attack_type = "short"
+            bias = 60
+        else:
+            attack_type = "long"
+
+        # Look towards their expected next position
+        self.look_towards(
+            self.get_best_aim_position(enemy, dist_sqrd, bias=bias))
 
         if dist_sqrd > optimal_dist_sqrd:
             # MOVE TOWARDS ENEMY
@@ -37,11 +51,8 @@ class DynamicBrain:
             pass
         else:
             # INVERSE MOVEMENT
-            if random.random() > dist_sqrd / optimal_dist_sqrd:
-                if dist_sqrd <= math.pow(pawn.get_short_range_dist(), 2):
-                    pawn.attack("short")
-                else:
-                    pawn.attack("long")
+            if random.random()*1.3 > dist_sqrd / optimal_dist_sqrd:
+                pawn.attack(attack_type)
 
             if round(time.time()) % 2 != 0:
                 e_vel = enemy.get_vel()
@@ -70,6 +81,22 @@ class DynamicBrain:
 
         return closest
 
+    def get_best_aim_position(self, pawn, dist_squared, bias=100):
+        """
+        @param dist_squared Squared distance from this pawn to the enemy.
+        @return Returns the best position to aim with the given params.
+        """
+
+        pos = pawn.get_pos()
+        vel = pawn.get_vel()
+        dist = math.sqrt(dist_squared)
+        scalar = dist/pawn.laser_speed*bias
+
+        return [
+            pos[0] + vel[0]*scalar,
+            pos[1] + vel[1]*scalar
+        ]
+
     def look_towards(self, pos):
         """
         Make the pawn look towards a given position.
@@ -89,9 +116,9 @@ class DynamicBrain:
 
         # d=(x−x1)(y2−y1)−(y−y1)(x2−x1)
         d = (pos[0]-A[0])*(B[1]-A[1])-(pos[1]-A[1])*(B[0]-A[0])
-        if d > 0:
+        if d > 0.5:
             pawn.look("left")
-        elif d < 0:
+        elif d < 0.5:
             pawn.look("right")
         else:
             pawn.look(None)
