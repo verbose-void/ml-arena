@@ -3,13 +3,13 @@ import arcade
 
 SPEED = 25
 LENGTH = 20
-WIDTH = 3
+WIDTH = 5
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 
 
 class LaserBeam:
-    def __init__(self, pos, direction, life_span, damage, speed):
+    def __init__(self, pos, direction, life_span, damage, speed, color):
         """
         Laser beam data structure.
         @param pos Starting position.
@@ -24,6 +24,7 @@ class LaserBeam:
         self.pos = pos
         self.damage = damage
         self.speed = speed
+        self.color = color
 
         self.life_span_squared = math.pow(life_span, 2)
         self.killed = None
@@ -85,7 +86,7 @@ class LaserBeam:
         hp = self.get_head_position()
 
         arcade.draw_line(self.pos[0], self.pos[1],
-                         hp[0], hp[1], arcade.color.RED, WIDTH)
+                         hp[0], hp[1], self.color, WIDTH)
 
     def get_dir(self):
         """

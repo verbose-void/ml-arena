@@ -13,7 +13,7 @@ HALF_PI = math.pi / 2
 
 
 class Pawn:
-    def __init__(self, brain, x, y, direc=0, mcontrols=None, dcontrols=None, acontrol=None):
+    def __init__(self, brain, x, y, direc=0, mcontrols=None, dcontrols=None, acontrols=None):
         """
         The default pawn type.
         @param brain The brain is the artificial controller for the pawn.
@@ -39,11 +39,13 @@ class Pawn:
         # Base-Stats
         self.speed = 120
         self.look_speed = 2
-        self.max_health = 100
+        self.max_health = 500
         self.laser_life = 600
         self.laser_damage = 10
         self.laser_speed = 700
         self.laser_cooldown = 0.1  # measured in seconds
+        self.shield_count = 5  # amount of shield uses
+        self.shield_durability = 5  # amount of hits the shield can take
 
         # Meta initialization
         self.pos = [x, y]
@@ -53,13 +55,17 @@ class Pawn:
         self.starting_dir = direc
         self.health = -100
         self.rotation = None
+
         self.__last_laser__ = time.time()
+        self.__shield_on__ = False
+        self.__shield_dura__ = self.shield_durability
 
         # Manual control override initialization
         self.mcontrols = mcontrols
         self.dcontrols = dcontrols
-        self.acontrol = acontrol
+        self.acontrols = acontrols
 
+        self.last_shot = None
         self.lasers = []
         self.env = None
 
@@ -75,7 +81,7 @@ class Pawn:
             self.starting_dir,
             self.mcontrols,
             self.dcontrols,
-            self.acontrol
+            self.acontrols
         )
 
         out.set_env(self.env)
@@ -88,6 +94,13 @@ class Pawn:
         """
 
         return self.laser_life
+
+    def use_shield(self):
+        if self.shield_count <= 0:
+            return
+
+        self.__shield_on__ = True
+        self.shield_count -= 1
 
     def get_dir(self):
         """
@@ -151,9 +164,20 @@ class Pawn:
     def laser_on_cooldown(self):
         """
         Checks weather laser usage is on cooldown according to the 'laser_cooldown' field variable.
+
+        If the last shot was a long shot, cooldown is twice the time.
+        Otherwise, if shot was a short shot, cooldown is half the time.
         """
 
-        return self.__last_laser__ + self.laser_cooldown >= time.time()
+        if self.last_shot == None:
+            return self.__last_laser__ + 1 >= time.time()
+
+        cool = self.laser_cooldown
+
+        if self.last_shot == "long":
+            cool = self.laser_cooldown * 4
+
+        return self.__last_laser__ + cool >= time.time()
 
     def get_lasers(self):
         """
@@ -200,9 +224,14 @@ class Pawn:
         Sizing is relative to the radius field variable.
         """
 
+        color = arcade.color.WHITE
+
+        if self.__shield_on__:
+            color = arcade.color.BLUE
+
         # Draw body circle
         arcade.draw_circle_filled(
-            self.pos[0], self.pos[1], self.mod_radius, arcade.color.WHITE)
+            self.pos[0], self.pos[1], self.mod_radius, color)
 
         # Get triangle verticies relative to the rotation stored in the field variable 'direction'.
         facing = (math.cos(self.dir) * self.radius,
@@ -222,7 +251,7 @@ class Pawn:
                                     leftLeg[0], self.pos[1]+leftLeg[1],
                                     self.pos[0] +
                                     rightLeg[0], self.pos[1]+rightLeg[1],
-                                    arcade.color.WHITE)
+                                    color)
 
         self.draw_health_bar()
 
@@ -232,9 +261,17 @@ class Pawn:
         in the manual control overrides.
         """
 
-        if self.acontrol != None:
-            if key == self.acontrol:
-                self.attack()
+        if self.acontrols != None:
+            if key in self.acontrols:
+                i = self.acontrols.index(key)
+
+                if i == 0:
+                    self.attack("long")
+                elif i == 1:
+                    self.attack("short")
+                elif i == 2:
+                    self.use_shield()
+
                 return
 
         if self.mcontrols == None:
@@ -268,19 +305,76 @@ class Pawn:
             elif i == 1:
                 self.rotation = "right"
 
-    def attack(self):
+    def get_long_range_dist(self):
+        """
+        Returns how far a long distance attack will travel.
+        """
+
+        return self.laser_life*2
+
+    def get_short_range_dist(self):
+        """
+        Returns how far a short distance attack will travel.
+        """
+
+        return self.laser_life*0.4
+
+    def has_active_shield(self):
+        """
+        @return Returns wether this pawn has it's shield active.
+        """
+
+        return self.__shield_on__
+
+    def get_shield_count(self):
+        """
+        @return Returns how many shields this pawn has.
+        """
+
+        return self.shield_count
+
+    def take_damage(self, amount):
+        """
+        Inflicts damage on this pawn.
+        """
+
+        hit = True
+
+        if self.__shield_dura__ <= 0:
+            self.__shield_on__ = False
+            self.__shield_dura__ = self.shield_durability
+        else:
+            self.__shield_dura__ -= 1
+            hit = False
+
+        if hit:
+            self.health -= amount
+
+    def attack(self, t="long"):
         """
         Checks if the pawn is on laser cooldown, if not it dispatches a laser from the origin of the
         graphical representation.
+        @param type Type of attack. Accepts 'long' & 'short'.
         """
 
         if self.laser_on_cooldown():
             return
 
-        self.lasers.append(laser_beam.LaserBeam(
-            [self.pos[0], self.pos[1]], self.dir, self.laser_life, self.laser_damage, self.laser_speed))
+        laser = None
+
+        if t == "long":
+            laser = laser_beam.LaserBeam(
+                [self.pos[0], self.pos[1]],
+                self.dir, self.get_long_range_dist(), self.laser_damage*2, self.laser_speed, arcade.color.RED)
+        elif t == "short":
+            laser = laser_beam.LaserBeam(
+                [self.pos[0], self.pos[1]],
+                self.dir, self.get_short_range_dist(), self.laser_damage*0.8, self.laser_speed*0.6, arcade.color.BLUE)
+
+        self.lasers.append(laser)
 
         self.__last_laser__ = time.time()
+        self.last_shot = t
 
     def draw_lasers(self):
         """
@@ -373,7 +467,7 @@ class Pawn:
         # Check for laser collisions
         for l in lasers:
             if self.colliding_with(l):
-                self.health -= l.get_damage()
+                self.take_damage(l.get_damage())
                 if self.health <= 0:
                     l.kill(self)
                 else:
@@ -407,4 +501,9 @@ class Pawn:
         return self.dist_squared(lhp) < self.radius_squared
 
     def dist_squared(self, pos):
+        """
+        @param pos Tuple or array of the pos in the form [x,y].
+        @return Returns the distance squared from this pawn to the given pos.
+        """
+
         return math.pow(self.pos[0]-pos[0], 2) + math.pow(self.pos[1]-pos[1], 2)

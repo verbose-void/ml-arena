@@ -1,7 +1,7 @@
 import arcade
 import sys
 import math
-from actors import pawn, short_range_pawn, long_range_pawn
+from actors import pawn
 from models import brain, dynamic_scripting_brain
 
 SCREEN_WIDTH = 1000
@@ -123,7 +123,13 @@ def default_player_pawn():
     Generates a default player-controlled pawn with a default controller scheme.
     """
 
-    return pawn.Pawn(None, SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2, 0, (arcade.key.A, arcade.key.W, arcade.key.D, arcade.key.S), (arcade.key.LEFT, arcade.key.RIGHT), arcade.key.SPACE)
+    return pawn.Pawn(None, SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2, 0,
+                     # Movement
+                     (arcade.key.A, arcade.key.W, arcade.key.D, arcade.key.S),
+                     # Directional
+                     (arcade.key.LEFT, arcade.key.RIGHT),
+                     # Attacks & Shield
+                     (arcade.key.LSHIFT, arcade.key.SPACE, arcade.key.Q))
 
 
 def default_mindless_pawn():
@@ -142,7 +148,7 @@ def dynamic_scripting_pawn(x, y, rot=math.pi):
     """
 
     #out = pawn.Pawn(dynamic_scripting_brain.DynamicBrain, x, y, 1)
-    out = long_range_pawn.LongRangePawn(
+    out = pawn.Pawn(
         dynamic_scripting_brain.DynamicBrain, x, y, rot)
     return out
 
@@ -166,5 +172,5 @@ def player_vs_mindless():
 
 if __name__ == "__main__":
     # player_vs_mindless()
-    # player_vs_dynamic_game()
-    dynamic_vs_dynamic_game()
+    player_vs_dynamic_game()
+    # dynamic_vs_dynamic_game()
