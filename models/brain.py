@@ -8,7 +8,7 @@ class Brain:
     def __init__(self, pawn):
         self.pawn = pawn
 
-    def on_tick(self):
+    def on_tick(self, dt):
         """
         This method will be called every time the game loop calls update. Should encapsulate all brain logic.
         """
