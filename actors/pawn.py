@@ -96,6 +96,10 @@ class Pawn:
         return self.laser_life
 
     def use_shield(self):
+        """
+        Attempt to activate shield for this pawn.
+        """
+
         if self.shield_count <= 0:
             return
 
