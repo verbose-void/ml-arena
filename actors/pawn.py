@@ -11,7 +11,7 @@ HEALTH_BAR_MAX_WIDTH = 60
 
 HALF_PI = math.pi / 2
 
-RAY_TRACES = True
+RAY_TRACES = False
 
 
 class Pawn:
@@ -41,7 +41,7 @@ class Pawn:
         # Base-Stats
         self.speed = 120
         self.look_speed = 2
-        self.max_health = 500
+        self.max_health = 70
         self.laser_life = 600
         self.laser_damage = 10
         self.laser_speed = 700
@@ -207,6 +207,9 @@ class Pawn:
         Height above it's body is set in the global variable 'HEALTH_BAR_HEIGHT'.
         """
 
+        if self.health <= 0:
+            return
+
         x = self.pos[0] - HEALTH_BAR_MAX_WIDTH / 2
         y = self.pos[1] + self.mod_radius + HEALTH_BAR_HEIGHT
 
@@ -234,6 +237,8 @@ class Pawn:
 
         if self.__shield_on__:
             color = arcade.color.BLUE
+        elif self.health <= 0:
+            color = arcade.color.RED
 
         # Get triangle verticies relative to the rotation stored in the field variable 'direction'.
         facing = (math.cos(self.dir) * self.radius,
@@ -470,7 +475,7 @@ class Pawn:
 
         # Artifical controller decision making process if a brain is contained.
         if self.brain != None:
-            self.brain.on_tick()
+            self.brain.on_tick(delta_time)
 
         if self.health <= -100:
             self.health = self.max_health
@@ -511,10 +516,13 @@ class Pawn:
 
         return self.dist_squared(lhp) < self.radius_squared
 
-    def dist_squared(self, pos):
+    def dist_squared(self, pos, compare_pos=None):
         """
         @param pos Tuple or array of the pos in the form [x,y].
         @return Returns the distance squared from this pawn to the given pos.
         """
 
-        return math.pow(self.pos[0]-pos[0], 2) + math.pow(self.pos[1]-pos[1], 2)
+        if compare_pos == None:
+            compare_pos = self.pos
+
+        return math.pow(compare_pos[0]-pos[0], 2) + math.pow(compare_pos[1]-pos[1], 2)
