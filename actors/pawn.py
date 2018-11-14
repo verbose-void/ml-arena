@@ -11,6 +11,8 @@ HEALTH_BAR_MAX_WIDTH = 60
 
 HALF_PI = math.pi / 2
 
+RAY_TRACES = True
+
 
 class Pawn:
     def __init__(self, brain, x, y, direc=0, mcontrols=None, dcontrols=None, acontrols=None):
@@ -233,10 +235,6 @@ class Pawn:
         if self.__shield_on__:
             color = arcade.color.BLUE
 
-        # Draw body circle
-        arcade.draw_circle_filled(
-            self.pos[0], self.pos[1], self.mod_radius, color)
-
         # Get triangle verticies relative to the rotation stored in the field variable 'direction'.
         facing = (math.cos(self.dir) * self.radius,
                   math.sin(self.dir) * self.radius)
@@ -248,6 +246,15 @@ class Pawn:
         temp = self.dir-HALF_PI
         rightLeg = (math.cos(temp) * self.minor_radius,
                     math.sin(temp) * self.minor_radius)
+
+        # Draw Ray Traces (Debugging)
+        if RAY_TRACES:
+            arcade.draw_line(self.pos[0], self.pos[1], facing[0]
+                             * 1000, facing[1] * 1000, arcade.color.RED_DEVIL, 3)
+
+        # Draw body circle
+        arcade.draw_circle_filled(
+            self.pos[0], self.pos[1], self.mod_radius, color)
 
         # Draw triangle according to the determined verticies.
         arcade.draw_triangle_filled(self.pos[0]+facing[0], self.pos[1]+facing[1],
