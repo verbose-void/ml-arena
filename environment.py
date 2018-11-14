@@ -23,6 +23,10 @@ class Environment(arcade.Window):
         self.dead_pawns = []
 
     def restart(self):
+        """
+        Restarts to beginning game state.
+        """
+
         new_pawns = []
 
         for pawn in self.dead_pawns:
@@ -154,23 +158,35 @@ def dynamic_scripting_pawn(x, y, rot=math.pi):
 
 
 def dynamic_vs_dynamic_game():
+    """
+    Creates and runs a Dynamic Brain vs another Dynamic Brain game.
+    """
+
     env = Environment([dynamic_scripting_pawn(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2, 0), dynamic_scripting_pawn(
         SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2)])
     arcade.run()
 
 
 def player_vs_dynamic_game():
+    """
+    Creates and runs a Player vs Dynamic Brain game.
+    """
+
     env = Environment([default_player_pawn(), dynamic_scripting_pawn(
         SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2)])
     arcade.run()
 
 
 def player_vs_mindless():
+    """
+    Creates and runs a Player vs Stagnant Pawn game.
+    """
+
     env = Environment([default_player_pawn(), default_mindless_pawn()])
     arcade.run()
 
 
 if __name__ == "__main__":
     # player_vs_mindless()
-    player_vs_dynamic_game()
-    # dynamic_vs_dynamic_game()
+    # player_vs_dynamic_game()
+    dynamic_vs_dynamic_game()
