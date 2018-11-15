@@ -1,5 +1,6 @@
 import math
 import arcade
+import numpy as np
 
 SPEED = 25
 LENGTH = 20
@@ -101,6 +102,36 @@ class LaserBeam:
         """
 
         return self.speed
+
+    def is_in_path(self, C, r):
+        """
+        This method checks to see if the given center with radius is in the path of
+        this laser.
+        """
+
+        E = [self.pos[0], self.pos[1]]
+        L = [
+            E[0] + math.cos(self.dir) * SCREEN_WIDTH,
+            E[1] + math.sin(self.dir) * SCREEN_HEIGHT,
+        ]
+
+        d = np.subtract(L, E)
+        f = np.subtract(E, C)
+
+        a = np.dot(d, d)
+        b = 2*np.dot(f, d)
+        c = np.dot(f, f) - r*r
+
+        discriminant = b*b-4*a*c
+
+        return discriminant >= 0
+
+    def get_vec(self):
+        """
+        Returns the vector of dir
+        """
+
+        return (math.cos(self.dir), math.sin(self.dir))
 
     def get_head_position(self):
         """
