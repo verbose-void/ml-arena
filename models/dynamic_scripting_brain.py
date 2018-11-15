@@ -8,7 +8,7 @@ class DynamicBrain:
     def __init__(self, pawn):
         self.pawn = pawn
 
-    def on_tick(self):
+    def on_tick(self, dt):
         pawn = self.pawn
         enemy = self.get_closest_enemy()
 
@@ -28,7 +28,7 @@ class DynamicBrain:
 
         if dist_sqrd <= math.pow(pawn.get_short_range_dist(), 2):
             attack_type = "short"
-            bias = 60
+            bias = 200
         else:
             attack_type = "long"
 
@@ -50,7 +50,7 @@ class DynamicBrain:
             pawn.move(vec[0], vec[1])
             pass
         else:
-            # INVERSE MOVEMENT
+            # # INVERSE MOVEMENT
             if random.random()*1.3 > dist_sqrd / optimal_dist_sqrd:
                 pawn.attack(attack_type)
 
@@ -63,6 +63,9 @@ class DynamicBrain:
                     xv = 1
 
                 pawn.move(xv, yv)
+
+            # m = self.get_best_move()
+            # pawn.move(m[0], m[1])
 
     def get_closest_enemy(self):
         """
@@ -80,6 +83,26 @@ class DynamicBrain:
                 closest = enemy
 
         return closest
+
+    def get_best_move(self):
+        """
+        Analyzes all enemy laser paths and chooses the path of least resistance.
+
+        Does NOT take into consideration delta time, because it is calculating the best
+        future reward, not necessarily immediately following the current frame.
+        """
+
+        pass
+
+    def dist_sqd_from_hit(self, laser, center, radius):
+        """
+        Returns how far the given laser is from hitting a circle with the given
+        center & radius.
+
+        Returns -1 if the circle is not on the laser's path.
+        """
+
+        pass
 
     def get_best_aim_position(self, pawn, dist_squared, bias=100):
         """
