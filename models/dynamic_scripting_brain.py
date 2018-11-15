@@ -47,11 +47,10 @@ class DynamicBrain:
                 -pos[1]+e_pos[1]
             ]
 
-            # pawn.move(vec[0], vec[1])
+            pawn.move(vec[0], vec[1])
         else:
-            if random.random()*1.3 > dist_sqrd / optimal_dist_sqrd:
-                pawn.attack(attack_type)
-
+            pawn.attack(attack_type)
+            self.move_to_expected_best()
             # # Random movements to simulate "strafing"
             # if round(time.time()) % 2 != 0:
             #     e_vel = enemy.get_vel()
@@ -65,8 +64,6 @@ class DynamicBrain:
 
             # m = self.get_best_move()
             # pawn.move(m[0], m[1])
-
-        self.move_to_expected_best()
 
     def get_closest_enemy(self):
         """
