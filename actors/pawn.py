@@ -61,6 +61,8 @@ class Pawn:
         self.__last_laser__ = time.time()
         self.__shield_on__ = False
         self.__shield_dura__ = self.shield_durability
+        self.__long_held__ = False
+        self.__short_held__ = False
 
         # Manual control override initialization
         self.mcontrols = mcontrols
@@ -282,9 +284,9 @@ class Pawn:
                 i = self.acontrols.index(key)
 
                 if i == 0:
-                    self.attack("long")
+                    self.__long_held__ = True
                 elif i == 1:
-                    self.attack("short")
+                    self.__short_held__ = True
                 elif i == 2:
                     self.use_shield()
 
@@ -424,6 +426,19 @@ class Pawn:
         by the manual control overrides.
         """
 
+        if self.acontrols != None:
+            if key in self.acontrols:
+                i = self.acontrols.index(key)
+
+                if i == 0:
+                    self.__long_held__ = False
+                elif i == 1:
+                    self.__short_held__ = False
+                elif i == 2:
+                    self.use_shield()
+
+                return
+
         if self.mcontrols == None:
             return
 
@@ -472,6 +487,11 @@ class Pawn:
         """
         Called every update round: handles updates for lasers & pawn position / rotation.
         """
+
+        if self.__short_held__:
+            self.attack("short")
+        elif self.__long_held__:
+            self.attack("long")
 
         # Artifical controller decision making process if a brain is contained.
         if self.brain != None:
