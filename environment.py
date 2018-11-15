@@ -1,6 +1,7 @@
 import arcade
 import sys
 import math
+import random
 from actors import pawn
 from models import brain, dynamic_scripting_brain
 
@@ -93,8 +94,9 @@ class Environment(arcade.Window):
         Removes the given pawn from the players list, effectively killing it.
         """
 
-        self.pawns.remove(pawn)
-        self.dead_pawns.append(pawn)
+        if pawn in self.pawns:
+            self.pawns.remove(pawn)
+            self.dead_pawns.append(pawn)
 
     def update(self, delta_time):
         """
@@ -160,7 +162,7 @@ def dynamic_scripting_pawn(x, y, rot=math.pi):
     Generates a pawn with responses pre-programmed.
     """
 
-    #out = pawn.Pawn(dynamic_scripting_brain.DynamicBrain, x, y, 1)
+    # out = pawn.Pawn(dynamic_scripting_brain.DynamicBrain, x, y, 1)
     out = pawn.Pawn(
         dynamic_scripting_brain.DynamicBrain, x, y, rot)
     return out
@@ -195,7 +197,23 @@ def player_vs_mindless():
     arcade.run()
 
 
+def dynamic_royale(amount):
+    pawns = []
+    for i in range(amount):
+        pawns.append(dynamic_scripting_pawn(
+            random.randint(100, SCREEN_WIDTH - 100),
+            random.randint(100, SCREEN_HEIGHT - 100)))
+    env = Environment(pawns)
+    arcade.run()
+    return env
+
+
 if __name__ == "__main__":
     # player_vs_mindless()
     # player_vs_dynamic_game()
-    dynamic_vs_dynamic_game()
+    # dynamic_vs_dynamic_game()
+    # env = Environment([default_player_pawn(), dynamic_scripting_pawn(
+    #     SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2), dynamic_scripting_pawn(
+    #     SCREEN_WIDTH * 0.5, SCREEN_HEIGHT / 2)])
+    # arcade.run()
+    dynamic_royale(50)
