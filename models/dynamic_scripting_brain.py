@@ -47,25 +47,26 @@ class DynamicBrain:
                 -pos[1]+e_pos[1]
             ]
 
-            pawn.move(vec[0], vec[1])
-            pass
+            # pawn.move(vec[0], vec[1])
         else:
-            # # INVERSE MOVEMENT
             if random.random()*1.3 > dist_sqrd / optimal_dist_sqrd:
                 pawn.attack(attack_type)
 
-            if round(time.time()) % 2 != 0:
-                e_vel = enemy.get_vel()
-                xv = random.randint(-1, 1)
-                yv = random.randint(-1, 1)
+            # # Random movements to simulate "strafing"
+            # if round(time.time()) % 2 != 0:
+            #     e_vel = enemy.get_vel()
+            #     xv = random.randint(-1, 1)
+            #     yv = random.randint(-1, 1)
 
-                if xv == 0 and yv == 0:
-                    xv = 1
+            #     if xv == 0 and yv == 0:
+            #         xv = 1
 
-                pawn.move(xv, yv)
+            #     pawn.move(xv, yv)
 
             # m = self.get_best_move()
             # pawn.move(m[0], m[1])
+
+        self.move_to_expected_best()
 
     def get_closest_enemy(self):
         """
@@ -84,7 +85,7 @@ class DynamicBrain:
 
         return closest
 
-    def get_best_move(self):
+    def move_to_expected_best(self):
         """
         Analyzes all enemy laser paths and chooses the path of least resistance.
 
@@ -92,17 +93,29 @@ class DynamicBrain:
         future reward, not necessarily immediately following the current frame.
         """
 
-        pass
+        pawn = self.pawn
+        lasers = pawn.env.get_lasers(pawn)  # All enemy lasers
 
-    def dist_sqd_from_hit(self, laser, center, radius):
-        """
-        Returns how far the given laser is from hitting a circle with the given
-        center & radius.
+        possible = []
 
-        Returns -1 if the circle is not on the laser's path.
-        """
+        # Loop through every possible move
+        for i in range(-1, 1):
+            for j in range(-1, 1):
 
-        pass
+                # Loop through every laser and get if it's heading towards
+                # the current testing position
+
+                for laser in lasers:
+                    on_route = laser.is_in_path(
+                        (pawn.pos[0] + i * pawn.radius*2, pawn.pos[1] + j * pawn.radius*2), pawn.radius)
+                    if not on_route:
+                        possible.append((i, j))
+
+        if len(possible) > 0:
+            c = random.choice(possible)
+        else:
+            c = (random.randint(-1, 1), random.randint(-1, 1))
+        pawn.move(c[0], c[1])
 
     def get_best_aim_position(self, pawn, dist_squared, bias=100):
         """
