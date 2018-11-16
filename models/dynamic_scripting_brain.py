@@ -8,6 +8,20 @@ class DynamicBrain:
     def __init__(self, pawn):
         self.pawn = pawn
 
+        # Define shield usage strategy
+        shield_strats = [
+            # Shields are used throughout the game in a spread out manner.
+            "spread",
+            # Shields are used when the pawn is low health as a "panic" action.
+            "panic"
+        ]
+
+        # Initialize shield strategy at random.
+        self.shield_strat = random.choice(shield_strats)
+
+        print("Dynamic Brain initialized with a " +
+              self.shield_strat + " shield strategy.")
+
     def on_tick(self, dt):
         pawn = self.pawn
         enemy = self.get_closest_enemy()
@@ -16,6 +30,15 @@ class DynamicBrain:
             pawn.move(0, 0)
             pawn.look(None)
             return
+
+        if self.shield_strat == "spread":
+            if pawn.health < pawn.max_health / pawn.max_shield_count * pawn.shield_count:
+                # Use shields periodically throughout gameplay.
+                pawn.use_shield()
+        elif self.shield_strat == "panic":
+            if pawn.health < pawn.laser_damage * 1.5:
+                # Use shields when health is critical.
+                pawn.use_shield()
 
         optimal_dist_sqrd = math.pow(pawn.get_laser_life() * 0.85, 2)
         dist_sqrd = pawn.dist_squared(enemy.get_pos())
@@ -123,8 +146,6 @@ class DynamicBrain:
 
         if len(possible) > 0:
             if has_to_move:
-                print("Have to move, changing directions @ " + str(time.time()))
-
                 if best_move != None:
                     pawn.move(best_move[0], best_move[1])
                 else:
