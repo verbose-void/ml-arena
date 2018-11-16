@@ -126,7 +126,6 @@ class DynamicBrain:
         best_move = None
         max_dist = float("-inf")
 
-        count = 0
         # Loop through every possible move
         for i in range(-1, 2):
             for j in range(-1, 2):
@@ -136,9 +135,6 @@ class DynamicBrain:
 
                 dx = pawn.pos[0] + i * pawn.radius
                 dy = pawn.pos[1] + j * pawn.radius
-
-                count += 1
-                print(str(count) + " " + str((i, j)))
 
                 # Draw each path of testing for debugging
 
