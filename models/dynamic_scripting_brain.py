@@ -126,16 +126,28 @@ class DynamicBrain:
         best_move = None
         max_dist = float("-inf")
 
+        count = 0
         # Loop through every possible move
-        for i in range(-1, 1):
-            for j in range(-1, 1):
+        for i in range(-1, 2):
+            for j in range(-1, 2):
 
                 # Loop through every laser and get if it's heading towards
                 # the current testing position
 
+                dx = pawn.pos[0] + i * pawn.radius
+                dy = pawn.pos[1] + j * pawn.radius
+
+                count += 1
+                print(str(count) + " " + str((i, j)))
+
+                # Draw each path of testing for debugging
+
+                # arcade.draw_line(
+                # pawn.pos[0], pawn.pos[1], dx, dy, arcade.color.WHITE, 2)
+
                 for laser in lasers:
-                    dist = laser.get_dist_if_in_path(
-                        (pawn.pos[0] + i * pawn.radius, pawn.pos[1] + j * pawn.radius), pawn.radius)
+
+                    dist = laser.get_dist_if_in_path((dx, dy), pawn.radius)
                     if dist <= -1:
                         possible.append((i, j))
                     else:
@@ -143,6 +155,8 @@ class DynamicBrain:
                         if max_dist < dist:
                             best_move = (i, j)
                             max_dist = dist
+
+        arcade.finish_render()
 
         if len(possible) > 0:
             if has_to_move:
