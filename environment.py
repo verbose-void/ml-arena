@@ -24,6 +24,7 @@ class Environment(arcade.Window):
         self.dead_pawns = []
 
         self.__death_anim_count__ = 100
+        self.__frame_count__ = 0
 
     def restart(self):
         """
@@ -35,6 +36,7 @@ class Environment(arcade.Window):
             return
 
         self.__death_anim_count__ = 100
+        self.__frame_count__ = 0
 
         new_pawns = []
 
@@ -102,6 +104,7 @@ class Environment(arcade.Window):
         """
         Called every cycle prior to on_draw.
         """
+        self.__frame_count__ += 1
 
         if len(self.pawns) <= 1:
             self.restart()
@@ -210,10 +213,6 @@ def dynamic_royale(amount):
 
 if __name__ == "__main__":
     # player_vs_mindless()
-    # player_vs_dynamic_game()
+    player_vs_dynamic_game()
     # dynamic_vs_dynamic_game()
-    # env = Environment([default_player_pawn(), dynamic_scripting_pawn(
-    #     SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2), dynamic_scripting_pawn(
-    #     SCREEN_WIDTH * 0.5, SCREEN_HEIGHT / 2)])
-    # arcade.run()
-    dynamic_royale(50)
+    # dynamic_royale(50)
