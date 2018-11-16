@@ -103,13 +103,16 @@ class LaserBeam:
 
         return self.speed
 
-    def is_in_path(self, C, r):
+    def get_dist_if_in_path(self, C, r):
         """
-        This method checks to see if the given center with radius is in the path of
-        this laser.
+        This method takes in the center & radius of a circle, and determines weather it's in
+        this lasers path, and if so returns the distance squared.
+
+        @returns Returns -1 if not in path, otherwise distance squared from the circle radius
+        point to the laser head.
         """
 
-        E = [self.pos[0], self.pos[1]]
+        E = self.get_head_position()
         L = [
             E[0] + math.cos(self.dir) * SCREEN_WIDTH,
             E[1] + math.sin(self.dir) * SCREEN_HEIGHT,
@@ -124,7 +127,12 @@ class LaserBeam:
 
         discriminant = b*b-4*a*c
 
-        return discriminant >= 0
+        if discriminant >= 0:
+            # If this laser is on track to collide, return
+            # distance squared.
+            return (E[0]-C[0])**2 + (E[1]-C[0])**2
+
+        return -1
 
     def get_vec(self):
         """
