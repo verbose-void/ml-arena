@@ -3,6 +3,8 @@ import math
 import arcade
 import random
 
+DEBUG = False
+
 
 class DynamicBrain:
     def __init__(self, pawn):
@@ -133,13 +135,13 @@ class DynamicBrain:
                 # Loop through every laser and get if it's heading towards
                 # the current testing position
 
-                dx = pawn.pos[0] + i * pawn.radius
-                dy = pawn.pos[1] + j * pawn.radius
+                dx = pawn.pos[0] + i * pawn.radius * 1.5
+                dy = pawn.pos[1] + j * pawn.radius * 1.5
 
-                # Draw each path of testing for debugging
-
-                # arcade.draw_line(
-                # pawn.pos[0], pawn.pos[1], dx, dy, arcade.color.WHITE, 2)
+                if DEBUG:
+                    # Draw each path of testing for debugging
+                    arcade.draw_line(
+                        pawn.pos[0], pawn.pos[1], dx, dy, arcade.color.WHITE, 2)
 
                 for laser in lasers:
 
@@ -151,6 +153,9 @@ class DynamicBrain:
                         if max_dist < dist:
                             best_move = (i, j)
                             max_dist = dist
+
+        if DEBUG:
+            arcade.finish_render()
 
         if len(possible) > 0:
             if has_to_move:
