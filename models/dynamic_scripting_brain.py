@@ -50,7 +50,9 @@ class DynamicBrain:
             pawn.move(vec[0], vec[1])
         else:
             pawn.attack(attack_type)
-            self.move_to_expected_best()
+
+            if pawn.env.__frame_count__ % 15 == 0:
+                self.move_to_expected_best()
             # # Random movements to simulate "strafing"
             # if round(time.time()) % 2 != 0:
             #     e_vel = enemy.get_vel()
@@ -93,7 +95,13 @@ class DynamicBrain:
         pawn = self.pawn
         lasers = pawn.env.get_lasers(pawn)  # All enemy lasers
 
+        has_to_move = False
         possible = []
+
+        # These help when the pawn has no place to go
+        # that is completely safe.
+        best_move = None
+        max_dist = float("-inf")
 
         # Loop through every possible move
         for i in range(-1, 1):
@@ -103,16 +111,29 @@ class DynamicBrain:
                 # the current testing position
 
                 for laser in lasers:
-                    on_route = laser.is_in_path(
-                        (pawn.pos[0] + i * pawn.radius*2, pawn.pos[1] + j * pawn.radius*2), pawn.radius)
-                    if not on_route:
+                    dist = laser.get_dist_if_in_path(
+                        (pawn.pos[0] + i * pawn.radius, pawn.pos[1] + j * pawn.radius), pawn.radius)
+                    if dist <= -1:
                         possible.append((i, j))
+                    else:
+                        has_to_move = True
+                        if max_dist < dist:
+                            best_move = (i, j)
+                            max_dist = dist
 
         if len(possible) > 0:
-            c = random.choice(possible)
-        else:
-            c = (random.randint(-1, 1), random.randint(-1, 1))
-        pawn.move(c[0], c[1])
+            if has_to_move:
+                print("Have to move, changing directions @ " + str(time.time()))
+
+                if best_move != None:
+                    pawn.move(best_move[0], best_move[1])
+                else:
+                    c = random.choice(possible)
+                    pawn.move(c[0], c[1])
+        # else:
+        #     c = (random.randint(-1, 1), random.randint(-1, 1))
+
+        # if has_to_move:
 
     def get_best_aim_position(self, pawn, dist_squared, bias=100):
         """
