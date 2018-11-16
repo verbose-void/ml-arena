@@ -41,7 +41,7 @@ class Pawn:
         # Base-Stats
         self.speed = 120
         self.look_speed = 2
-        self.max_health = 120
+        self.max_health = 200
         self.laser_life = 600
         self.laser_damage = 10
         self.laser_speed = 700
@@ -356,21 +356,23 @@ class Pawn:
         """
         Inflicts damage on this pawn.
         """
-
+        print("1" + str(self.health))
         hit = True
 
-        if self.__shield_dura__ <= 0:
+        if self.__shield_dura__ <= 0 and self.__shield_on__:
             self.__shield_on__ = False
             self.__shield_dura__ = self.shield_durability
 
             # Shield de-activates before damage can be taken
             return
-        else:
+        elif self.__shield_on__:
             self.__shield_dura__ -= 1
             hit = False
 
         if hit:
             self.health -= amount
+
+        print(self.health)
 
     def attack(self, t="long"):
         """
