@@ -43,6 +43,9 @@ class DynamicBrain:
         optimal_dist_sqrd = math.pow(pawn.get_laser_life() * 0.85, 2)
         dist_sqrd = pawn.dist_squared(enemy.get_pos())
 
+        if pawn.env.__frame_count__ % 10 == 0:
+            self.move_to_expected_best()
+
         # Look towards their current position
         # self.look_towards(enemy.get_pos())
 
@@ -73,9 +76,6 @@ class DynamicBrain:
             pawn.move(vec[0], vec[1])
         else:
             pawn.attack(attack_type)
-
-            if pawn.env.__frame_count__ % 15 == 0:
-                self.move_to_expected_best()
             # # Random movements to simulate "strafing"
             # if round(time.time()) % 2 != 0:
             #     e_vel = enemy.get_vel()
