@@ -41,12 +41,13 @@ class Pawn:
         # Base-Stats
         self.speed = 120
         self.look_speed = 2
-        self.max_health = 70
+        self.max_health = 120
         self.laser_life = 600
         self.laser_damage = 10
         self.laser_speed = 700
         self.laser_cooldown = 0.1  # measured in seconds
-        self.shield_count = 5  # amount of shield uses
+        self.max_shield_count = 5
+        self.shield_count = self.max_shield_count  # amount of shield uses
         self.shield_durability = 5  # amount of hits the shield can take
 
         # Meta initialization
@@ -104,7 +105,7 @@ class Pawn:
         Attempt to activate shield for this pawn.
         """
 
-        if self.shield_count <= 0:
+        if self.shield_count <= 0 or self.__shield_on__:
             return
 
         self.__shield_on__ = True
@@ -493,12 +494,12 @@ class Pawn:
         elif self.__long_held__:
             self.attack("long")
 
+        if self.health <= -100:
+            self.health = self.max_health
+
         # Artifical controller decision making process if a brain is contained.
         if self.brain != None:
             self.brain.on_tick(delta_time)
-
-        if self.health <= -100:
-            self.health = self.max_health
 
         # Check for laser collisions
         for l in lasers:
