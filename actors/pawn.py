@@ -356,7 +356,6 @@ class Pawn:
         """
         Inflicts damage on this pawn.
         """
-        print("1" + str(self.health))
         hit = True
 
         if self.__shield_dura__ <= 0 and self.__shield_on__:
@@ -371,8 +370,6 @@ class Pawn:
 
         if hit:
             self.health -= amount
-
-        print(self.health)
 
     def attack(self, t="long"):
         """
