@@ -362,6 +362,9 @@ class Pawn:
         if self.__shield_dura__ <= 0:
             self.__shield_on__ = False
             self.__shield_dura__ = self.shield_durability
+
+            # Shield de-activates before damage can be taken
+            return
         else:
             self.__shield_dura__ -= 1
             hit = False
