@@ -243,8 +243,8 @@ class Pawn:
             color = arcade.color.RED
 
         # Get triangle verticies relative to the rotation stored in the field variable 'direction'.
-        facing = (math.cos(self.dir) * self.radius,
-                  math.sin(self.dir) * self.radius)
+        facing = (math.cos(self.dir) * self.radius*1.3,
+                  math.sin(self.dir) * self.radius*1.3)
 
         temp = self.dir+HALF_PI
         leftLeg = (math.cos(temp) * self.minor_radius,
