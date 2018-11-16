@@ -36,7 +36,7 @@ class DynamicBrain:
                 # Use shields periodically throughout gameplay.
                 pawn.use_shield()
         elif self.shield_strat == "panic":
-            if pawn.health < pawn.laser_damage * 1.5:
+            if pawn.health < pawn.laser_damage * 4:
                 # Use shields when health is critical.
                 pawn.use_shield()
 
@@ -152,8 +152,6 @@ class DynamicBrain:
                             best_move = (i, j)
                             max_dist = dist
 
-        arcade.finish_render()
-
         if len(possible) > 0:
             if has_to_move:
                 if best_move != None:
@@ -161,10 +159,6 @@ class DynamicBrain:
                 else:
                     c = random.choice(possible)
                     pawn.move(c[0], c[1])
-        # else:
-        #     c = (random.randint(-1, 1), random.randint(-1, 1))
-
-        # if has_to_move:
 
     def get_best_aim_position(self, pawn, dist_squared, bias=100):
         """
