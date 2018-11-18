@@ -94,7 +94,8 @@ class DynamicBrain:
 
     def get_closest_enemy(self):
         """
-        Returns the closest pawn to the given pawn.
+        Returns:
+            The closest pawn to the given pawn.
         """
 
         min_dist = float("inf")
@@ -167,8 +168,11 @@ class DynamicBrain:
 
     def get_best_aim_position(self, pawn, dist_squared, bias=100):
         """
-        @param dist_squared Squared distance from this pawn to the enemy.
-        @return Returns the best position to aim with the given params.
+        Args:
+            dist_squared (float): Squared distance from this pawn to the enemy.
+
+        Returns:
+            The best position to aim with the given params.
         """
 
         pos = pawn.get_pos()

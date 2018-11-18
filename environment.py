@@ -80,7 +80,9 @@ class Environment(arcade.Window):
     def get_pawns(self, pawn):
         """
         Returns all opposing pawns.
-        @param pawn The calling pawn.
+
+        Args:
+            pawn (Pawn): The calling pawn.
         """
 
         pawns = []
@@ -104,6 +106,7 @@ class Environment(arcade.Window):
         """
         Called every cycle prior to on_draw.
         """
+
         self.__frame_count__ += 1
 
         if len(self.pawns) <= 1:
@@ -213,6 +216,6 @@ def dynamic_royale(amount):
 
 if __name__ == "__main__":
     # player_vs_mindless()
-    player_vs_dynamic_game()
+    # player_vs_dynamic_game()
     # dynamic_vs_dynamic_game()
-    # dynamic_royale(50)
+    dynamic_royale(5)
