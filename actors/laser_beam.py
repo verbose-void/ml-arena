@@ -10,7 +10,7 @@ SCREEN_HEIGHT = 600
 
 
 class LaserBeam:
-    def __init__(self, pos, direction, life_span, damage, speed, color):
+    def __init__(self, pos, direction, life_span, damage, speed, color, firing_pawn):
         """
         Laser beam data structure.
 
@@ -22,6 +22,7 @@ class LaserBeam:
             speed: How fast this laser will travel.
         """
 
+        self.firing_pawn = firing_pawn
         self.dir = direction
         self.start_pos = [pos[0], pos[1]]
         self.pos = pos
@@ -46,6 +47,7 @@ class LaserBeam:
         will be killed, and the calling laser will be deleted.
         """
 
+        self.firing_pawn.laser_hits += 1
         self.killed = pawn
         self.end_of_life = True
 

@@ -101,6 +101,7 @@ class Environment(arcade.Window):
         if pawn in self.pawns:
             self.pawns.remove(pawn)
             self.dead_pawns.append(pawn)
+            pawn.on_death()
 
     def update(self, delta_time):
         """

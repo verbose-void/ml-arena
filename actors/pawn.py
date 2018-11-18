@@ -72,6 +72,11 @@ class Pawn:
         self.dcontrols = dcontrols
         self.acontrols = acontrols
 
+        # Fitness variables
+        self.frames_alive = -1
+        self.laser_hits = 0
+        self.laser_hits_taken = 0
+
         self.last_shot = None
         self.lasers = []
         self.env = None
@@ -94,6 +99,24 @@ class Pawn:
         out.set_env(self.env)
 
         return out
+
+    def calculate_fitness(self):
+        """
+        Returns a score that determines how well this pawn did.
+
+        ### If pawn is still alive, it will return None. ###
+        """
+
+        if self.frames_alive < 0:
+            return None
+        return self.laser_hits - (self.laser_hits_taken * 0.3) + self.frames_alive
+
+    def on_death(self):
+        """
+        Called when this pawn is killed.
+        """
+
+        self.frames_alive = self.env.__frame_count__
 
     def get_laser_life(self):
         return self.laser_life
@@ -345,6 +368,7 @@ class Pawn:
 
         if hit:
             self.health -= amount
+            self.laser_hits_taken += 1
 
     def attack(self, t="long"):
         """
@@ -363,11 +387,11 @@ class Pawn:
         if t == "long":
             laser = laser_beam.LaserBeam(
                 [self.pos[0], self.pos[1]],
-                self.dir, self.get_long_range_dist(), self.laser_damage*2, self.laser_speed, arcade.color.RED)
+                self.dir, self.get_long_range_dist(), self.laser_damage*2, self.laser_speed, arcade.color.RED, self)
         elif t == "short":
             laser = laser_beam.LaserBeam(
                 [self.pos[0], self.pos[1]],
-                self.dir, self.get_short_range_dist(), self.laser_damage*0.8, self.laser_speed*0.6, arcade.color.BLUE)
+                self.dir, self.get_short_range_dist(), self.laser_damage*0.8, self.laser_speed*0.6, arcade.color.BLUE, self)
 
         self.lasers.append(laser)
 
