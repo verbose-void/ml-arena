@@ -13,11 +13,13 @@ class LaserBeam:
     def __init__(self, pos, direction, life_span, damage, speed, color):
         """
         Laser beam data structure.
-        @param pos Starting position.
-        @param direction Constant heading direction.
-        @param life_span How far the laser will travel until it's deletion.
-        @param damage How much damage will be caused by this laser.
-        @param speed How fast this laser will travel.
+
+        Args:
+            pos (float tuple): Starting position.
+            direction: Constant heading direction.
+            life_span: How far the laser will travel until it's deletion.
+            damage: How much damage will be caused by this laser.
+            speed: How fast this laser will travel.
         """
 
         self.dir = direction
@@ -33,7 +35,7 @@ class LaserBeam:
 
     def get_damage(self):
         """
-        @return Returns the amount of damage to be inflicted by this laser.
+        Returns the amount of damage to be inflicted by this laser.
         """
 
         return self.damage
@@ -50,7 +52,9 @@ class LaserBeam:
     def who_was_killed(self):
         """
         Denotes which pawn the laser collided with.
-        @return Returns the killed field variable.
+
+        Returns:
+            The killed field variable.
         """
 
         return self.killed
@@ -58,7 +62,9 @@ class LaserBeam:
     def update(self, delta_time):
         """
         Handles updating the laser's position & if it's out of range it will be delted.
-        @return Returns False if this laser should be deleted. (aka went off screen, landed a shot, or went out of range).
+
+        Returns:
+            False if this laser should be deleted. (aka went off screen, landed a shot, or went out of range).
         """
 
         if self.killed != None or self.end_of_life:
@@ -91,14 +97,14 @@ class LaserBeam:
 
     def get_dir(self):
         """
-        @return Returns this laser's heading direction in radians.
+        Returns this laser's heading direction in radians.
         """
 
         return self.dir
 
     def get_speed(self):
         """
-        @return Returns this laser's speed.
+        Returns this laser's speed.
         """
 
         return self.speed
@@ -108,8 +114,8 @@ class LaserBeam:
         This method takes in the center & radius of a circle, and determines weather it's in
         this lasers path, and if so returns the distance squared.
 
-        @returns Returns -1 if not in path, otherwise distance squared from the circle radius
-        point to the laser head.
+        Returns:
+            -1 if not in path, otherwise distance squared from the circle radius point to the laser head.
         """
 
         E = self.get_head_position()
