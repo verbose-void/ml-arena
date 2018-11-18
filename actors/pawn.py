@@ -18,11 +18,13 @@ class Pawn:
     def __init__(self, brain, x, y, direc=0, mcontrols=None, dcontrols=None, acontrols=None):
         """
         The default pawn type.
-        @param brain The brain is the artificial controller for the pawn.
-        @param x, y Starting position.
-        @param mcontrols A list of movement controls containing arcade.keys for LEFT, UP, RIGHT, & DOWN respectively.
-        @param dcontrols A list of diretional movement controls containing arcade.keys for CLOCKWISE & COUNTER-CLOCKWISE respectively.
-        @param mcontrols An arcade.key that controls the dispatching of lasers (the Pawn.attack(...) method).
+
+        Args:
+            brain: The brain is the artificial controller for the pawn.
+            x, y: Starting position.
+            mcontrols: A list of movement controls containing arcade.keys for LEFT, UP, RIGHT, & DOWN respectively.
+            dcontrols: A list of diretional movement controls containing arcade.keys for CLOCKWISE & COUNTER-CLOCKWISE respectively.
+            mcontrols: An arcade.key that controls the dispatching of lasers (the Pawn.attack(...) method).
         """
 
         self.brain_constructor = brain
@@ -94,10 +96,6 @@ class Pawn:
         return out
 
     def get_laser_life(self):
-        """
-        @return Returns the pawn's laser's life-span.
-        """
-
         return self.laser_life
 
     def use_shield(self):
@@ -112,52 +110,28 @@ class Pawn:
         self.shield_count -= 1
 
     def get_dir(self):
-        """
-        @return Returns the pawn's direction in radians.
-        """
-
         return self.dir
 
     def get_speed(self):
-        """
-        @return Returns the speed of this pawn.
-        """
-
         return self.speed
 
     def get_vel(self):
-        """
-        @return Returns this pawn's velocities (headings)
-        """
-
         return self.vel
 
     def get_health(self):
-        """
-        @return Returns this pawn's health value.
-        """
-
         return self.health
 
     def set_env(self, env):
-        """
-        Sets the environment containing this pawn.
-        """
-
         self.env = env
 
     def get_pawns(self):
         """
-        @return Returns all pawns in the environment that isn't itself.
+        Returns all pawns in the environment that isn't itself.
         """
 
         return self.env.get_pawns(self)
 
     def get_pos(self):
-        """
-        @return Returns the pawns position.
-        """
-
         return self.pos
 
     def move(self, x, y):
@@ -190,7 +164,7 @@ class Pawn:
 
     def get_lasers(self):
         """
-        @return Returns all lasers shot by the current pawn.
+        Returns all lasers shot by the current pawn.
         """
 
         return self.lasers
@@ -198,7 +172,8 @@ class Pawn:
     def look(self, direction):
         """
         Starts rotation towards 'right' (clockwise) or 'left' (counter-clockwise)
-        @param direction must be of value 'right', 'left', or None. Otherwise, it will be converted to None.
+        Args:
+            direction: Must be of value 'right', 'left', or None. Otherwise, it will be converted to None.
         """
 
         self.rotation = "right" if direction == "right" else "left" if direction == "left" else None
@@ -340,14 +315,14 @@ class Pawn:
 
     def has_active_shield(self):
         """
-        @return Returns wether this pawn has it's shield active.
+        Returns wether this pawn has it's shield active.
         """
 
         return self.__shield_on__
 
     def get_shield_count(self):
         """
-        @return Returns how many shields this pawn has.
+        Returns how many shields this pawn has.
         """
 
         return self.shield_count
@@ -375,7 +350,9 @@ class Pawn:
         """
         Checks if the pawn is on laser cooldown, if not it dispatches a laser from the origin of the
         graphical representation.
-        @param type Type of attack. Accepts 'long' & 'short'.
+
+        Args:
+            type (string): Type of attack. Accepts 'long' & 'short'.
         """
 
         if self.laser_on_cooldown():
@@ -408,7 +385,9 @@ class Pawn:
     def update_lasers(self, delta_time):
         """
         Updates each individual laser this pawn is responsible for.
-        @return Returns a list of all pawns that were killed by lasers.
+
+        Returns:
+            A list of all pawns that were killed by lasers.
         """
 
         keep = []
@@ -466,7 +445,7 @@ class Pawn:
 
     def get_rotation(self):
         """
-        @return Returns the pawn's rotational heading.
+        Returns the pawn's rotational heading.
         """
 
         return self.rotation
@@ -541,8 +520,11 @@ class Pawn:
 
     def dist_squared(self, pos, compare_pos=None):
         """
-        @param pos Tuple or array of the pos in the form [x,y].
-        @return Returns the distance squared from this pawn to the given pos.
+        Args:
+            pos: Tuple or array of the pos in the form [x,y].
+
+        Returns:
+            The distance squared from this pawn to the given pos.
         """
 
         if compare_pos == None:
