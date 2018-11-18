@@ -27,10 +27,13 @@ class Pawn:
             mcontrols: An arcade.key that controls the dispatching of lasers (the Pawn.attack(...) method).
         """
 
-        self.brain_constructor = brain
-
         if brain != None:
-            self.brain = brain(self)
+            if type(brain) is type:
+                self.brain_constructor = brain
+                self.brain = brain()
+            else:
+                self.brain = brain
+                self.brain_constructor = None
         else:
             self.brain = None
 
@@ -87,7 +90,7 @@ class Pawn:
         """
 
         out = Pawn(
-            self.brain_constructor,
+            self.brain_constructor if self.brain_constructor != None else self.brain,
             self.start_pos[0],
             self.start_pos[1],
             self.starting_dir,
