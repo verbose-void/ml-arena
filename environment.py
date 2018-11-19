@@ -41,7 +41,7 @@ class Environment(arcade.Window):
         self.match_ups = list(match_ups)
         self.__frame_count__ = 0
         self.on_restart = None
-        self.best_match_up = None
+        self.best_match_up = 0
         self.on_end = None
         self.current_gen = 1
         self.print_string = ""
