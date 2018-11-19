@@ -77,9 +77,10 @@ class Pawn:
         self.acontrols = acontrols
 
         # Fitness variables
-        self.frames_alive = -1
+        self.frames_alive = 0
         self.laser_hits = 0
         self.laser_hits_taken = 0
+        self.won = False
 
         self.last_shot = None
         self.lasers = []
@@ -109,14 +110,15 @@ class Pawn:
 
     def calculate_fitness(self):
         """
-        Returns a score that determines how well this pawn did.
-
-        ### If pawn is still alive, it will return None. ###
+        Returns a score that determines how well this pawn is doing.
         """
 
-        if self.frames_alive < 0:
-            return None
-        return self.laser_hits - (self.laser_hits_taken * 0.3) + self.frames_alive
+        f = (self.laser_hits*10) - (self.laser_hits_taken * 0.3) + (self.frames_alive*0.05)
+
+        if self.won:
+            f *= 1.3
+
+        return f
 
     def on_death(self):
         """
@@ -498,6 +500,8 @@ class Pawn:
         """
         Called every update round: handles updates for lasers & pawn position / rotation.
         """
+
+        self.frames_alive += 1
 
         if self.__short_held__:
             self.attack("short")
