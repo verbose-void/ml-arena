@@ -30,12 +30,13 @@ class Pawn:
         if brain != None:
             if type(brain) is type:
                 self.brain_constructor = brain
-                self.brain = brain()
+                self.brain = brain(self)
             else:
                 self.brain = brain
                 self.brain_constructor = None
         else:
             self.brain = None
+            self.brain_constructor = None
 
         # Graphical data initialization
         self.radius = 20
@@ -83,6 +84,8 @@ class Pawn:
         self.last_shot = None
         self.lasers = []
         self.env = None
+
+        self.match_index = -1
 
     def reset(self):
         """
@@ -231,13 +234,11 @@ class Pawn:
         arcade.draw_line(x, y, x + (HEALTH_BAR_MAX_WIDTH *
                                     normal_health), y, color, 5)
 
-    def draw(self):
+    def draw(self, color=arcade.color.WHITE):
         """
         Creates the graphical representation for the pawn using a triangle & circle.
         Sizing is relative to the radius field variable.
         """
-
-        color = arcade.color.WHITE
 
         if self.__shield_on__:
             color = arcade.color.BLUE

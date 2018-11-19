@@ -10,45 +10,54 @@ SCREEN_HEIGHT = 600
 
 
 class Environment(arcade.Window):
-    def __init__(self, pawns):
+    def __init__(self, *match_ups):
+        """
+        Create an instance of an Arena environment.
+
+        Args:
+            *match_ups (array of pawns): Each argument under 'match_ups' should be an array containing the participating pawns for that fight.
+        """
+
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT)
         arcade.set_background_color(arcade.color.BLACK)
 
-        self.starting_data = dict()
+        self.match_up_data = dict()
 
-        for pawn in pawns:
-            pawn.set_env(self)
-            self.starting_data[pawn] = (pawn.get_pos(), pawn.get_dir())
+        for i, match_up in enumerate(match_ups):
+            # Initialize game-unique data
+            self.match_up_data[i] = {
+                "starting": dict(),
+                "dead_pawns": []
+            }
 
-        self.pawns = pawns
-        self.dead_pawns = []
+            for pawn in match_up:
+                pawn.match_index = i
+                pawn.set_env(self)
+                self.match_up_data[i]["starting"][pawn] = (
+                    pawn.get_pos(), pawn.get_dir())
 
-        self.__death_anim_count__ = 100
+        self.match_ups = match_ups
         self.__frame_count__ = 0
 
     def restart(self):
         """
-        Restarts to beginning game state.
+        Restarts all games to beginn   ing states.
         """
 
-        if self.__death_anim_count__ > 0:
-            self.__death_anim_count__ -= 1
-            return
-
-        self.__death_anim_count__ = 100
         self.__frame_count__ = 0
 
-        new_pawns = []
+        for i, match_up in enumerate(self.match_ups):
 
-        for pawn in self.dead_pawns:
-            new_pawns.append(pawn.reset())
+            for pawn in match_up:
+                pawn.reset()
 
-        self.dead_pawns.clear()
+            # Put all dead pawns back in their respective alive container
+            # and reset them.
+            for pawn in self.match_up_data[i]["dead_pawns"]:
+                match_up.append(pawn.reset())
 
-        for pawn in self.pawns:
-            new_pawns.append(pawn.reset())
-
-        self.pawns = new_pawns
+            # Clear dead pawns
+            self.match_up_data[i]["dead_pawns"].clear()
 
     def on_draw(self):
         """
@@ -57,24 +66,36 @@ class Environment(arcade.Window):
 
         arcade.start_render()
 
-        for pawn in self.pawns:
-            pawn.draw_lasers()
-            pawn.draw()
+        # Draw all matches
+        for i, match_up in enumerate(self.match_ups):
+            l = len(match_up)
+            for pawn in match_up:
+                pawn.draw_lasers()
 
-        for pawn in self.dead_pawns:
-            pawn.draw()
+                if l <= 1:
+                    # If this pawn is the winner, then color them green.
+                    pawn.draw(arcade.color.GREEN)
+                else:
+                    pawn.draw()
+
+            for pawn in self.match_up_data[i]["dead_pawns"]:
+                pawn.draw()
 
     def get_lasers(self, pawn):
         """
-        @return Returns a list of all lasers that are not owned by the given pawn.
+        Returns a list of all lasers in their match that are not owned by the given pawn.
+
+        Args:
+            pawn (Pawn): The pawn that is requesting the lasers.
         """
 
         lasers = []
 
-        for lpawn in self.pawns:
+        for lpawn in self.match_ups[pawn.match_index]:
             if lpawn != pawn:
                 for l in lpawn.get_lasers():
                     lasers.append(l)
+
         return lasers
 
     def get_pawns(self, pawn):
@@ -82,12 +103,12 @@ class Environment(arcade.Window):
         Returns all opposing pawns.
 
         Args:
-            pawn (Pawn): The calling pawn.
+            pawn (Pawn): The pawn that is requesting the enemies.
         """
 
         pawns = []
 
-        for p in self.pawns:
+        for p in self.match_ups[pawn.match_index]:
             if p != pawn:
                 pawns.append(p)
 
@@ -96,12 +117,28 @@ class Environment(arcade.Window):
     def kill_pawn(self, pawn):
         """
         Removes the given pawn from the players list, effectively killing it.
+
+        Args:
+            pawn (Pawn): The pawn that is to be killed.
         """
 
-        if pawn in self.pawns:
-            self.pawns.remove(pawn)
-            self.dead_pawns.append(pawn)
+        match_up = self.match_ups[pawn.match_index]
+
+        if pawn in match_up:
+            match_up.remove(pawn)
+            self.match_up_data[pawn.match_index]["dead_pawns"].append(pawn)
             pawn.on_death()
+
+    def are_all_episodes_over(self):
+        """
+        Checks if all current matches are over.
+        """
+
+        for match_up in self.match_ups:
+            if len(match_up) > 1:
+                return False
+
+        return True
 
     def update(self, delta_time):
         """
@@ -110,34 +147,38 @@ class Environment(arcade.Window):
 
         self.__frame_count__ += 1
 
-        if len(self.pawns) <= 1:
+        if self.are_all_episodes_over():
             self.restart()
 
-        for pawn in self.pawns:
-            lasers = self.get_lasers(pawn)
-            pawn.update(lasers, delta_time)
-            pawns_killed = pawn.update_lasers(delta_time)
+        # Update all pawns in all match ups
 
-            if len(pawns_killed) > 0:
-                for pawn in pawns_killed:
-                    self.kill_pawn(pawn)
+        for i, match_up in enumerate(self.match_ups):
+            for pawn in match_up:
+                lasers = self.get_lasers(pawn)
+                pawn.update(lasers, delta_time)
+                pawns_killed = pawn.update_lasers(delta_time)
+
+                if len(pawns_killed) > 0:
+                    for pawn in pawns_killed:
+                        self.kill_pawn(pawn)
 
     def on_key_press(self, symbol, modifiers):
         """
         Called when a key is pressed. Then passed to each pawn to check if it's in their control scheme.
         """
 
-        for pawn in self.pawns:
-            pawn.press(symbol)
+        for match_up in self.match_ups:
+            for pawn in match_up:
+                pawn.press(symbol)
 
     def on_key_release(self, symbol, modifiers):
         """
         Called when a key is released. Then passed to each pawn to check if it's in their control scheme.
         """
 
-        for pawn in self.pawns:
-            pawn.release(symbol)
-        return super().on_key_release(symbol, modifiers)
+        for match_up in self.match_ups:
+            for pawn in match_up:
+                pawn.release(symbol)
 
 
 def default_player_pawn():
@@ -204,19 +245,11 @@ def player_vs_mindless():
     arcade.run()
 
 
-def dynamic_royale(amount):
-    pawns = []
-    for i in range(amount):
-        pawns.append(dynamic_scripting_pawn(
-            random.randint(100, SCREEN_WIDTH - 100),
-            random.randint(100, SCREEN_HEIGHT - 100)))
-    env = Environment(pawns)
-    arcade.run()
-    return env
-
-
 if __name__ == "__main__":
     # player_vs_mindless()
     # player_vs_dynamic_game()
     # dynamic_vs_dynamic_game()
-    dynamic_royale(5)
+
+    env = Environment([default_player_pawn(), default_mindless_pawn()],
+                      [dynamic_scripting_pawn(500, 200), dynamic_scripting_pawn(200, 200)])
+    arcade.run()
