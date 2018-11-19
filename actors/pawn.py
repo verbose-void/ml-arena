@@ -118,7 +118,7 @@ class Pawn:
         if self.won:
             f *= 1.3
 
-        return f
+        return f if f > 0 else 0
 
     def on_death(self):
         """
