@@ -15,7 +15,7 @@ RAY_TRACES = False
 
 
 class Pawn:
-    def __init__(self, brain, x, y, direc=0, mcontrols=None, dcontrols=None, acontrols=None):
+    def __init__(self, brain, x, y, direc=0, mcontrols=None, dcontrols=None, acontrols=None, match_index=-1):
         """
         The default pawn type.
 
@@ -85,7 +85,7 @@ class Pawn:
         self.lasers = []
         self.env = None
 
-        self.match_index = -1
+        self.match_index = match_index
 
     def reset(self):
         """
@@ -99,7 +99,8 @@ class Pawn:
             self.starting_dir,
             self.mcontrols,
             self.dcontrols,
-            self.acontrols
+            self.acontrols,
+            self.match_index
         )
 
         out.set_env(self.env)

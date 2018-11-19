@@ -36,8 +36,44 @@ class Environment(arcade.Window):
                 self.match_up_data[i]["starting"][pawn] = (
                     pawn.get_pos(), pawn.get_dir())
 
-        self.match_ups = match_ups
+        self.match_ups = list(match_ups)
         self.__frame_count__ = 0
+
+    def get_closest_enemy_laser(self, pawn):
+        """
+        Returns the closest enemy laser to the given pawn.
+        """
+
+        lasers = self.get_lasers(pawn)
+        min_dist = float("inf")
+        dist_sqrd = None
+        closest = None
+
+        for laser in lasers:
+            dist_sqrd = pawn.dist_squared(laser.pos)
+            if dist_sqrd < min_dist:
+                min_dist = dist_sqrd
+                closest = laser
+
+        return closest
+
+    def get_closest_enemy(self, pawn):
+        """
+        Returns the closest pawn to the given pawn.
+        """
+
+        min_dist = float("inf")
+        dist_sqrd = None
+        closest = None
+
+        for enemy in self.match_ups[pawn.match_index]:
+            if pawn != enemy:
+                dist_sqrd = pawn.dist_squared(enemy.get_pos())
+                if min_dist > dist_sqrd:
+                    min_dist = dist_sqrd
+                    closest = enemy
+
+        return closest
 
     def restart(self):
         """
@@ -48,16 +84,19 @@ class Environment(arcade.Window):
 
         for i, match_up in enumerate(self.match_ups):
 
+            new = list()
+
             for pawn in match_up:
-                pawn.reset()
+                new.append(pawn.reset())
 
             # Put all dead pawns back in their respective alive container
             # and reset them.
             for pawn in self.match_up_data[i]["dead_pawns"]:
-                match_up.append(pawn.reset())
+                new.append(pawn.reset())
 
             # Clear dead pawns
             self.match_up_data[i]["dead_pawns"].clear()
+            self.match_ups[i] = new
 
     def on_draw(self):
         """
@@ -201,7 +240,7 @@ def default_mindless_pawn():
     """
 
     out = pawn.Pawn(brain.Brain, SCREEN_WIDTH *
-                    0.8, SCREEN_HEIGHT / 2, math.pi)
+                    random.random(), SCREEN_HEIGHT * random.random(), math.pi)
     return out
 
 
@@ -251,5 +290,8 @@ if __name__ == "__main__":
     # dynamic_vs_dynamic_game()
 
     env = Environment([default_player_pawn(), default_mindless_pawn()],
-                      [dynamic_scripting_pawn(500, 200), dynamic_scripting_pawn(200, 200)])
+                      [default_mindless_pawn(), dynamic_scripting_pawn(200, 200)])
+
+    # env = Environment(
+    #     [dynamic_scripting_pawn(500, 200), dynamic_scripting_pawn(200, 200)])
     arcade.run()
