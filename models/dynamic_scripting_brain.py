@@ -26,7 +26,7 @@ class DynamicBrain:
 
     def on_tick(self, dt):
         pawn = self.pawn
-        enemy = self.get_closest_enemy()
+        enemy = self.pawn.env.get_closest_enemy(self.pawn)
 
         if enemy == None:
             pawn.move(0, 0)
@@ -91,24 +91,6 @@ class DynamicBrain:
 
             # m = self.get_best_move()
             # pawn.move(m[0], m[1])
-
-    def get_closest_enemy(self):
-        """
-        Returns:
-            The closest pawn to the given pawn.
-        """
-
-        min_dist = float("inf")
-        dist_sqrd = None
-        closest = None
-
-        for enemy in self.pawn.get_pawns():
-            dist_sqrd = self.pawn.dist_squared(enemy.get_pos())
-            if min_dist > dist_sqrd:
-                min_dist = dist_sqrd
-                closest = enemy
-
-        return closest
 
     def move_to_expected_best(self):
         """

@@ -12,14 +12,20 @@ class EvolutionaryNN:
             outputs (int): Number of output nodes.
         """
 
-        # Generate random weight values for all layers
-        # (bias included)
-        self.inputs_to_hidden = self.randomize(
-            np.zeros(shape=(hidden, inputs + 1)))
-        self.hidden_to_hidden = self.randomize(
-            np.zeros(shape=(hidden, hidden + 1)))
-        self.hidden_to_output = self.randomize(
-            np.zeros(shape=(outputs, hidden + 1)))
+        if type(inputs) == int:
+            # Generate random weight values for all layers
+            # (bias included)
+            self.inputs_to_hidden = self.randomize(
+                np.zeros(shape=(hidden, inputs + 1)))
+            self.hidden_to_hidden = self.randomize(
+                np.zeros(shape=(hidden, hidden + 1)))
+            self.hidden_to_output = self.randomize(
+                np.zeros(shape=(outputs, hidden + 1)))
+
+        else:
+            self.inputs_to_hidden = inputs
+            self.hidden_to_hidden = hidden
+            self.hidden_to_output = outputs
 
     def output(self, inputs):
         """
@@ -53,7 +59,7 @@ class EvolutionaryNN:
         # Flatten to 1-D array and return.
         return np.ndarray.flatten(outputs)
 
-    def mutate(self, matrix, mr):
+    def mutate(self, mr, matrix=None):
         """
         Mutates the given matrix with the given rate.
 
@@ -61,6 +67,12 @@ class EvolutionaryNN:
             matrix (np.array): Matrix to be mutated.
             mr (float): Mutation Rate, the probability of mutation for each weight.
         """
+
+        if matrix is None:
+            self.mutate(mr, self.inputs_to_hidden)
+            self.mutate(mr, self.hidden_to_hidden)
+            self.mutate(mr, self.hidden_to_output)
+            return self
 
         for i, _ in enumerate(matrix):
             for j, val in enumerate(_):
@@ -104,7 +116,7 @@ class EvolutionaryNN:
     def sigmoid(self, x):
         return 1 / (1 + pow(math.e, -x))
 
-    def crossover(self, matrix1, matrix2):
+    def crossover(self, matrix1, matrix2=None):
         """
         Generate a random ratio and create a 'child' matrix that has that ratio of parent1 'genes' - parent2 'genes'.
 
@@ -118,6 +130,15 @@ class EvolutionaryNN:
             matrix1 (np.array): Parent1
             matrix2 (np.array): Parent2
         """
+
+        if matrix2 is None:
+            self.inputs_to_hidden = self.crossover(
+                self.inputs_to_hidden, matrix1.inputs_to_hidden)
+            self.hidden_to_hidden = self.crossover(
+                self.hidden_to_hidden, matrix1.hidden_to_hidden)
+            self.hidden_to_output = self.crossover(
+                self.hidden_to_output, matrix1.hidden_to_output)
+            return self
 
         rows = len(matrix1)
         assert rows == len(
@@ -164,7 +185,14 @@ class EvolutionaryNN:
         new[rows-1] = [1]
         return new
 
-    def clone(self, matrix):
+    def clone(self, matrix=None):
+        if matrix is None:
+            return EvolutionaryNN(
+                self.clone(self.inputs_to_hidden),
+                self.clone(self.hidden_to_hidden),
+                self.clone(self.hidden_to_output)
+            )
+
         out = np.zeros(shape=(len(matrix), len(matrix[0])))
 
         for i, _ in enumerate(matrix):
@@ -172,3 +200,8 @@ class EvolutionaryNN:
                 out[i, j] = matrix[i, j]
 
         return out
+
+    def __str__(self):
+        return ("Input Weights: " + str(self.inputs_to_hidden) +
+                "\nHidden Weights: " + str(self.hidden_to_hidden) +
+                "\nOutput Weights: " + str(self.hidden_to_output))
