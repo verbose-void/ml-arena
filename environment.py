@@ -150,20 +150,36 @@ class Environment(arcade.Window):
 
         if self.__frame_count__ % 30 == 0:
             running = 0
-            best_fitness = float('-inf')
+            best_fitness = float(-10000)
+            best_overall_fitness = float(-10000)
 
-            for match_up in self.match_ups:
+            for i, match_up in enumerate(self.match_ups):
                 if len(match_up) > 1:
                     running += 1
 
-                fit = match_up[0].calculate_fitness()
-                if best_fitness < fit:
-                    best_fitness = fit
+                for pawn in match_up:
+                    if pawn.brain_constructor == None:
+                        fit = pawn.calculate_fitness()
+                        if best_fitness < fit:
+                            best_fitness = fit
+                            self.best_match_up = i
+
+                        if best_overall_fitness < fit:
+                            best_overall_fitness = fit
+
+                for pawn in self.match_up_data[i]['dead_pawns']:
+                    if pawn.brain_constructor == None:
+                        fit = pawn.calculate_fitness()
+                        if best_overall_fitness < fit:
+                            best_overall_fitness = fit
 
             self.print_string = "Matches Running: " + \
                 str(running) + "/" + str(self.pop_size)
             self.print_string += " | Generation: " + str(self.current_gen)
-            self.print_string += " | Best Fitness: " + str(best_fitness)
+            self.print_string += " | Best Alive Fitness: " + \
+                str(round(best_fitness))
+            self.print_string += " | Best Overall Fitness: " + \
+                str(round(best_overall_fitness))
 
         # Display how many matches are running
         arcade.draw_text(self.print_string, 10,
@@ -235,24 +251,24 @@ class Environment(arcade.Window):
 
         self.__frame_count__ += 1
 
-        if self.__frame_count__ % 60 == 0:
-            best_fitness = float('-inf')
-            best_match = None
+        # if self.__frame_count__ % 60 == 0:
+        #     best_fitness = float('-inf')
+        #     best_match = None
 
-            # Pick a best pawn
-            for i, match_up in enumerate(self.match_ups):
-                if len(match_up) <= 1:
-                    match_up[0].won = True
-                    continue
+        #     # Pick a best pawn
+        #     for i, match_up in enumerate(self.match_ups):
+        #         if len(match_up) <= 1:
+        #             match_up[0].won = True
+        #             continue
 
-                p = match_up[0]
-                fit = p.calculate_fitness()
-                if fit > best_fitness:
-                    best_fitness = fit
-                    best_match = i
+        #         p = match_up[0]
+        #         fit = p.calculate_fitness()
+        #         if fit > best_fitness:
+        #             best_fitness = fit
+        #             best_match = i
 
-            if best_match != None:
-                self.best_match_up = best_match
+        #     if best_match != None:
+        #         self.best_match_up = best_match
 
         if self.are_all_episodes_over():
             self.restart()
