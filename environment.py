@@ -8,6 +8,8 @@ from models import brain, dynamic_scripting_brain
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 
+DRAW_BEST = True
+
 
 class Environment(arcade.Window):
     def __init__(self, *match_ups):
@@ -38,6 +40,11 @@ class Environment(arcade.Window):
 
         self.match_ups = list(match_ups)
         self.__frame_count__ = 0
+        self.on_restart = None
+        self.best_match_up = None
+        self.on_end = None
+        self.current_gen = 1
+        self.print_string = ""
 
     def get_closest_enemy_laser(self, pawn):
         """
@@ -98,6 +105,9 @@ class Environment(arcade.Window):
             self.match_up_data[i]["dead_pawns"].clear()
             self.match_ups[i] = new
 
+        if self.on_restart != None:
+            self.on_restart(self)
+
     def on_draw(self):
         """
         Called every cycle prior to update.
@@ -105,8 +115,9 @@ class Environment(arcade.Window):
 
         arcade.start_render()
 
-        # Draw all matches
-        for i, match_up in enumerate(self.match_ups):
+        # Draw only the best pawn
+        if DRAW_BEST and self.best_match_up != None:
+            match_up = self.match_ups[self.best_match_up]
             l = len(match_up)
             for pawn in match_up:
                 pawn.draw_lasers()
@@ -117,8 +128,46 @@ class Environment(arcade.Window):
                 else:
                     pawn.draw()
 
-            for pawn in self.match_up_data[i]["dead_pawns"]:
+            for pawn in self.match_up_data[self.best_match_up]["dead_pawns"]:
                 pawn.draw()
+
+        else:
+
+            # Draw all matches
+            for i, match_up in enumerate(self.match_ups):
+                l = len(match_up)
+                for pawn in match_up:
+                    pawn.draw_lasers()
+
+                    if l <= 1:
+                        # If this pawn is the winner, then color them green.
+                        pawn.draw(arcade.color.GREEN)
+                    else:
+                        pawn.draw()
+
+                for pawn in self.match_up_data[i]["dead_pawns"]:
+                    pawn.draw()
+
+        if self.__frame_count__ % 30 == 0:
+            running = 0
+            best_fitness = float('-inf')
+
+            for match_up in self.match_ups:
+                if len(match_up) > 1:
+                    running += 1
+
+                fit = match_up[0].calculate_fitness()
+                if best_fitness < fit:
+                    best_fitness = fit
+
+            self.print_string = "Matches Running: " + \
+                str(running) + "/" + str(self.pop_size)
+            self.print_string += " | Generation: " + str(self.current_gen)
+            self.print_string += " | Best Fitness: " + str(best_fitness)
+
+        # Display how many matches are running
+        arcade.draw_text(self.print_string, 10,
+                         SCREEN_HEIGHT-20, arcade.color.WHITE)
 
     def get_lasers(self, pawn):
         """
@@ -186,6 +235,25 @@ class Environment(arcade.Window):
 
         self.__frame_count__ += 1
 
+        if self.__frame_count__ % 60 == 0:
+            best_fitness = float('-inf')
+            best_match = None
+
+            # Pick a best pawn
+            for i, match_up in enumerate(self.match_ups):
+                if len(match_up) <= 1:
+                    match_up[0].won = True
+                    continue
+
+                p = match_up[0]
+                fit = p.calculate_fitness()
+                if fit > best_fitness:
+                    best_fitness = fit
+                    best_match = i
+
+            if best_match != None:
+                self.best_match_up = best_match
+
         if self.are_all_episodes_over():
             self.restart()
 
@@ -205,6 +273,13 @@ class Environment(arcade.Window):
         """
         Called when a key is pressed. Then passed to each pawn to check if it's in their control scheme.
         """
+
+        if symbol == arcade.key.ESCAPE:
+            # End the game.
+            arcade.close_window()
+            if self.on_end != None:
+                self.on_end(self)
+            return
 
         for match_up in self.match_ups:
             for pawn in match_up:
