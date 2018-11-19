@@ -21,7 +21,9 @@ pop = []
 
 def create_pawn(nn):
     brain = en_brain.NEBrain(nn)
-    pawn = pawn_actor.Pawn(brain, 200, 500)
+    pawn = pawn_actor.Pawn(brain,
+                           random.random() * environment.SCREEN_WIDTH,
+                           random.random() * environment.SCREEN_HEIGHT)
     brain.set_pawn(pawn)
     return pawn
 
