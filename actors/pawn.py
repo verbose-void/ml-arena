@@ -113,7 +113,7 @@ class Pawn:
         Returns a score that determines how well this pawn is doing.
         """
 
-        f = (self.laser_hits*10) - (self.laser_hits_taken * 0.3) + (self.frames_alive*0.05)
+        f = (self.laser_hits*10) - (self.laser_hits_taken * 0.3)
 
         if self.won:
             f *= 1.3
@@ -210,6 +210,10 @@ class Pawn:
 
         self.rotation = "right" if direction == "right" else "left" if direction == "left" else None
 
+    def display_fitness(self):
+        arcade.draw_text(str(self.calculate_fitness()),
+                         self.pos[0]-100, self.pos[1]-35, arcade.color.WHITE, align="center", width=200)
+
     def draw_health_bar(self):
         """
         Displays the pawns health above it's graphical representation.
@@ -278,6 +282,7 @@ class Pawn:
                                     color)
 
         self.draw_health_bar()
+        self.display_fitness()
 
     def press(self, key):
         """
