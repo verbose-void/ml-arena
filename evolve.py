@@ -13,7 +13,7 @@ AUTO_SAVE_INTERVAL = 10  # Every 10 generations, force save.
 assert POP_SIZE % 2 == 0, "Population size MUST be even."
 
 INPUT_NODE_COUNT = 19
-HIDDEN_NODE_COUNT = 20
+HIDDEN_NODE_COUNT = 40
 OUTPUT_NODE_COUNT = 9
 
 pop = []
@@ -106,12 +106,12 @@ def natural_selection(env):
         nn = None
 
         if i < POP_SIZE / 2:
-            nn = env.pop[i].brain.nn.clone()
+            nn = random_pawn().brain.nn.clone()
         else:
-            nn = env.pop[i].brain.nn.clone().crossover(
-                random_pawn().brain.nn.clone())
+            nn = random_pawn().brain.nn.crossover(
+                random_pawn().brain.nn)
 
-        pawn = create_pawn(nn.mutate(0.05))
+        pawn = create_pawn(nn.mutate(0.1))
         pawn.set_env(env)
         new_pop.append(pawn)
 
