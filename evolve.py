@@ -93,7 +93,6 @@ def random_pawn(env):
     for pawn in env.pop:
         running_sum += pawn.calculate_fitness()
         if r < running_sum:
-            print(pawn.calculate_fitness())
             return pawn
 
     return env.pop[0]
