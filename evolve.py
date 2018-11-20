@@ -76,40 +76,40 @@ def best_pawn():
     return out
 
 
-def random_pawn():
+def random_pawn(env):
     """
     Randomly select a pawn from the population. (fitness is taken into consideration)
     """
 
     fitness_sum = 1
 
-    for pawn in pop:
+    for pawn in env.pop:
         fitness_sum += pawn.calculate_fitness()
 
     r = random.randrange(start=0, stop=math.floor(fitness_sum))
 
     running_sum = 0
 
-    for pawn in pop:
+    for pawn in env.pop:
         running_sum += pawn.calculate_fitness()
         if r < running_sum:
+            print(pawn.calculate_fitness())
             return pawn
 
-    return pop[0]
+    return env.pop[0]
 
 
 def natural_selection(env):
     new_pop = [best_pawn().reset()]  # Get best net without any mutations
 
-    # Natural selection (50% pop size)
     for i in range(POP_SIZE-1):
         nn = None
 
         if i < POP_SIZE / 2:
-            nn = random_pawn().brain.nn.clone()
+            nn = random_pawn(env).brain.nn.clone()
         else:
-            nn = random_pawn().brain.nn.crossover(
-                random_pawn().brain.nn)
+            nn = random_pawn(env).brain.nn.clone().crossover(
+                random_pawn(env).brain.nn.clone())
 
         pawn = create_pawn(nn.mutate(0.1))
         pawn.set_env(env)

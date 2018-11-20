@@ -109,18 +109,20 @@ class NEBrain:
         if o[0] > 0.8:
             # LEFT
             p.move(-1, None)
+        elif o[2] > 0.8:
+            # RIGHT
+            p.move(1, None)
+        else:
+            p.move(0, None)
 
         if o[1] > 0.8:
             # UP
             p.move(None, 1)
-
-        if o[2] > 0.8:
-            # RIGHT
-            p.move(1, None)
-
-        if o[3] > 0.8:
+        elif o[3] > 0.8:
             # DOWN
             p.move(None, -1)
+        else:
+            p.move(None, 0)
 
         if o[4] > 0.8:
             # Long
