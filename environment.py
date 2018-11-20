@@ -1,5 +1,6 @@
 import arcade
 import sys
+import time
 import math
 import random
 from actors import pawn
@@ -7,6 +8,8 @@ from models import brain, dynamic_scripting_brain
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
+
+MAX_GAME_LENGTH = 30  # 30 seconds
 
 DRAW_BEST = True
 
@@ -45,6 +48,7 @@ class Environment(arcade.Window):
         self.on_end = None
         self.current_gen = 1
         self.print_string = ""
+        self.start_time = time.time()
 
     def get_closest_enemy_laser(self, pawn):
         """
@@ -86,6 +90,8 @@ class Environment(arcade.Window):
         """
         Restarts all games to beginn   ing states.
         """
+
+        self.start_time = time.time()
 
         self.__frame_count__ = 0
 
@@ -148,42 +154,58 @@ class Environment(arcade.Window):
                 for pawn in self.match_up_data[i]["dead_pawns"]:
                     pawn.draw()
 
-        if self.__frame_count__ % 30 == 0:
-            running = 0
-            best_fitness = float(-10000)
-            best_overall_fitness = float(-10000)
-
-            for i, match_up in enumerate(self.match_ups):
-                if len(match_up) > 1:
-                    running += 1
-
-                for pawn in match_up:
-                    if pawn.brain_constructor == None:
-                        fit = pawn.calculate_fitness()
-                        if best_fitness < fit:
-                            best_fitness = fit
-                            self.best_match_up = i
-
-                        if best_overall_fitness < fit:
-                            best_overall_fitness = fit
-
-                for pawn in self.match_up_data[i]['dead_pawns']:
-                    if pawn.brain_constructor == None:
-                        fit = pawn.calculate_fitness()
-                        if best_overall_fitness < fit:
-                            best_overall_fitness = fit
-
-            self.print_string = "Matches Running: " + \
-                str(running) + "/" + str(self.pop_size)
-            self.print_string += " | Generation: " + str(self.current_gen)
-            self.print_string += " | Best Alive Fitness: " + \
-                str(round(best_fitness))
-            self.print_string += " | Best Overall Fitness: " + \
-                str(round(best_overall_fitness))
-
         # Display how many matches are running
         arcade.draw_text(self.print_string, 10,
                          SCREEN_HEIGHT-20, arcade.color.WHITE)
+
+    def update_print_string(self):
+        best_alive_fitness = -1
+        running = 0
+        best_overall_fitness = -1
+
+        for i, match_up in enumerate(self.match_ups):
+            l = len(match_up)
+            if l > 1:
+                running += 1
+
+            for pawn in match_up:
+                if pawn.brain_constructor == None:
+
+                    fit = pawn.calculate_fitness()
+
+                    if l > 1:
+                        if fit > best_alive_fitness:
+                            best_alive_fitness = fit
+                            self.best_match_up = i
+
+                    if fit > best_overall_fitness:
+                        best_overall_fitness = fit
+
+            for pawn in self.match_up_data[i]['dead_pawns']:
+                if pawn.brain_constructor == None:
+
+                    fit = pawn.calculate_fitness()
+
+                    if fit > best_overall_fitness:
+                        best_overall_fitness = fit
+
+        self.print_string = ""
+
+        self.print_string += "Generation: " + \
+            str(self.current_gen) + " | "
+
+        self.print_string += "Matches Running: " + \
+            str(running) + "/" + str(round(self.pop_size/2)) + " | "
+
+        self.print_string += "Best Alive Fitness: " + \
+            str(round(best_alive_fitness)) + " | "
+
+        self.print_string += "Best Overall Fitness: " + \
+            str(round(best_overall_fitness)) + " | "
+
+        self.print_string += "Time Elapsed/Allotted: " + \
+            str(round(time.time() - self.start_time)) + \
+            "/" + str(MAX_GAME_LENGTH)
 
     def get_lasers(self, pawn):
         """
@@ -249,6 +271,9 @@ class Environment(arcade.Window):
         Called every cycle prior to on_draw.
         """
 
+        if time.time() - self.start_time > MAX_GAME_LENGTH:
+            self.restart()
+
         self.__frame_count__ += 1
 
         # if self.__frame_count__ % 60 == 0:
@@ -284,6 +309,8 @@ class Environment(arcade.Window):
                 if len(pawns_killed) > 0:
                     for pawn in pawns_killed:
                         self.kill_pawn(pawn)
+
+        self.update_print_string()
 
     def on_key_press(self, symbol, modifiers):
         """
