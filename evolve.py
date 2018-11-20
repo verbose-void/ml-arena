@@ -7,7 +7,7 @@ import random
 import numpy as np
 import math
 
-POP_SIZE = 200
+POP_SIZE = 180
 assert POP_SIZE % 2 == 0, "Population size MUST be even."
 
 GENERATIONS = 5
@@ -43,7 +43,6 @@ def on_restart(env):
     env.pop = natural_selection(env)
     reset_matchups(env)
     env.current_gen += 1
-    print("Current Generation: " + str(env.current_gen))
 
 
 def on_end(env):
@@ -78,7 +77,7 @@ def random_pawn():
     Randomly select a pawn from the population. (fitness is taken into consideration)
     """
 
-    fitness_sum = 0
+    fitness_sum = 1
 
     for pawn in pop:
         fitness_sum += pawn.calculate_fitness()
@@ -117,18 +116,10 @@ def natural_selection(env):
 def reset_matchups(env):
     new_match_ups = []
 
-    for i, pawn in enumerate(env.pop):
-        dynamic = environment.dynamic_scripting_pawn(
-            random.random() * environment.SCREEN_WIDTH,
-            random.random() * environment.SCREEN_HEIGHT)
-
-        dynamic.set_env(env)
-        pawn.match_index = i
-        dynamic.match_index = i
-
+    for i in range(0, len(pop), 2):
         new_match_ups.append([
-            pawn,
-            dynamic
+            pop[i],
+            pop[i+1]
         ])
 
     assert len(env.match_ups) == len(new_match_ups), (
@@ -142,19 +133,17 @@ def reset_matchups(env):
 def run_matches():
     match_ups = []
 
-    for pawn in pop:
+    for i in range(0, len(pop), 2):
         match_ups.append([
-            pawn,
-            environment.dynamic_scripting_pawn(
-                random.random() * environment.SCREEN_WIDTH,
-                random.random() * environment.SCREEN_HEIGHT)
+            pop[i],
+            pop[i+1]
         ])
 
     env = environment.Environment(*match_ups)
-    env.pop = pop
     env.on_restart = on_restart
-    env.on_end = on_end
     env.pop_size = POP_SIZE
+    env.pop = pop
+    env.on_end = on_end
     arcade.run()
 
 
