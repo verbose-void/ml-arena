@@ -9,7 +9,7 @@ from models import brain, dynamic_scripting_brain
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 
-MAX_GAME_LENGTH = 30  # 30 seconds
+MAX_GAME_LENGTH = 120  # 2 minutes
 
 
 class Environment(arcade.Window):
@@ -306,7 +306,8 @@ class Environment(arcade.Window):
                     for pawn in pawns_killed:
                         self.kill_pawn(pawn)
 
-        self.update_print_string()
+        if self.on_restart != None:
+            self.update_print_string()
 
     def on_key_press(self, symbol, modifiers):
         """
@@ -377,43 +378,41 @@ def dynamic_scripting_pawn(x, y, rot=math.pi):
     return out
 
 
-def dynamic_vs_dynamic_game():
-    """
-    Creates and runs a Dynamic Brain vs another Dynamic Brain game.
-    """
+def player_from_str(s):
+    if s == "player":
+        return default_player_pawn()
+    elif s == "dynamic":
+        return dynamic_scripting_pawn(random.random() * SCREEN_WIDTH, random.random() * SCREEN_HEIGHT)
+    elif s == "mindless":
+        return default_mindless_pawn()
 
-    env = Environment([dynamic_scripting_pawn(SCREEN_WIDTH * 0.2, SCREEN_HEIGHT / 2, 0), dynamic_scripting_pawn(
-        SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2)])
-    arcade.run()
-
-
-def player_vs_dynamic_game():
-    """
-    Creates and runs a Player vs Dynamic Brain game.
-    """
-
-    env = Environment([default_player_pawn(), dynamic_scripting_pawn(
-        SCREEN_WIDTH * 0.8, SCREEN_HEIGHT / 2)])
-    arcade.run()
+    return None
 
 
-def player_vs_mindless():
-    """
-    Creates and runs a Player vs Stagnant Pawn game.
-    """
-
-    env = Environment([default_player_pawn(), default_mindless_pawn()])
-    arcade.run()
+def prompt_for_player(pid):
+    print("")
+    print("-------------------------------")
+    print("What player should be player " + pid + "?")
+    print("Hint: You can choose between:")
+    print(" [player, dynamic, mindless]")
+    print("-------------------------------")
+    print("")
 
 
 if __name__ == "__main__":
-    # player_vs_mindless()
-    # player_vs_dynamic_game()
-    # dynamic_vs_dynamic_game()
+    prompt_for_player("1")
+    p1 = player_from_str(input("P1 Choice: "))
 
-    env = Environment([default_player_pawn(), default_mindless_pawn()],
-                      [default_mindless_pawn(), dynamic_scripting_pawn(200, 200)])
+    if p1 == None:
+        print("That isn't a valid player.")
+        exit()
 
-    # env = Environment(
-    #     [dynamic_scripting_pawn(500, 200), dynamic_scripting_pawn(200, 200)])
+    prompt_for_player("2")
+    p2 = player_from_str(input("P2 Choice: "))
+
+    if p2 == None:
+        print("That isn't a valid player.")
+        exit()
+
+    env = Environment([p1, p2])
     arcade.run()
