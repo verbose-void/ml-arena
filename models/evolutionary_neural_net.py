@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import math
+import os
 
 
 class EvolutionaryNN:
@@ -102,7 +103,7 @@ class EvolutionaryNN:
         Uses sigmoid as the activateion function.
 
         Returns:
-            Returns a new matrix 
+            Returns a new matrix
         """
 
         out = np.zeros(shape=(len(matrix), len(matrix[0])))
@@ -201,7 +202,32 @@ class EvolutionaryNN:
 
         return out
 
+    def save_to_file(self, path_with_name):
+        """
+        Saves all layers to a file with the given path.
+        """
+
+        save = np.asarray(
+            (self.inputs_to_hidden,
+             self.hidden_to_hidden,
+             self.hidden_to_output))
+
+        if not os.path.exists(os.path.dirname(path_with_name)):
+            os.makedirs(os.path.dirname(path_with_name))
+
+        np.save(path_with_name, save)
+        print("Save to file " + path_with_name + " was successful.")
+
     def __str__(self):
         return ("Input Weights: " + str(self.inputs_to_hidden) +
                 "\nHidden Weights: " + str(self.hidden_to_hidden) +
                 "\nOutput Weights: " + str(self.hidden_to_output))
+
+
+def load_from_file(path_with_name):
+    loaded = np.load(path_with_name)
+    ith = loaded[0]
+    hth = loaded[1]
+    hto = loaded[2]
+
+    return EvolutionaryNN(ith, hth, hto)

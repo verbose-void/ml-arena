@@ -95,24 +95,24 @@ class Environment(arcade.Window):
 
         self.__frame_count__ = 0
 
-        for i, match_up in enumerate(self.match_ups):
-
-            new = list()
-
-            for pawn in match_up:
-                new.append(pawn.reset())
-
-            # Put all dead pawns back in their respective alive container
-            # and reset them.
-            for pawn in self.match_up_data[i]["dead_pawns"]:
-                new.append(pawn.reset())
-
-            # Clear dead pawns
-            self.match_up_data[i]["dead_pawns"].clear()
-            self.match_ups[i] = new
-
         if self.on_restart != None:
             self.on_restart(self)
+        else:
+            for i, match_up in enumerate(self.match_ups):
+
+                new = list()
+
+                for pawn in match_up:
+                    new.append(pawn.reset())
+
+                # Put all dead pawns back in their respective alive container
+                # and reset them.
+                for pawn in self.match_up_data[i]["dead_pawns"]:
+                    new.append(pawn.reset())
+
+                # Clear dead pawns
+                self.match_up_data[i]["dead_pawns"].clear()
+                self.match_ups[i] = new
 
     def on_draw(self):
         """
@@ -271,7 +271,7 @@ class Environment(arcade.Window):
         Called every cycle prior to on_draw.
         """
 
-        if time.time() - self.start_time > MAX_GAME_LENGTH:
+        if time.time() - self.start_time > MAX_GAME_LENGTH or self.are_all_episodes_over():
             self.restart()
 
         self.__frame_count__ += 1
@@ -294,9 +294,6 @@ class Environment(arcade.Window):
 
         #     if best_match != None:
         #         self.best_match_up = best_match
-
-        if self.are_all_episodes_over():
-            self.restart()
 
         # Update all pawns in all match ups
 

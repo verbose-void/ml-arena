@@ -5,12 +5,12 @@ import environment
 import arcade
 import random
 import numpy as np
+import os
 import math
 
-POP_SIZE = 180
+POP_SIZE = 200
+AUTO_SAVE_INTERVAL = 10  # Every 10 generations, force save.
 assert POP_SIZE % 2 == 0, "Population size MUST be even."
-
-GENERATIONS = 5
 
 INPUT_NODE_COUNT = 19
 HIDDEN_NODE_COUNT = 20
@@ -40,23 +40,27 @@ def on_restart(env):
     """
     This method is called when all current match ups have completed.
     """
+
     env.pop = natural_selection(env)
     reset_matchups(env)
     env.current_gen += 1
+    print("Training Gen " + str(env.current_gen))
+    if env.current_gen % AUTO_SAVE_INTERVAL == 0:
+        save_data(env, force=True)
 
 
 def on_end(env):
     # Save training data to file & end.
 
-    response = input("Would you like to save the training data? (y/n): ")
-    if response == "y":
-        file_name = input("What file name should I save the data?: ")
-        save_data(file_name, env)
+    save_data(env)
 
 
-def save_data(file_name, env):
-    print("Saving data under " + file_name)
-    # TODO
+def save_data(env, force=False):
+    if force or input("Would you like to save this population? (y/n): ") == "y":
+        for i, pawn in enumerate(env.pop):
+            pawn.brain.nn.save_to_file(env.pop_name + "/" + str(i))
+
+    print("Save Successful.")
 
 
 def best_pawn():
@@ -95,7 +99,7 @@ def random_pawn():
 
 
 def natural_selection(env):
-    new_pop = [best_pawn()]  # Get best net without any mutations
+    new_pop = [best_pawn().reset()]  # Get best net without any mutations
 
     # Natural selection (50% pop size)
     for i in range(POP_SIZE-1):
@@ -104,9 +108,10 @@ def natural_selection(env):
         if i < POP_SIZE / 2:
             nn = env.pop[i].brain.nn.clone()
         else:
-            nn = env.pop[i].brain.nn.crossover(random_pawn().brain.nn)
+            nn = env.pop[i].brain.nn.clone().crossover(
+                random_pawn().brain.nn.clone())
 
-        pawn = create_pawn(nn.mutate(0.1))
+        pawn = create_pawn(nn.mutate(0.05))
         pawn.set_env(env)
         new_pop.append(pawn)
 
@@ -116,11 +121,19 @@ def natural_selection(env):
 def reset_matchups(env):
     new_match_ups = []
 
-    for i in range(0, len(pop), 2):
+    for i in range(0, len(env.pop), 2):
         new_match_ups.append([
-            pop[i],
-            pop[i+1]
+            env.pop[i],
+            env.pop[i+1]
         ])
+
+    for i, mu in enumerate(new_match_ups):
+        for pawn in mu:
+            pawn.match_index = i
+            pawn.set_env(env)
+            env.match_up_data[i]["dead_pawns"].clear()
+            env.match_up_data[i]["starting"][pawn] = (
+                pawn.get_pos(), pawn.get_dir())
 
     assert len(env.match_ups) == len(new_match_ups), (
         "New match ups are " + str(len(new_match_ups)) +
@@ -130,7 +143,7 @@ def reset_matchups(env):
     env.match_ups = new_match_ups
 
 
-def run_matches():
+def run_matches(pop_name):
     match_ups = []
 
     for i in range(0, len(pop), 2):
@@ -143,10 +156,50 @@ def run_matches():
     env.on_restart = on_restart
     env.pop_size = POP_SIZE
     env.pop = pop
+    env.pop_name = pop_name
     env.on_end = on_end
     arcade.run()
 
 
+def save_population(env, containing_folder):
+    pop = env.pop
+
+    for i, pawn in enumerate(pop):
+        pawn.brain.nn.save_to_file(containing_folder + "/" + str(i) + ".txt")
+
+    print("Finished saving population.")
+
+
+def load_population(containing_folder):
+    loaded = []
+
+    for filename in os.listdir(containing_folder):
+        if filename.endswith(".npy"):
+            print(filename)
+            loaded.append(create_pawn(
+                enn.load_from_file(containing_folder + "/" + filename)
+            ))
+
+    return loaded
+
+
 if __name__ == "__main__":
+    resp = input("Would you like to load a population? (y/n): ")
+    pop_name = None
+
+    if resp == "y":
+        pop_name = input(
+            "What is the name of the population?: ")
+
+        if(os.path.isdir(direc)):
+            pop = load_population(direc)
+        else:
+            print("Loading failed. Direcotry \'" +
+                  direc + "\' does not exist.")
+            exit()
+    else:
+        pop_name = input(
+            "Ok, what would you like to name this new population?: ")
+
     generate_random_population()
-    run_matches()
+    run_matches(pop_name)
