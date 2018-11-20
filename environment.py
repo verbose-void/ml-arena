@@ -11,8 +11,6 @@ SCREEN_HEIGHT = 600
 
 MAX_GAME_LENGTH = 30  # 30 seconds
 
-DRAW_BEST = True
-
 
 class Environment(arcade.Window):
     def __init__(self, *match_ups):
@@ -40,6 +38,8 @@ class Environment(arcade.Window):
                 pawn.set_env(self)
                 self.match_up_data[i]["starting"][pawn] = (
                     pawn.get_pos(), pawn.get_dir())
+
+        self.draw_best = True
 
         self.match_ups = list(match_ups)
         self.__frame_count__ = 0
@@ -122,7 +122,7 @@ class Environment(arcade.Window):
         arcade.start_render()
 
         # Draw only the best pawn
-        if DRAW_BEST and self.best_match_up != None:
+        if self.draw_best and self.best_match_up != None:
             match_up = self.match_ups[self.best_match_up]
             l = len(match_up)
             for pawn in match_up:
@@ -138,7 +138,6 @@ class Environment(arcade.Window):
                 pawn.draw()
 
         else:
-
             # Draw all matches
             for i, match_up in enumerate(self.match_ups):
                 l = len(match_up)
@@ -321,6 +320,10 @@ class Environment(arcade.Window):
                 self.on_end(self)
             return
 
+        if symbol == arcade.key.BRACKETLEFT:
+            self.draw_best = False
+            print("ENABLE SHOW ALL")
+
         for match_up in self.match_ups:
             for pawn in match_up:
                 pawn.press(symbol)
@@ -329,6 +332,10 @@ class Environment(arcade.Window):
         """
         Called when a key is released. Then passed to each pawn to check if it's in their control scheme.
         """
+
+        if symbol == arcade.key.BRACKETLEFT:
+            self.draw_best = True
+            print("DISABLE SHOW ALL")
 
         for match_up in self.match_ups:
             for pawn in match_up:

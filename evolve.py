@@ -191,8 +191,8 @@ if __name__ == "__main__":
         pop_name = input(
             "What is the name of the population?: ")
 
-        if(os.path.isdir(direc)):
-            pop = load_population(direc)
+        if(os.path.isdir(pop_name)):
+            pop = load_population(pop_name)
         else:
             print("Loading failed. Direcotry \'" +
                   direc + "\' does not exist.")
@@ -201,5 +201,7 @@ if __name__ == "__main__":
         pop_name = input(
             "Ok, what would you like to name this new population?: ")
 
-    generate_random_population()
+        generate_random_population()
+
+    POP_SIZE = len(pop)
     run_matches(pop_name)
