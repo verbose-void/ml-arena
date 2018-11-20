@@ -21,8 +21,8 @@ class DynamicBrain:
         # Initialize shield strategy at random.
         self.shield_strat = random.choice(shield_strats)
 
-        print("Dynamic Brain initialized with a " +
-              self.shield_strat + " shield strategy.")
+        # print("Dynamic Brain initialized with a " +
+        #       self.shield_strat + " shield strategy.")
 
     def on_tick(self, dt):
         pawn = self.pawn
@@ -42,7 +42,9 @@ class DynamicBrain:
                 # Use shields when health is critical.
                 pawn.use_shield()
 
-        optimal_dist_sqrd = math.pow(pawn.get_laser_life() * 0.85, 2)
+        optimal_dist_sqrd = math.pow(
+            pawn.get_laser_life() * 0.8, 2)
+        optimal_dist_sqrd -= random.random() * 100
         dist_sqrd = pawn.dist_squared(enemy.get_pos())
 
         if pawn.env.__frame_count__ % 10 == 0:
