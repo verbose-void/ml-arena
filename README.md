@@ -25,7 +25,8 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 |Q|Shield|Player Controlled Pawn|
 |SHIFT|Long-range laser|Player Controlled Pawn|
 |SPACE|Short-range laser|Player Controlled Pawn|
-|OPEN-BRACKET|Show all pawns in the population|Evolutionary Training|
+|OPEN-BRACKET|Draw all pawns in every match|All Types|
+|CLOSE-BRACKET|Show connections between all on-screen pawns|All Types|
 |ESCAPE|End training session and prompt to save progress|Evolutionary Training|
 
 
