@@ -197,6 +197,7 @@ if __name__ == "__main__":
 
         if(os.path.isdir(pop_name)):
             pop = load_population(pop_name)
+            size = len(pop)
         else:
             print("Loading failed. Direcotry \'" +
                   direc + "\' does not exist.")
