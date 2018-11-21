@@ -27,3 +27,11 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 |SPACE|Short-range laser|Player Controlled Pawn|
 |OPEN-BRACKET|Show all pawns in the population|Evolutionary Training|
 |ESCAPE|End training session and prompt to save progress|Evolutionary Training|
+
+
+## Showcase:
+#### Base Gameplay:
+![https://i.gyazo.com/b2fd1b4b7dbb1044a2218b12d565b063.gif](https://i.gyazo.com/b2fd1b4b7dbb1044a2218b12d565b063.gif)
+
+#### Evolutionary Training:
+![https://i.gyazo.com/c8d974d828994b937921119e4ebde1ed.gif](https://i.gyazo.com/c8d974d828994b937921119e4ebde1ed.gif)
