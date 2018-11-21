@@ -45,9 +45,6 @@ class DynamicBrain:
                 # Use shields when health is critical.
                 pawn.use_shield()
 
-        optimal_dist_sqrd = math.pow(
-            pawn.get_laser_life() * 0.8, 2)
-        optimal_dist_sqrd -= random.random() * 100
         dist_sqrd = pawn.dist_squared(enemy.get_pos())
 
         if pawn.env.__frame_count__ % 10 == 0:
@@ -62,40 +59,30 @@ class DynamicBrain:
         if dist_sqrd <= math.pow(pawn.get_short_range_dist(), 2):
             attack_type = "short"
             bias = 200
+        elif dist_sqrd <= 500**2:
+            attack_type = "long"
         else:
             attack_type = "long"
+            bias = 130
 
         # Look towards their expected next position
         self.look_towards(
             self.get_best_aim_position(enemy, dist_sqrd, bias=bias))
 
-        if dist_sqrd > optimal_dist_sqrd:
-            # MOVE TOWARDS ENEMY
+        pawn.attack(attack_type)
+        # # Random movements to simulate "strafing"
+        # if round(time.time()) % 2 != 0:
+        #     e_vel = enemy.get_vel()
+        #     xv = random.randint(-1, 1)
+        #     yv = random.randint(-1, 1)
 
-            pos = pawn.get_pos()
-            e_pos = enemy.get_pos()
+        #     if xv == 0 and yv == 0:
+        #         xv = 1
 
-            vec = [
-                -pos[0]+e_pos[0],
-                -pos[1]+e_pos[1]
-            ]
+        #     pawn.move(xv, yv)
 
-            pawn.move(vec[0], vec[1])
-        else:
-            pawn.attack(attack_type)
-            # # Random movements to simulate "strafing"
-            # if round(time.time()) % 2 != 0:
-            #     e_vel = enemy.get_vel()
-            #     xv = random.randint(-1, 1)
-            #     yv = random.randint(-1, 1)
-
-            #     if xv == 0 and yv == 0:
-            #         xv = 1
-
-            #     pawn.move(xv, yv)
-
-            # m = self.get_best_move()
-            # pawn.move(m[0], m[1])
+        # m = self.get_best_move()
+        # pawn.move(m[0], m[1])
 
     def move_to_expected_best(self):
         """

@@ -9,7 +9,7 @@ from models import brain, dynamic_scripting_brain
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 
-MAX_GAME_LENGTH = 45  # 45 seconds
+MAX_GAME_LENGTH = 60  # 1 minute
 
 
 class Environment(arcade.Window):
@@ -39,8 +39,6 @@ class Environment(arcade.Window):
                 self.match_up_data[i]["starting"][pawn] = (
                     pawn.get_pos(), pawn.get_dir())
 
-        self.draw_best = True
-
         self.match_ups = list(match_ups)
         self.__frame_count__ = 0
         self.on_restart = None
@@ -49,6 +47,10 @@ class Environment(arcade.Window):
         self.current_gen = 1
         self.print_string = ""
         self.start_time = time.time()
+
+        # Debug Variables
+        self.draw_best = True
+        self.draw_match_connections = False
 
     def get_closest_enemy_laser(self, pawn):
         """
@@ -121,12 +123,14 @@ class Environment(arcade.Window):
         """
 
         arcade.start_render()
+        prev = None
 
         # Draw only the best pawn
         if self.draw_best and self.best_match_up != None:
             match_up = self.match_ups[self.best_match_up]
             l = len(match_up)
             for pawn in match_up:
+
                 pawn.draw_lasers()
 
                 if l <= 1:
@@ -135,6 +139,12 @@ class Environment(arcade.Window):
                 else:
                     pawn.draw()
 
+                if self.draw_match_connections and prev != None:
+                    arcade.draw_line(
+                        prev.pos[0], prev.pos[1], pawn.pos[0], pawn.pos[1], arcade.color.RED_DEVIL)
+
+                prev = pawn
+
             for pawn in self.match_up_data[self.best_match_up]["dead_pawns"]:
                 pawn.draw()
 
@@ -142,14 +152,19 @@ class Environment(arcade.Window):
             # Draw all matches
             for i, match_up in enumerate(self.match_ups):
                 l = len(match_up)
+
+                if l <= 1:
+                    continue
+
                 for pawn in match_up:
                     pawn.draw_lasers()
+                    pawn.draw()
 
-                    if l <= 1:
-                        # If this pawn is the winner, then color them green.
-                        pawn.draw(arcade.color.GREEN)
-                    else:
-                        pawn.draw()
+                    if self.draw_match_connections and prev != None:
+                        arcade.draw_line(
+                            prev.pos[0], prev.pos[1], pawn.pos[0], pawn.pos[1], arcade.color.RED_DEVIL)
+
+                    prev = pawn
 
                 for pawn in self.match_up_data[i]["dead_pawns"]:
                     pawn.draw()
@@ -306,6 +321,9 @@ class Environment(arcade.Window):
         # Update all pawns in all match ups
 
         for i, match_up in enumerate(self.match_ups):
+            if len(match_up) <= 1:
+                continue
+
             for pawn in match_up:
 
                 if pawn.match_index < 0 or pawn.env == None:
@@ -338,6 +356,10 @@ class Environment(arcade.Window):
             self.draw_best = False
             print("ENABLE SHOW ALL")
 
+        if symbol == arcade.key.BRACKETRIGHT:
+            self.draw_match_connections = True
+            print("ENABLE MATCH CONNECTIONS")
+
         for match_up in self.match_ups:
             for pawn in match_up:
                 pawn.press(symbol)
@@ -350,6 +372,10 @@ class Environment(arcade.Window):
         if symbol == arcade.key.BRACKETLEFT:
             self.draw_best = True
             print("DISABLE SHOW ALL")
+
+        if symbol == arcade.key.BRACKETRIGHT:
+            self.draw_match_connections = False
+            print("DISABLE MATCH CONNECTIONS")
 
         for match_up in self.match_ups:
             for pawn in match_up:

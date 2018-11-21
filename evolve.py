@@ -10,8 +10,8 @@ import math
 
 AUTO_SAVE_INTERVAL = 10  # Every 10 generations, force save.
 
-INPUT_NODE_COUNT = 19
-HIDDEN_NODE_COUNT = 40
+INPUT_NODE_COUNT = 11
+HIDDEN_NODE_COUNT = 20
 OUTPUT_NODE_COUNT = 9
 
 TRAINING_DIR = "training_data"
@@ -21,7 +21,8 @@ def create_pawn(nn):
     brain = en_brain.NEBrain(nn)
     pawn = pawn_actor.Pawn(brain,
                            random.random() * environment.SCREEN_WIDTH,
-                           random.random() * environment.SCREEN_HEIGHT)
+                           random.random() * environment.SCREEN_HEIGHT,
+                           direc=random.random()*math.pi*2)
     brain.set_pawn(pawn)
     return pawn
 
@@ -63,6 +64,9 @@ def on_end(env):
 
 def save_data(env, force=False):
     if force or input("Would you like to save this population? (y/n): ") == "y":
+        if not os.path.isdir(env.pop_name):
+            os.makedirs(env.pop_name)
+
         for i, pawn in enumerate(env.pop):
             pawn.brain.nn.save_to_file(env.pop_name + "/" + str(i))
 
@@ -225,11 +229,11 @@ if __name__ == "__main__":
         print("----------------------")
         print("")
 
-        pop_name = input(
+        pop_name = TRAINING_DIR + "/" + input(
             "Which one?: ")
 
-        if(os.path.isdir(TRAINING_DIR + "/" + pop_name)):
-            pop = load_population(TRAINING_DIR + "/" + pop_name)
+        if(os.path.isdir(pop_name)):
+            pop = load_population(pop_name)
             size = len(pop)
         else:
             print("Loading failed. Direcotry \'" +

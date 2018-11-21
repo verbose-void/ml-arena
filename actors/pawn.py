@@ -80,6 +80,7 @@ class Pawn:
         # Fitness variables
         self.frames_alive = 0
         self.laser_hits = 0
+        self.lasers_shot = 0
         self.laser_hits_taken = 0
         self.won = False
 
@@ -114,7 +115,9 @@ class Pawn:
         Returns a score that determines how well this pawn is doing.
         """
 
-        f = (self.laser_hits*10) - (self.laser_hits_taken * 0.3)
+        # f = (self.laser_hits*10) - (self.laser_hits_taken * 0.3)
+
+        f = (self.laser_hits - (self.lasers_shot*0.05)) * 5
 
         if self.won:
             f *= 1.3
@@ -402,10 +405,14 @@ class Pawn:
             laser = laser_beam.LaserBeam(
                 [self.pos[0], self.pos[1]],
                 self.dir, self.get_long_range_dist(), self.laser_damage*2, self.laser_speed, arcade.color.RED, self)
+
+            self.lasers_shot += 1
         elif t == "short":
             laser = laser_beam.LaserBeam(
                 [self.pos[0], self.pos[1]],
                 self.dir, self.get_short_range_dist(), self.laser_damage*0.8, self.laser_speed*0.6, arcade.color.BLUE, self)
+
+            self.lasers_shot += 1
 
         self.lasers.append(laser)
 

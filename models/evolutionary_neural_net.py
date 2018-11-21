@@ -212,9 +212,6 @@ class EvolutionaryNN:
              self.hidden_to_hidden,
              self.hidden_to_output))
 
-        if not os.path.exists(os.path.dirname(path_with_name)):
-            os.makedirs(os.path.dirname(path_with_name))
-
         np.save(path_with_name, save)
         print("Save to file " + path_with_name + " was successful.")
 

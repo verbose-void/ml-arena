@@ -26,19 +26,19 @@ class NEBrain:
             Pawn Y
             Pawn VelX
             Pawn VelY
-            Pawn Shields
-            Pawn Shield Active
-            Pawn Dir
-            Pawn Health
+            # Pawn Shields
+            # Pawn Shield Active
+            # Pawn Dir
+            # Pawn Health
 
             Enemy X
             Enemy Y
             Enemy VelX
             Enemy VelY
-            Enemy Shields
-            Enemy Shield Active
-            Enemy Dir
-            Enemy Health
+            # Enemy Shields
+            # Enemy Shield Active
+            # Enemy Dir
+            # Enemy Health
 
             Closest Laser X
             Closest Laser Y
@@ -55,20 +55,20 @@ class NEBrain:
             p.pos[1],
             p.vel[0],
             p.vel[1],
-            p.shield_count,
-            1 if p.__shield_on__ else 0,  # Convert to boolean
-            p.dir,
-            p.health,
+            # p.shield_count,
+            # 1 if p.__shield_on__ else 0,  # Convert to boolean
+            # p.dir,
+            # p.health,
 
             # Enemy Data
-            - 1 if e == None else e.pos[0],
+            -1 if e == None else e.pos[0],
             -1 if e == None else e.pos[1],
             -1 if e == None else e.vel[0],
             -1 if e == None else e.vel[1],
-            -1 if e == None else e.shield_count,
-            -1 if e == None else 1 if e.__shield_on__ else 0,  # Convert to boolean
-            -1 if e == None else e.dir,
-            -1 if e == None else e.health,
+            # -1 if e == None else e.shield_count,
+            # -1 if e == None else 1 if e.__shield_on__ else 0,  # Convert to boolean
+            # -1 if e == None else e.dir,
+            # -1 if e == None else e.health,
 
             -1 if l == None else l.pos[0],
             -1 if l == None else l.pos[1],
@@ -90,7 +90,7 @@ class NEBrain:
 
     def act(self):
         """
-        According to the net's outputs, react accordingly.
+        According to the net's outputs, react.
 
         Actions:
             [0]: Move LEFT
