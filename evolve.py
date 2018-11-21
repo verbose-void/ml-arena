@@ -8,9 +8,7 @@ import numpy as np
 import os
 import math
 
-POP_SIZE = 200
 AUTO_SAVE_INTERVAL = 10  # Every 10 generations, force save.
-assert POP_SIZE % 2 == 0, "Population size MUST be even."
 
 INPUT_NODE_COUNT = 19
 HIDDEN_NODE_COUNT = 40
@@ -28,12 +26,19 @@ def create_pawn(nn):
     return pawn
 
 
-def generate_random_population():
+def generate_random_population(size):
+    assert size % 2 == 0, "Population size MUST be even."
+    assert size > 0, "Population size MUST be positive."
+
+    out = []
+
     # Generate initial population
-    for i in range(POP_SIZE):
+    for i in range(size):
         pawn = create_pawn(enn.EvolutionaryNN(
             INPUT_NODE_COUNT, HIDDEN_NODE_COUNT, OUTPUT_NODE_COUNT))
-        pop.append(pawn)
+        out.append(pawn)
+
+    return out
 
 
 def on_restart(env):
@@ -60,7 +65,7 @@ def save_data(env, force=False):
         for i, pawn in enumerate(env.pop):
             pawn.brain.nn.save_to_file(env.pop_name + "/" + str(i))
 
-    print("Save Successful.")
+        print("Save Successful.")
 
 
 def best_pawn():
@@ -101,10 +106,10 @@ def random_pawn(env):
 def natural_selection(env):
     new_pop = [best_pawn().reset()]  # Get best net without any mutations
 
-    for i in range(POP_SIZE-1):
+    for i in range(env.pop_size-1):
         nn = None
 
-        if i < POP_SIZE / 2:
+        if i < env.pop_size / 2:
             nn = random_pawn(env).brain.nn.clone()
         else:
             nn = random_pawn(env).brain.nn.clone().crossover(
@@ -142,10 +147,10 @@ def reset_matchups(env):
     env.match_ups = new_match_ups
 
 
-def run_matches(pop_name):
+def run_matches(pop_name, size):
     match_ups = []
 
-    for i in range(0, len(pop), 2):
+    for i in range(0, size, 2):
         match_ups.append([
             pop[i],
             pop[i+1]
@@ -153,7 +158,7 @@ def run_matches(pop_name):
 
     env = environment.Environment(*match_ups)
     env.on_restart = on_restart
-    env.pop_size = POP_SIZE
+    env.pop_size = size
     env.pop = pop
     env.pop_name = pop_name
     env.on_end = on_end
@@ -199,8 +204,7 @@ if __name__ == "__main__":
     else:
         pop_name = input(
             "Ok, what would you like to name this new population?: ")
+        size = int(input("How many agents per population? (even int): "))
+        pop = generate_random_population(size)
 
-        generate_random_population()
-
-    POP_SIZE = len(pop)
-    run_matches(pop_name)
+    run_matches(pop_name, size)
