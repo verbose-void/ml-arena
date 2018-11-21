@@ -283,7 +283,8 @@ class Pawn:
                                     color)
 
         self.draw_health_bar()
-        self.display_fitness()
+        if self.brain_constructor == None:
+            self.display_fitness()
 
     def press(self, key):
         """

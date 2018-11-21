@@ -9,7 +9,7 @@ from models import brain, dynamic_scripting_brain
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 
-MAX_GAME_LENGTH = 120  # 2 minutes
+MAX_GAME_LENGTH = 45  # 45 seconds
 
 
 class Environment(arcade.Window):
@@ -110,9 +110,10 @@ class Environment(arcade.Window):
                 for pawn in self.match_up_data[i]["dead_pawns"]:
                     new.append(pawn.reset())
 
-                # Clear dead pawns
-                self.match_up_data[i]["dead_pawns"].clear()
                 self.match_ups[i] = new
+
+        for data in self.match_up_data.keys():
+            self.match_up_data[data]["dead_pawns"].clear()
 
     def on_draw(self):
         """
@@ -307,7 +308,7 @@ class Environment(arcade.Window):
         for i, match_up in enumerate(self.match_ups):
             for pawn in match_up:
 
-                if pawn.match_index < 0:
+                if pawn.match_index < 0 or pawn.env == None:
                     continue
 
                 lasers = self.get_lasers(pawn)

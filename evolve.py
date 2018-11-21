@@ -47,7 +47,8 @@ def on_restart(env):
     """
 
     env.pop = natural_selection(env)
-    env.match_ups = convert_pop_to_match_ups(env.pop, env.training_type)
+    env.match_ups = convert_pop_to_match_ups(
+        env.pop, env.training_type, env=env)
     env.current_gen += 1
     print("Training Gen " + str(env.current_gen))
     if env.current_gen % AUTO_SAVE_INTERVAL == 0:
@@ -122,15 +123,17 @@ def natural_selection(env):
     return new_pop
 
 
-def convert_pop_to_match_ups(pop, training_type):
+def convert_pop_to_match_ups(pop, training_type, env=None):
     out = []
 
     if training_type == "self":
         for i in range(0, size, 2):
-            p1 = pop[i].reset()
+            pop[i] = pop[i].reset()
+            p1 = pop[i]
             p1.match_index = math.floor(i/2)
 
-            p2 = pop[i+1].reset()
+            pop[i+1] = pop[i+1].reset()
+            p2 = pop[i+1]
             p2.match_index = math.floor(i/2)
 
             out.append([
@@ -139,14 +142,18 @@ def convert_pop_to_match_ups(pop, training_type):
             ])
     else:
         for i in range(size):
-            p1 = pop[i].reset()
-            p1.match_index = math.floor(i)
+            pop[i] = pop[i].reset()
+            p1 = pop[i]
+            p1.match_index = i
 
             p2 = environment.dynamic_scripting_pawn(
                 random.random() * environment.SCREEN_WIDTH,
                 random.random() * environment.SCREEN_HEIGHT
             )
-            p2.match_index = math.floor(i)
+            p2.match_index = i
+
+            if env != None:
+                p2.env = env
 
             out.append([
                 p1,

@@ -25,6 +25,9 @@ class DynamicBrain:
         #       self.shield_strat + " shield strategy.")
 
     def on_tick(self, dt):
+        if self.pawn.env == None:
+            return
+
         pawn = self.pawn
         enemy = self.pawn.env.get_closest_enemy(self.pawn)
 
