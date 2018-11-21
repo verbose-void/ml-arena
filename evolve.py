@@ -237,7 +237,7 @@ if __name__ == "__main__":
             size = len(pop)
         else:
             print("Loading failed. Direcotry \'" +
-                  direc + "\' does not exist.")
+                  pop_name + "\' does not exist.")
             exit()
     else:
         print("")
