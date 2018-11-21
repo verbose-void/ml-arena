@@ -123,10 +123,10 @@ class Environment(arcade.Window):
         """
 
         arcade.start_render()
-        prev = None
 
         # Draw only the best pawn
         if self.draw_best and self.best_match_up != None:
+            prev = None
             match_up = self.match_ups[self.best_match_up]
             l = len(match_up)
             for pawn in match_up:
@@ -151,6 +151,7 @@ class Environment(arcade.Window):
         else:
             # Draw all matches
             for i, match_up in enumerate(self.match_ups):
+                prev = None
                 l = len(match_up)
 
                 if l <= 1:
