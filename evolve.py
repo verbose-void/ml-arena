@@ -14,6 +14,8 @@ INPUT_NODE_COUNT = 19
 HIDDEN_NODE_COUNT = 40
 OUTPUT_NODE_COUNT = 9
 
+TRAINING_DIR = "training_data"
+
 
 def create_pawn(nn):
     brain = en_brain.NEBrain(nn)
@@ -149,21 +151,12 @@ def run_matches(pop, pop_name, size):
     arcade.run()
 
 
-def save_population(env, containing_folder):
-    pop = env.pop
-
-    for i, pawn in enumerate(pop):
-        pawn.brain.nn.save_to_file(containing_folder + "/" + str(i) + ".txt")
-
-    print("Finished saving population.")
-
-
 def load_population(containing_folder):
     loaded = []
 
     for filename in os.listdir(containing_folder):
         if filename.endswith(".npy"):
-            print(filename)
+            print("Loading %s..." % filename)
             loaded.append(create_pawn(
                 enn.load_from_file(containing_folder + "/" + filename)
             ))
@@ -172,24 +165,61 @@ def load_population(containing_folder):
 
 
 if __name__ == "__main__":
-    resp = input("Would you like to load a population? (y/n): ")
+    existing_data = []
+    for f in os.listdir(TRAINING_DIR):
+        if os.path.isdir(TRAINING_DIR + "/" + f):
+            existing_data.append(f)
+
+    resp = "n"
+
+    print("")
+    print("---------------------------------------------------------")
+    if len(existing_data) > 0:
+        print("There are currently %i existing populations." %
+              len(existing_data))
+        resp = input("Would you like to load one? (y/n): ")
+
+        if resp == "no":
+            print("Ok, let's generate a new one.")
+    else:
+        print("No populations currently exist, let's generate a new one.")
+
     pop_name = None
 
     if resp == "y":
-        pop_name = input(
-            "What is the name of the population?: ")
+        print("")
+        print("----------------------")
+        print("Available populations:")
+        for p in existing_data:
+            print(p)
 
-        if(os.path.isdir(pop_name)):
-            pop = load_population(pop_name)
+        print("----------------------")
+        print("")
+
+        pop_name = input(
+            "Which one?: ")
+
+        if(os.path.isdir(TRAINING_DIR + "/" + pop_name)):
+            pop = load_population(TRAINING_DIR + "/" + pop_name)
             size = len(pop)
         else:
             print("Loading failed. Direcotry \'" +
                   direc + "\' does not exist.")
             exit()
     else:
-        pop_name = input(
-            "Ok, what would you like to name this new population?: ")
-        size = int(input("How many agents per population? (even int): "))
+        print("")
+        pop_name = TRAINING_DIR + "/" + input(
+            "What should we name it?: ")
+        size = int(input("How many agents per generation? (even int): "))
         pop = generate_random_population(size)
 
+    print("")
+    print("")
+    print("-----------------------------------------------")
+    print("")
+    print("            Beginning Simulation...            ")
+    print("")
+    print("-----------------------------------------------")
+    print("")
+    print("")
     run_matches(pop, pop_name, size)
