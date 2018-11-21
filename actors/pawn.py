@@ -33,6 +33,7 @@ class Pawn:
                 self.brain = brain(self)
             else:
                 self.brain = brain
+                self.brain.pawn = self
                 self.brain_constructor = None
         else:
             self.brain = None
@@ -104,7 +105,7 @@ class Pawn:
             self.match_index
         )
 
-        out.set_env(self.env)
+        out.env = self.env
 
         return out
 

@@ -14,8 +14,6 @@ INPUT_NODE_COUNT = 19
 HIDDEN_NODE_COUNT = 40
 OUTPUT_NODE_COUNT = 9
 
-pop = []
-
 
 def create_pawn(nn):
     brain = en_brain.NEBrain(nn)
@@ -47,7 +45,7 @@ def on_restart(env):
     """
 
     env.pop = natural_selection(env)
-    reset_matchups(env)
+    env.match_ups = convert_pop_to_match_ups(env.pop)
     env.current_gen += 1
     print("Training Gen " + str(env.current_gen))
     if env.current_gen % AUTO_SAVE_INTERVAL == 0:
@@ -122,40 +120,26 @@ def natural_selection(env):
     return new_pop
 
 
-def reset_matchups(env):
-    new_match_ups = []
-
-    for i in range(0, len(env.pop), 2):
-        new_match_ups.append([
-            env.pop[i],
-            env.pop[i+1]
-        ])
-
-    for i, mu in enumerate(new_match_ups):
-        for pawn in mu:
-            pawn.match_index = i
-            pawn.set_env(env)
-            env.match_up_data[i]["dead_pawns"].clear()
-            env.match_up_data[i]["starting"][pawn] = (
-                pawn.get_pos(), pawn.get_dir())
-
-    assert len(env.match_ups) == len(new_match_ups), (
-        "New match ups are " + str(len(new_match_ups)) +
-        "| Old match ups are " + str(len(env.match_ups)))
-
-    env.match_ups.clear()
-    env.match_ups = new_match_ups
-
-
-def run_matches(pop_name, size):
-    match_ups = []
+def convert_pop_to_match_ups(pop):
+    out = []
 
     for i in range(0, size, 2):
-        match_ups.append([
-            pop[i],
-            pop[i+1]
+        p1 = pop[i].reset()
+        p1.match_index = math.floor(i/2)
+
+        p2 = pop[i+1].reset()
+        p2.match_index = math.floor(i/2)
+
+        out.append([
+            p1,
+            p2
         ])
 
+    return out
+
+
+def run_matches(pop, pop_name, size):
+    match_ups = convert_pop_to_match_ups(pop)
     env = environment.Environment(*match_ups)
     env.on_restart = on_restart
     env.pop_size = size
@@ -208,4 +192,4 @@ if __name__ == "__main__":
         size = int(input("How many agents per population? (even int): "))
         pop = generate_random_population(size)
 
-    run_matches(pop_name, size)
+    run_matches(pop, pop_name, size)

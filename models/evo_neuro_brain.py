@@ -7,6 +7,9 @@ class NEBrain:
         self.pawn = pawn
 
     def on_tick(self, delta_time):
+        if self.pawn.env == None:
+            return
+
         if self.pawn.env.__frame_count__ % 15 != 0:
             return
 

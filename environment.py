@@ -9,7 +9,7 @@ from models import brain, dynamic_scripting_brain
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 
-MAX_GAME_LENGTH = 120  # 2 minutes
+MAX_GAME_LENGTH = 8  # 8 seconds
 
 
 class Environment(arcade.Window):
@@ -216,10 +216,15 @@ class Environment(arcade.Window):
 
         lasers = []
 
-        for lpawn in self.match_ups[pawn.match_index]:
-            if lpawn != pawn:
-                for l in lpawn.get_lasers():
-                    lasers.append(l)
+        try:
+            for lpawn in self.match_ups[pawn.match_index]:
+                if lpawn != pawn:
+                    for l in lpawn.get_lasers():
+                        lasers.append(l)
+        except:
+            print("exc")
+            print(pawn.match_index)
+            print(len(self.match_ups))
 
         return lasers
 
@@ -298,6 +303,10 @@ class Environment(arcade.Window):
 
         for i, match_up in enumerate(self.match_ups):
             for pawn in match_up:
+
+                if pawn.match_index < 0:
+                    continue
+
                 lasers = self.get_lasers(pawn)
                 pawn.update(lasers, delta_time)
                 pawns_killed = pawn.update_lasers(delta_time)
