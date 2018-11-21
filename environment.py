@@ -9,7 +9,7 @@ from models import brain, dynamic_scripting_brain
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 
-MAX_GAME_LENGTH = 8  # 8 seconds
+MAX_GAME_LENGTH = 120  # 2 minutes
 
 
 class Environment(arcade.Window):
@@ -188,13 +188,16 @@ class Environment(arcade.Window):
                     if fit > best_overall_fitness:
                         best_overall_fitness = fit
 
+        max_matches = math.floor(
+            len(self.pop)/2) if self.training_type == "self" else len(self.pop)
+
         self.print_string = ""
 
         self.print_string += "Generation: " + \
             str(self.current_gen) + " | "
 
         self.print_string += "Matches Running: " + \
-            str(running) + "/" + str(round(self.pop_size/2)) + " | "
+            str(running) + "/" + str(max_matches) + " | "
 
         self.print_string += "Best Alive Fitness: " + \
             str(round(best_alive_fitness)) + " | "

@@ -47,7 +47,7 @@ def on_restart(env):
     """
 
     env.pop = natural_selection(env)
-    env.match_ups = convert_pop_to_match_ups(env.pop)
+    env.match_ups = convert_pop_to_match_ups(env.pop, env.training_type)
     env.current_gen += 1
     print("Training Gen " + str(env.current_gen))
     if env.current_gen % AUTO_SAVE_INTERVAL == 0:
@@ -122,27 +122,44 @@ def natural_selection(env):
     return new_pop
 
 
-def convert_pop_to_match_ups(pop):
+def convert_pop_to_match_ups(pop, training_type):
     out = []
 
-    for i in range(0, size, 2):
-        p1 = pop[i].reset()
-        p1.match_index = math.floor(i/2)
+    if training_type == "self":
+        for i in range(0, size, 2):
+            p1 = pop[i].reset()
+            p1.match_index = math.floor(i/2)
 
-        p2 = pop[i+1].reset()
-        p2.match_index = math.floor(i/2)
+            p2 = pop[i+1].reset()
+            p2.match_index = math.floor(i/2)
 
-        out.append([
-            p1,
-            p2
-        ])
+            out.append([
+                p1,
+                p2
+            ])
+    else:
+        for i in range(size):
+            p1 = pop[i].reset()
+            p1.match_index = math.floor(i)
+
+            p2 = environment.dynamic_scripting_pawn(
+                random.random() * environment.SCREEN_WIDTH,
+                random.random() * environment.SCREEN_HEIGHT
+            )
+            p2.match_index = math.floor(i)
+
+            out.append([
+                p1,
+                p2
+            ])
 
     return out
 
 
-def run_matches(pop, pop_name, size):
-    match_ups = convert_pop_to_match_ups(pop)
+def run_matches(pop, pop_name, size, training_type):
+    match_ups = convert_pop_to_match_ups(pop, training_type)
     env = environment.Environment(*match_ups)
+    env.training_type = training_type
     env.on_restart = on_restart
     env.pop_size = size
     env.pop = pop
@@ -166,9 +183,11 @@ def load_population(containing_folder):
 
 if __name__ == "__main__":
     existing_data = []
-    for f in os.listdir(TRAINING_DIR):
-        if os.path.isdir(TRAINING_DIR + "/" + f):
-            existing_data.append(f)
+
+    if os.path.isdir(TRAINING_DIR):
+        for f in os.listdir(TRAINING_DIR):
+            if os.path.isdir(TRAINING_DIR + "/" + f):
+                existing_data.append(f)
 
     resp = "n"
 
@@ -181,8 +200,11 @@ if __name__ == "__main__":
 
         if resp == "no":
             print("Ok, let's generate a new one.")
+        else:
+            print("---------------------------------------------------------")
     else:
         print("No populations currently exist, let's generate a new one.")
+        print("---------------------------------------------------------")
 
     pop_name = None
 
@@ -208,10 +230,24 @@ if __name__ == "__main__":
             exit()
     else:
         print("")
+        print("---------------------------------------------------------")
         pop_name = TRAINING_DIR + "/" + input(
             "What should we name it?: ")
         size = int(input("How many agents per generation? (even int): "))
+        print("---------------------------------------------------------")
         pop = generate_random_population(size)
+
+    print("")
+    print("---------------------------------------------------------")
+    print("How would you like to train it?")
+    print("Types: [dynamic, self]")
+    training_type = input("Choice: ")
+
+    if training_type != "dynamic" and training_type != "self":
+        print("")
+        print("Invalid Training Type.")
+        print("")
+        exit()
 
     print("")
     print("")
@@ -222,4 +258,4 @@ if __name__ == "__main__":
     print("-----------------------------------------------")
     print("")
     print("")
-    run_matches(pop, pop_name, size)
+    run_matches(pop, pop_name, size, training_type)
