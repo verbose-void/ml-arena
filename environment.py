@@ -397,13 +397,13 @@ def default_player_pawn():
                      (arcade.key.LSHIFT, arcade.key.SPACE, arcade.key.Q))
 
 
-def default_mindless_pawn():
+def default_mindless_pawn(d=math.pi):
     """
     Generates a stagnant, brainless pawn.
     """
 
     out = pawn.Pawn(brain.Brain, SCREEN_WIDTH *
-                    random.random(), SCREEN_HEIGHT * random.random(), math.pi)
+                    random.random(), SCREEN_HEIGHT * random.random(), d)
     return out
 
 
