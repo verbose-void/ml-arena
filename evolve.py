@@ -150,10 +150,14 @@ def convert_pop_to_match_ups(pop, training_type, env=None):
             p1 = pop[i]
             p1.match_index = i
 
-            p2 = environment.dynamic_scripting_pawn(
-                random.random() * environment.SCREEN_WIDTH,
-                random.random() * environment.SCREEN_HEIGHT
-            )
+            if training_type == "dynamic":
+                p2 = environment.dynamic_scripting_pawn(
+                    random.random() * environment.SCREEN_WIDTH,
+                    random.random() * environment.SCREEN_HEIGHT
+                )
+            else:
+                p2 = environment.default_mindless_pawn()
+
             p2.match_index = i
 
             if env != None:
@@ -224,7 +228,7 @@ if __name__ == "__main__":
         print("----------------------")
         print("Available populations:")
         for p in existing_data:
-            print(p)
+            print(" + " + p)
 
         print("----------------------")
         print("")
@@ -251,10 +255,10 @@ if __name__ == "__main__":
     print("")
     print("---------------------------------------------------------")
     print("How would you like to train it?")
-    print("Types: [dynamic, self]")
+    print("Types: [dynamic, self, mindless]")
     training_type = input("Choice: ")
 
-    if training_type != "dynamic" and training_type != "self":
+    if training_type != "dynamic" and training_type != "self" and training_type != "mindless":
         print("")
         print("Invalid Training Type.")
         print("")
