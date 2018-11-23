@@ -28,6 +28,7 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 |OPEN-BRACKET|Draw all pawns in every match|All Types|
 |CLOSE-BRACKET|Show connections between all on-screen pawns|All Types|
 |ESCAPE|End training session and prompt to save progress|Evolutionary Training|
+|BACKSPACE|Force end the current generation|Evolutionary Training|
 
 
 ## Showcase:
