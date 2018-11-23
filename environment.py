@@ -346,6 +346,11 @@ class Environment(arcade.Window):
         Called when a key is pressed. Then passed to each pawn to check if it's in their control scheme.
         """
 
+        if symbol == arcade.key.BACKSPACE:
+            # End this generation
+            self.restart()
+            return
+
         if symbol == arcade.key.ESCAPE:
             # End the game.
             arcade.close_window()
