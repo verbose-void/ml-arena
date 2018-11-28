@@ -10,7 +10,7 @@ SCREEN_HEIGHT = 600
 
 
 class LaserBeam:
-    def __init__(self, pos, direction, life_span, damage, speed, color, firing_pawn):
+    def __init__(self, pos, direction, minimum_life_span, life_span, damage, speed, color, firing_pawn):
         """
         Laser beam data structure.
 
@@ -30,7 +30,8 @@ class LaserBeam:
         self.speed = speed
         self.color = color
 
-        self.life_span_squared = math.pow(life_span, 2)
+        self.life_span_squared = life_span ** 2
+        self.minimum_life_span_squared = minimum_life_span ** 2
         self.killed = None
         self.end_of_life = False
 
@@ -61,6 +62,10 @@ class LaserBeam:
 
         return self.killed
 
+    def get_distance_traveled_squared(self):
+        return math.pow(
+            self.start_pos[0]-self.pos[0], 2) + math.pow(self.start_pos[1]-self.pos[1], 2)
+
     def update(self, delta_time):
         """
         Handles updating the laser's position & if it's out of range it will be delted.
@@ -75,8 +80,7 @@ class LaserBeam:
         self.pos[0] += math.cos(self.dir) * self.speed * delta_time
         self.pos[1] += math.sin(self.dir) * self.speed * delta_time
 
-        dist_squared = math.pow(
-            self.start_pos[0]-self.pos[0], 2) + math.pow(self.start_pos[1]-self.pos[1], 2)
+        dist_squared = self.get_distance_traveled_squared()
 
         if dist_squared > self.life_span_squared:
             return False
