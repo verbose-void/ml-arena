@@ -18,11 +18,20 @@ class DynamicBrain:
             "panic"
         ]
 
+        # Define movement strategy
+        movement_strats = [
+            "aggressive",
+            "match",
+            "passive"
+        ]
+
+        self.movement_strat = random.choice(movement_strats)
+
         # Initialize shield strategy at random.
         self.shield_strat = random.choice(shield_strats)
 
-        # print("Dynamic Brain initialized with a " +
-        #       self.shield_strat + " shield strategy.")
+        print("Dynamic Brain initialized with a %s shield strategy and a %s movement strategy." % (
+            self.shield_strat, self.movement_strat))
 
     def on_tick(self, dt):
         if self.pawn.env == None:
@@ -139,6 +148,23 @@ class DynamicBrain:
                 else:
                     c = random.choice(possible)
                     pawn.move(c[0], c[1])
+        else:
+            enemy = self.pawn.env.get_closest_enemy(self.pawn)
+
+            if self.movement_strat == "match":
+                pawn.move(enemy.vel[0], enemy.vel[1])
+            elif self.movement_strat == "aggressive":
+                # Move towards enemy
+                if random.random() < 0.2:
+                    pawn.move(
+                        enemy.pos[0] - pawn.pos[0],
+                        enemy.pos[1] - pawn.pos[1])
+            elif self.movement_strat == "passive":
+                # Move away from enemy
+                if random.random() < 0.05:
+                    pawn.move(
+                        -(enemy.pos[0] - pawn.pos[0]),
+                        -(enemy.pos[1] - pawn.pos[1]))
 
     def get_best_aim_position(self, pawn, dist_squared, bias=100):
         """
