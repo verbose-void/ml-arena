@@ -5,11 +5,12 @@ import math
 import random
 from actors import pawn
 from models import brain, dynamic_scripting_brain
+import stat_biases
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
 
-MAX_GAME_LENGTH = 60  # 1 minute
+MAX_GAME_LENGTH = 150  # 1.5 minutes
 
 
 class Environment(arcade.Window):
@@ -124,8 +125,14 @@ class Environment(arcade.Window):
 
         arcade.start_render()
 
-        # Draw only the best pawn
+        if env.training_type == "balancing":
+            # The 'best match up' is just the first matchup that is open
+            for i, match_up in enumerate(self.match_ups):
+                if len(match_up) > 1:
+                    self.best_match_up = i
+
         if self.draw_best and self.best_match_up != None:
+            # Draw only the best pawn
             prev = None
             match_up = self.match_ups[self.best_match_up]
             l = len(match_up)
@@ -175,6 +182,17 @@ class Environment(arcade.Window):
                          SCREEN_HEIGHT-20, arcade.color.WHITE)
 
     def update_print_string(self):
+        if self.training_type == "balancing":
+            running = 0
+
+            for i, match_up in enumerate(self.match_ups):
+                l = len(match_up)
+                if l > 1:
+                    running += 1
+
+            self.print_string = "Matches Still Going: %i" % running
+            return
+
         best_alive_fitness = -1
         running = 0
         best_overall_fitness = -1
@@ -185,17 +203,16 @@ class Environment(arcade.Window):
                 running += 1
 
             for pawn in match_up:
-                if pawn.brain_constructor == None:
 
-                    fit = pawn.calculate_fitness()
+                fit = pawn.calculate_fitness()
 
-                    if l > 1:
-                        if fit > best_alive_fitness:
-                            best_alive_fitness = fit
-                            self.best_match_up = i
+                if l > 1:
+                    if fit > best_alive_fitness:
+                        best_alive_fitness = fit
+                        self.best_match_up = i
 
-                    if fit > best_overall_fitness:
-                        best_overall_fitness = fit
+                if fit > best_overall_fitness:
+                    best_overall_fitness = fit
 
             for pawn in self.match_up_data[i]['dead_pawns']:
                 if pawn.brain_constructor == None:
@@ -295,8 +312,12 @@ class Environment(arcade.Window):
         Called every cycle prior to on_draw.
         """
 
-        if time.time() - self.start_time > MAX_GAME_LENGTH or self.are_all_episodes_over():
-            self.restart()
+        if self.training_type != "balancing":
+            if time.time() - self.start_time > MAX_GAME_LENGTH or self.are_all_episodes_over():
+                self.restart()
+        else:
+            if self.are_all_episodes_over():
+                self.restart()
 
         self.__frame_count__ += 1
 
@@ -360,11 +381,9 @@ class Environment(arcade.Window):
 
         if symbol == arcade.key.BRACKETLEFT:
             self.draw_best = False
-            print("ENABLE SHOW ALL")
 
         if symbol == arcade.key.BRACKETRIGHT:
             self.draw_match_connections = True
-            print("ENABLE MATCH CONNECTIONS")
 
         for match_up in self.match_ups:
             for pawn in match_up:
@@ -377,11 +396,9 @@ class Environment(arcade.Window):
 
         if symbol == arcade.key.BRACKETLEFT:
             self.draw_best = True
-            print("DISABLE SHOW ALL")
 
         if symbol == arcade.key.BRACKETRIGHT:
             self.draw_match_connections = False
-            print("DISABLE MATCH CONNECTIONS")
 
         for match_up in self.match_ups:
             for pawn in match_up:
@@ -402,13 +419,18 @@ def default_player_pawn():
                      (arcade.key.LSHIFT, arcade.key.SPACE, arcade.key.Q))
 
 
-def default_mindless_pawn(d=math.pi):
+def default_mindless_pawn(x=None, y=None, d=math.pi):
     """
     Generates a stagnant, brainless pawn.
     """
 
-    out = pawn.Pawn(brain.Brain, SCREEN_WIDTH *
-                    random.random(), SCREEN_HEIGHT * random.random(), d)
+    if x == None:
+        x = SCREEN_WIDTH * random.random()
+
+    if y == None:
+        y = SCREEN_HEIGHT * random.random()
+
+    out = pawn.Pawn(brain.Brain, x, y, d)
     return out
 
 
@@ -434,30 +456,144 @@ def player_from_str(s):
     return None
 
 
+def bias_from_str(s):
+    if s == "normal":
+        return stat_biases.Normal()
+
+    if s == "long":
+        return stat_biases.LongRanged()
+
+    if s == "short":
+        return stat_biases.ShortRanged()
+
+    return None
+
+
 def prompt_for_player(pid):
     print("")
-    print("-------------------------------")
+    print("------------------------------------")
     print("What player should be player " + pid + "?")
-    print("Hint: You can choose between:")
-    print(" [player, dynamic, mindless]")
-    print("-------------------------------")
+    print("    Hint: You can choose between:   ")
+    print("     [player, dynamic, mindless]    ")
+    print("------------------------------------")
+
+
+def prompt_for_bias(pid):
     print("")
+    print("------------------------------------")
+    print("What stat bias should player " + pid + " use?")
+    print("    Hint: You can choose between:   ")
+    print("        [normal, long, short]       ")
+    print("------------------------------------")
+
+
+def on_balancing_restart(env):
+    bias_wins = dict()
+
+    for match_up in env.match_ups:
+        for pawn in match_up:
+            bias = type(pawn.bias).__name__
+
+            if bias not in bias_wins:
+                bias_wins[bias] = 1
+            else:
+                bias_wins[bias] += 1
+
+    c = len(match_ups)
+    print()
+    print("Total Games: %i" % c)
+    print("-------------------------------------")
+    for bias in bias_wins.keys():
+        s = "Bias %s had %i wins. " % (bias, bias_wins[bias])
+        perc = "%.1f" % ((bias_wins[bias] / c) * 100)
+        print(s + "\t" + perc + "%")
+    print("-------------------------------------")
+    print()
+    exit()
 
 
 if __name__ == "__main__":
-    prompt_for_player("1")
-    p1 = player_from_str(input("P1 Choice: "))
+    print()
+    print("---------------------------------------")
+    print("What kind of sim would you like to run?")
+    print("      Choices: [free, balancing]       ")
+    print("---------------------------------------")
+    game_type = input("Choice: ")
 
-    if p1 == None:
-        print("That isn't a valid player.")
-        exit()
+    if game_type == "balancing":
+        prompt_for_bias("1")
+        bias1 = bias_from_str(input("P1 Bias Choice: "))
 
-    prompt_for_player("2")
-    p2 = player_from_str(input("P2 Choice: "))
+        prompt_for_bias("2")
+        bias2 = bias_from_str(input("P2 Bias Choice: "))
 
-    if p2 == None:
-        print("That isn't a valid player.")
-        exit()
+        print("")
+        print("How many concurrent sims would you like to run?")
 
-    env = Environment([p1, p2])
-    arcade.run()
+        sim_count = int(input("Choice (int): "))
+
+        match_ups = []
+
+        for i in range(sim_count):
+            p1 = dynamic_scripting_pawn(
+                SCREEN_WIDTH * random.random(),
+                SCREEN_HEIGHT * random.random()
+            )
+
+            p1.bias = bias1
+
+            p2 = dynamic_scripting_pawn(
+                SCREEN_WIDTH * random.random(),
+                SCREEN_HEIGHT * random.random()
+            )
+
+            p2.bias = bias2
+
+            match_ups.append([p1, p2])
+
+        env = Environment(*match_ups)
+
+        env.training_type = "balancing"
+        env.on_restart = on_balancing_restart
+
+        arcade.run()
+
+    elif game_type == "free":
+
+        prompt_for_player("1")
+        p1 = player_from_str(input("P1 Choice: "))
+
+        if p1 == None:
+            print("That isn't a valid player.")
+            exit()
+
+        prompt_for_bias("1")
+        bias_type = bias_from_str(input("P1 Bias Choice: "))
+
+        if bias_type == None:
+            print("That isn't a valid bias.")
+            exit()
+
+        p1.bias = bias_type
+
+        prompt_for_player("2")
+        p2 = player_from_str(input("P2 Choice: "))
+
+        if p2 == None:
+            print("That isn't a valid player.")
+            exit()
+
+        prompt_for_bias("2")
+        bias_type = bias_from_str(input("P2 Bias Choice: "))
+
+        if bias_type == None:
+            print("That isn't a valid bias.")
+            exit()
+
+        p2.bias = bias_type
+
+        env = Environment([p1, p2])
+        arcade.run()
+
+    else:
+        print("Invalid Game Type.")

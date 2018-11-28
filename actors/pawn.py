@@ -2,6 +2,7 @@ import arcade
 import math
 import time
 from actors import laser_beam
+import stat_biases
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
@@ -15,7 +16,7 @@ RAY_TRACES = False
 
 
 class Pawn:
-    def __init__(self, brain, x, y, direc=0, mcontrols=None, dcontrols=None, acontrols=None, match_index=-1):
+    def __init__(self, brain, x, y, direc=0, mcontrols=None, dcontrols=None, acontrols=None, match_index=-1, bias=None):
         """
         The default pawn type.
 
@@ -49,13 +50,22 @@ class Pawn:
         self.speed = 120
         self.look_speed = 2
         self.max_health = 200
-        self.laser_life = 600
-        self.laser_damage = 10
-        self.laser_speed = 700
+        self.short_laser_life = 300
+        self.long_laser_life = 600
+        self.long_laser_damage = 15
+        self.short_laser_damage = 8
+        self.long_laser_speed = 700
+        self.short_laser_speed = 500
         self.laser_cooldown = 0.1  # measured in seconds
         self.max_shield_count = 5
         self.shield_count = self.max_shield_count  # amount of shield uses
         self.shield_durability = 5  # amount of hits the shield can take
+
+        # Bias Stats
+        if bias != None:
+            self.bias = bias
+        else:
+            self.bias = stat_biases.Normal()
 
         # Meta initialization
         self.pos = [x, y]
@@ -104,7 +114,8 @@ class Pawn:
             self.mcontrols,
             self.dcontrols,
             self.acontrols,
-            self.match_index
+            self.match_index,
+            self.bias
         )
 
         out.env = self.env
@@ -141,9 +152,6 @@ class Pawn:
 
         self.frames_alive = self.env.__frame_count__
         self.is_dead = True
-
-    def get_laser_life(self):
-        return self.laser_life
 
     def use_shield(self):
         """
@@ -363,20 +371,6 @@ class Pawn:
             elif i == 1:
                 self.rotation = "right"
 
-    def get_long_range_dist(self):
-        """
-        Returns how far a long distance attack will travel.
-        """
-
-        return self.laser_life*2
-
-    def get_short_range_dist(self):
-        """
-        Returns how far a short distance attack will travel.
-        """
-
-        return self.laser_life*0.4
-
     def has_active_shield(self):
         """
         Returns wether this pawn has it's shield active.
@@ -424,17 +418,28 @@ class Pawn:
             return
 
         laser = None
+        b = self.bias
 
         if t == "long":
             laser = laser_beam.LaserBeam(
                 [self.pos[0], self.pos[1]],
-                self.dir, self.get_short_range_dist(), self.get_long_range_dist(), self.laser_damage*2, self.laser_speed, arcade.color.RED, self)
+                self.dir,
+                self.short_laser_life * b.short_laser_life_mod,
+                self.long_laser_life * b.long_laser_life_mod,
+                self.long_laser_damage * b.long_laser_damage_mod,
+                self.long_laser_speed * b.long_laser_speed_mod,
+                arcade.color.RED, self)
 
             self.lasers_shot += 1
         elif t == "short":
             laser = laser_beam.LaserBeam(
                 [self.pos[0], self.pos[1]],
-                self.dir, 0, self.get_short_range_dist(), self.laser_damage*0.8, self.laser_speed*0.6, arcade.color.BLUE, self)
+                self.dir,
+                0,
+                self.short_laser_life * b.short_laser_life_mod,
+                self.short_laser_damage * b.short_laser_damage_mod,
+                self.short_laser_speed * b.short_laser_speed_mod,
+                arcade.color.BLUE, self)
 
             self.lasers_shot += 1
 

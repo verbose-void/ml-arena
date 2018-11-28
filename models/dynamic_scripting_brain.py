@@ -18,20 +18,11 @@ class DynamicBrain:
             "panic"
         ]
 
-        # Define movement strategy
-        movement_strats = [
-            "aggressive",
-            "match",
-            "passive"
-        ]
-
-        self.movement_strat = random.choice(movement_strats)
-
         # Initialize shield strategy at random.
         self.shield_strat = random.choice(shield_strats)
 
-        print("Dynamic Brain initialized with a %s shield strategy and a %s movement strategy." % (
-            self.shield_strat, self.movement_strat))
+        # print("Dynamic Brain initialized with a " +
+        #       self.shield_strat + " shield strategy.")
 
     def on_tick(self, dt):
         if self.pawn.env == None:
@@ -50,7 +41,7 @@ class DynamicBrain:
                 # Use shields periodically throughout gameplay.
                 pawn.use_shield()
         elif self.shield_strat == "panic":
-            if pawn.health < pawn.laser_damage * 4:
+            if pawn.health < pawn.long_laser_damage * 4:
                 # Use shields when health is critical.
                 pawn.use_shield()
 
@@ -65,20 +56,27 @@ class DynamicBrain:
         attack_type = None
         bias = 100
 
-        if dist_sqrd <= math.pow(pawn.get_short_range_dist(), 2):
+        if dist_sqrd <= pawn.short_laser_life ** 2:
             attack_type = "short"
             bias = 200
-        elif dist_sqrd <= 500**2:
+        elif dist_sqrd <= pawn.long_laser_life**2:
             attack_type = "long"
         else:
-            attack_type = "long"
-            bias = 130
+            # Move towards enemy
+            pawn.move(
+                enemy.pos[0] - pawn.pos[0],
+                enemy.pos[1] - pawn.pos[1])
+
+            self.look_towards(
+                self.get_best_aim_position(enemy, dist_sqrd, bias=bias))
+            return
 
         # Look towards their expected next position
         self.look_towards(
             self.get_best_aim_position(enemy, dist_sqrd, bias=bias))
 
-        pawn.attack(attack_type)
+        if attack_type:
+            pawn.attack(attack_type)
         # # Random movements to simulate "strafing"
         # if round(time.time()) % 2 != 0:
         #     e_vel = enemy.get_vel()
@@ -148,23 +146,14 @@ class DynamicBrain:
                 else:
                     c = random.choice(possible)
                     pawn.move(c[0], c[1])
+
         else:
             enemy = self.pawn.env.get_closest_enemy(self.pawn)
-
-            if self.movement_strat == "match":
-                pawn.move(enemy.vel[0], enemy.vel[1])
-            elif self.movement_strat == "aggressive":
-                # Move towards enemy
-                if random.random() < 0.2:
-                    pawn.move(
-                        enemy.pos[0] - pawn.pos[0],
-                        enemy.pos[1] - pawn.pos[1])
-            elif self.movement_strat == "passive":
-                # Move away from enemy
-                if random.random() < 0.05:
-                    pawn.move(
-                        -(enemy.pos[0] - pawn.pos[0]),
-                        -(enemy.pos[1] - pawn.pos[1]))
+            if random.random() < 0.5:
+                pawn.move(enemy.vel[1], enemy.vel[0])
+            else:
+                pawn.move(enemy.pos[0] - pawn.pos[0],
+                          enemy.pos[1] - pawn.pos[1])
 
     def get_best_aim_position(self, pawn, dist_squared, bias=100):
         """
@@ -178,7 +167,11 @@ class DynamicBrain:
         pos = pawn.get_pos()
         vel = pawn.get_vel()
         dist = math.sqrt(dist_squared)
-        scalar = dist/pawn.laser_speed*bias
+
+        if dist < pawn.short_laser_life * pawn.bias.short_laser_life_mod:
+            scalar = dist/pawn.short_laser_speed*bias
+        else:
+            scalar = dist/pawn.long_laser_speed*bias
 
         return [
             pos[0] + vel[0]*scalar,
