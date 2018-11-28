@@ -78,11 +78,12 @@ class Pawn:
         self.acontrols = acontrols
 
         # Fitness variables
-        self.frames_alive = 0
+        self.frames_alive = 1
         self.laser_hits = 0
-        self.lasers_shot = 0
-        self.laser_hits_taken = 0
+        self.lasers_shot = 1
+        self.laser_hits_taken = 1
         self.won = False
+        self.is_dead = False
 
         self.last_shot = None
         self.lasers = []
@@ -115,14 +116,23 @@ class Pawn:
         Returns a score that determines how well this pawn is doing.
         """
 
-        # f = (self.laser_hits*10) - (self.laser_hits_taken * 0.3)
+        # Goals for maximum efficiency:
 
-        f = (self.laser_hits - (self.lasers_shot*0.05)) * 5
+        # + Minimize incoming laser damage
+        # + Maximize outgoing laser damage
+        # + Maximize hit/miss ratio
+        # + Maximize time alive
+
+        hit_rate = self.laser_hits / self.lasers_shot
+        fitness = 1000 * hit_rate ** 2
+        # fitness *= self.laser_hits / 5
 
         if self.won:
-            f *= 1.3
+            fitness *= 1.3
+        if self.is_dead:
+            fitness *= 0.7
 
-        return f if f > 0 else 0
+        return fitness
 
     def on_death(self):
         """
@@ -130,6 +140,7 @@ class Pawn:
         """
 
         self.frames_alive = self.env.__frame_count__
+        self.is_dead = True
 
     def get_laser_life(self):
         return self.laser_life
@@ -159,6 +170,19 @@ class Pawn:
 
     def set_env(self, env):
         self.env = env
+
+    def angle_to(self, pos):
+        """
+        Get the required direction to be looking at (in radians) the given position.
+        """
+
+        vec = (
+            self.pos[0] - pos[0],
+            self.pos[1] - pos[1]
+        )
+
+        d = math.atan2(vec[1], vec[0])
+        return d
 
     def get_pawns(self):
         """
@@ -215,7 +239,7 @@ class Pawn:
         self.rotation = "right" if direction == "right" else "left" if direction == "left" else None
 
     def display_fitness(self):
-        arcade.draw_text(str(self.calculate_fitness()),
+        arcade.draw_text(str(round(self.calculate_fitness())),
                          self.pos[0]-100, self.pos[1]-35, arcade.color.WHITE, align="center", width=200)
 
     def draw_health_bar(self):
@@ -404,13 +428,13 @@ class Pawn:
         if t == "long":
             laser = laser_beam.LaserBeam(
                 [self.pos[0], self.pos[1]],
-                self.dir, self.get_long_range_dist(), self.laser_damage*2, self.laser_speed, arcade.color.RED, self)
+                self.dir, self.get_short_range_dist(), self.get_long_range_dist(), self.laser_damage*2, self.laser_speed, arcade.color.RED, self)
 
             self.lasers_shot += 1
         elif t == "short":
             laser = laser_beam.LaserBeam(
                 [self.pos[0], self.pos[1]],
-                self.dir, self.get_short_range_dist(), self.laser_damage*0.8, self.laser_speed*0.6, arcade.color.BLUE, self)
+                self.dir, 0, self.get_short_range_dist(), self.laser_damage*0.8, self.laser_speed*0.6, arcade.color.BLUE, self)
 
             self.lasers_shot += 1
 
@@ -532,6 +556,10 @@ class Pawn:
         # Check for laser collisions
         for l in lasers:
             if self.colliding_with(l):
+                if l.get_distance_traveled_squared() < l.minimum_life_span_squared:
+                    l.kill(None)
+                    continue
+
                 self.take_damage(l.get_damage())
                 if self.health <= 0:
                     l.kill(self)
