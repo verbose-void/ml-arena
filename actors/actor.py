@@ -6,6 +6,10 @@ from environments.environment import *
 BASE_MOVEMENT_SPEED = 100
 BASE_DIRECTIONAL_SPEED = 2
 
+# Determines how large the body will be.
+BODY_RADIUS = 20
+BODY_RADIUS_SQUARED = BODY_RADIUS ** 2
+
 
 class Actor:
 
@@ -207,3 +211,39 @@ class Actor:
     def clear_attack(self):
         """Clears the current attack function (releases the key)."""
         self.current_attack = None
+
+    def look_towards(self, pos: Tuple[int] = None, actor: 'Actor' = None):
+        """
+        Make the actor look at the given pos/actor.
+        """
+
+        assert pos != None or actor != None, 'Can\'t compute the distance between None & None.'
+        assert not(pos != None and actor !=
+                   None), 'Can only compute the distance between a position or an actor, not both.'
+
+        pos: Tuple[float] = pos if pos != None else (
+            actor.get_x(),
+            actor.get_y()
+        )
+
+        di = self.get_direc()
+
+        # A = (x1, y1)
+        A = (math.cos(di)+self.pos[0], math.sin(di)+self.pos[1])
+
+        # B = (x2, y2)
+        B = (-math.cos(di)+self.pos[0], -math.sin(di)+self.pos[1])
+
+        # P = (x, y)
+
+        # d=(x−x1)(y2−y1)−(y−y1)(x2−x1)
+        d = (pos[0]-A[0]) * (B[1]-A[1]) - (pos[1]-A[1]) * (B[0]-A[0])
+
+        looking: int = 0
+
+        if d > 0.505:
+            looking = -1
+        elif d < 0.505:
+            looking = 1
+
+        self.set_looking(looking)

@@ -7,6 +7,7 @@ from actors.pawns.pawn import *
 from actors.actions import *
 from controllers.controller import *
 from controllers.player_controller import *
+from controllers.dynamic_controller import *
 
 import util.stat_biases as stat_biases
 
@@ -112,6 +113,12 @@ def build_player_pawn():
     return pawn
 
 
+def build_dynamic_pawn():
+    pawn = Pawn()
+    pawn.set_controller(DynamicController)
+    return pawn
+
+
 biases = {
     'normal': stat_biases.Normal,
     'short': stat_biases.ShortRanged,
@@ -120,7 +127,8 @@ biases = {
 
 pawn_types = {
     'brainless': Pawn,
-    'player': build_player_pawn
+    'player': build_player_pawn,
+    'dynamic': build_dynamic_pawn
 }
 
 if __name__ == '__main__':

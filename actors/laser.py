@@ -1,6 +1,7 @@
 from typing import List, Tuple
 from actors.actor import *
 import arcade
+import numpy as np
 
 LENGTH = 30
 WIDTH = 5

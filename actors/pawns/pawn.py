@@ -19,9 +19,6 @@ RAY_TRACES = False
 HEALTH_BAR_HEIGHT = 20
 HEALTH_BAR_MAX_WIDTH = 60
 
-# Determines how large the body will be (scales everything.)
-BODY_RADIUS = 20
-BODY_RADIUS_SQUARED = BODY_RADIUS ** 2
 # Determines how wide the base of the aiming cone should be.
 LEG_BASE = BODY_RADIUS * 0.75
 # Determines how far the end of the aiming cone should be.
@@ -254,15 +251,21 @@ class Pawn(actor.Actor):
         for laser in self.lasers:
             laser.draw()
 
-    def update(self, match_up: 'MatchUp', delta_time):
+    def update(self, match_up: 'MatchUp', delta_time) -> bool:
+        """Returns False if this pawn was killed."""
+
         super().update(delta_time)
 
         enemy_lasers = match_up.get_lasers(self)
         laser: Laser
         for laser in enemy_lasers:
             if self.is_colliding_with_laser(laser):
-                self.take_damage(laser.get_damage())
+                if self.take_damage(laser.get_damage()):
+                    return False
+
                 laser.kill()
+
+        return True
 
     def is_colliding_with_laser(self, laser: Laser):
         if self.is_dead:
@@ -343,3 +346,26 @@ class Pawn(actor.Actor):
 
     def get_lasers(self):
         return self.lasers
+
+    def get_best_aim_position(self, pawn: 'Pawn') -> Tuple[float, float]:
+        """
+        Args:
+            actor (Actor): The actor to which you want the best aim position for.
+        """
+
+        bias = 100
+        sb: StatBias = self.stat_bias
+
+        pos = pawn.get_pos()
+        vel = pawn.get_vel()
+        dist = math.sqrt(self.dist_squared(actor=pawn))
+
+        if dist < sb.short_attack_range[1]:
+            scalar = dist / sb.short_attack_speed * bias
+        else:
+            scalar = dist / sb.long_attack_speed * bias
+
+        return (
+            pos[0] + vel[0]*scalar,
+            pos[1] + vel[1]*scalar
+        )

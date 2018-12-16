@@ -44,7 +44,7 @@ class Environment(arcade.Window):
         """Sets the 'best_match_up' property based on each pawn's fitness."""
 
         self.best_match_up = max(
-            self.match_ups, key=lambda mu: mu.get_best_pawn().calculate_fitness())
+            self.match_ups, key=lambda mu: mu.get_best_pawn_based_on_fitness().calculate_fitness())
         return self.best_match_up
 
     def on_draw(self):
@@ -79,7 +79,7 @@ class Environment(arcade.Window):
         )
 
     def on_update(self, delta_time):
-        if not self.are_match_ups_still_going() or \
+        if (not self.are_match_ups_still_going()) or \
                 time.time() - self.start_time > MAX_GAME_LENGTH:
 
             return self.reset()
@@ -93,15 +93,16 @@ class Environment(arcade.Window):
             # Set the absolute max fitness
             self.absolute_max_fitness = \
                 max(self.absolute_max_fitness,
-                    match_up.get_best_pawn().calculate_fitness())
+                    match_up.get_best_pawn_based_on_fitness().calculate_fitness())
 
     def reset(self):
         if self.on_reset != None:
             self.on_reset()
-        else:
-            match_up: MatchUp
-            for match_up in match_ups:
-                match_up.reset()
+
+        print('reset')
+        match_up: MatchUp
+        for match_up in self.match_ups:
+            match_up.reset()
 
         if self.gen_based:
             self.current_gen += 1

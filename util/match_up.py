@@ -1,5 +1,6 @@
 from environments.environment import *
 from actors.pawns.pawn import *
+from controllers.controller import *
 
 
 class MatchUp:
@@ -47,33 +48,101 @@ class MatchUp:
         pawn_set = self.get_alive_pawns() if not draw_dead else self.pawns
         pawn: Pawn
 
+        # Draw all lasers first
         for pawn in pawn_set:
             pawn.draw_lasers()
+
+        # Then draw all pawn bodies
+        for pawn in pawn_set:
             pawn.draw()
+
+        # This way, pawn bodies will always overlay lasers.
 
     def update(self, delta_time, update_dead=False):
         """Updates all pawns & lasers contained in this matchup."""
+        if not self.is_still_going():
+            return
 
         pawn_set = self.get_alive_pawns() if not update_dead else self.pawns
         pawn: Pawn
+        controller: Controller
 
         for pawn in pawn_set:
-            pawn.update(self, delta_time)
+            # Returns false if pawn is KIA
+            if not pawn.update(self, delta_time):
+                self.kill(pawn)
+                break
+
             pawn.update_lasers(self, delta_time)
+
+            # For now, look, think, and act every frame.
+            controller = pawn.controller
+
+            controller.look(self)
+            controller.think()
+            controller.act()
 
     def get_best_pawn_based_on_fitness(self, include_dead=False):
         pawn_set = self.get_alive_pawns() if not include_dead else self.pawns
         return max(pawn_set, key=lambda p: p.calculate_fitness())
 
+    def get_closest_opponent(self, pawn: Pawn) -> Pawn:
+        opponents = self.get_opponents_for(pawn)
+        opponent: Pawn
+
+        closest = None
+        closest_dist = float('inf')
+
+        for opponent in opponents:
+            dist = pawn.dist_squared(actor=opponent)
+            if closest_dist > dist:
+                closest_dist = dist
+                closest = opponent
+
+        return closest
+
+    def get_most_imminent_laser(self, pawn: Pawn) -> Laser:
+        lasers = self.get_lasers(pawn)
+        laser: Laser
+
+        imminent: Laser = None
+        any_on_route = False
+        min_dist = float('inf')
+
+        # If one is on route, they are immediately the most imminent
+        # Unless... there is another laser on route that is closer.
+
+        for laser in lasers:
+            dist = laser.get_dist_if_in_path(pawn.get_pos(), BODY_RADIUS)
+
+            if dist > 0:
+                # ON ROUTE
+
+                # If there weren't any on route before, disregard all previous calculations.
+                if not any_on_route:
+                    min_dist = dist
+                    imminent = laser
+
+                any_on_route = True
+
+                if dist < min_dist:
+                    imminent = laser
+                    min_dist = dist
+
+            elif not any_on_route:
+                if dist < min_dist:
+                    imminent = laser
+                    min_dist = dist
+
+        return imminent
+
     def reset(self):
+        print('reset')
         self.dead_pawns.clear()
-        new_pawns = set()
 
         pawn: Pawn
         for pawn in self.pawns:
-            new_pawns.add(pawn.reset())
-
-        self.pawns = new_pawns
+            pawn.reset()
 
     def on_key_press(self, symbol):
         pawn: Pawn
