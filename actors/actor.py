@@ -90,7 +90,7 @@ class Actor:
 
         return False
 
-    def set_vel(self, new_vel: Tuple[float]):
+    def set_vel(self, new_vel: Tuple[float, float]):
         """Automatically normalized to -1, 0, or 1."""
 
         # Set values to -1, 0, or 1.

@@ -84,7 +84,6 @@ class Laser(Actor):
 
     def draw(self):
         if self.is_dead:
-            print('Be aware... dead laser still being updated.')
             return
 
         color = self.color
