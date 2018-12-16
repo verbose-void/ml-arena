@@ -140,7 +140,7 @@ class Environment(arcade.Window):
 
     def __str__(self):
         if self.best_match_up:
-            max_alive_fitness = self.best_match_up.get_best_pawn().calculate_fitness()
+            max_alive_fitness = self.best_match_up.get_best_pawn_based_on_fitness().calculate_fitness()
         else:
             max_alive_fitness = 0
 
