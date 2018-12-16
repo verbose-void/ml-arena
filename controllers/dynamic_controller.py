@@ -1,6 +1,6 @@
 from controllers.controller import *
 from enum import Enum
-from typing import Tuple, Callable
+from typing import Tuple, Callable, Set
 import random
 
 from actors.laser import *
@@ -8,6 +8,8 @@ from actors.actor import *
 from actors.pawns.pawn import *
 from util.match_up import *
 from util.stat_biases import *
+
+DEBUG = False
 
 
 class ShieldStrat(Enum):
@@ -20,6 +22,7 @@ class DynamicController(Controller):
     shield_strat: ShieldStrat
 
     imminent_laser: Laser = None
+    lasers: Set[Laser] = None
     closest_opponent: Pawn = None
 
     next_move: Tuple[int] = None
@@ -34,35 +37,74 @@ class DynamicController(Controller):
         self.shield_strat = random.choice(list(ShieldStrat))
 
     def set_optimal_move(self):
-        """Set 'next_move' to the most viable velocity combination."""
+        """
+        Set 'next_move' to the most viable velocity combination.
+        Analyzes all enemy laser paths and chooses the path of least resistance.
+        Does NOT take into consideration delta time, because it is calculating the best
+        future reward, not necessarily immediately following the current frame.
+        """
 
-        # Goal: Get out of the way of the imminent laser.
-        il: Laser = self.imminent_laser
+        pawn: Pawn = self.actor
+        lasers = self.lasers
+        laser: Laser
 
-        if il == None:
-            # Move towards enemy
-            self.next_move = (
-                self.closest_opponent.get_x() - self.actor.get_x(),
-                self.closest_opponent.get_y() - self.actor.get_y()
-            )
-            return
+        moves_map = dict()
+        initialized = False
 
-        # Ideally, this value is -1.
-        min_dist = float('inf')
-
-        # Loop through all possible moves
+        # Loop through every possible move
         for i in range(-1, 2):
             for j in range(-1, 2):
                 move = (i, j)
 
-                dist = il.get_dist_if_in_path(move, BODY_RADIUS)
+                # Loop through every laser and get if it's heading towards
+                # the current testing position
 
-                if dist < min_dist:
-                    min_dist = dist
-                    self.next_move = move
+                dx = pawn.get_x() + i * BODY_RADIUS * 1.5
+                dy = pawn.get_y() + j * BODY_RADIUS * 1.5
 
-                    if dist == -1:
-                        break
+                if DEBUG:
+                    # Draw each path of testing for debugging
+                    arcade.draw_line(
+                        pawn.pos[0], pawn.pos[1], dx, dy, arcade.color.WHITE, 2)
+
+                for laser in lasers:
+                    if moves_map.get(move, None) == None:
+                        initialized = True
+                        moves_map[move] = float('-inf')
+
+                    dist = laser.get_dist_if_in_path((dx, dy), BODY_RADIUS)
+
+                    # Log the worst move
+                    moves_map[move] = \
+                        max(moves_map[move], dist)
+
+        if DEBUG:
+            arcade.finish_render()
+
+        if initialized:
+            # Pick min moves_map
+            min_dist = float('inf')
+            best_move = None
+            for move in moves_map.keys():
+                worst = moves_map[move]
+                if worst < min_dist:
+                    min_dist = worst
+                    best_move = move
+
+            self.next_move = best_move
+
+        else:
+            # if random.random() < 0.5:
+            #     pawn.move(enemy.vel[1], enemy.vel[0])
+            # else:
+            #     pawn.move(enemy.pos[0] - pawn.pos[0],
+            #               enemy.pos[1] - pawn.pos[1])
+
+            # Move towards enemy
+            self.next_move = (
+                self.closest_opponent.get_x() - pawn.get_x(),
+                self.closest_opponent.get_y() - pawn.get_y()
+            )
 
     def set_optimal_attack(self):
         dist_squared = self.actor.dist_squared(actor=self.closest_opponent)
@@ -76,6 +118,7 @@ class DynamicController(Controller):
     def look(self, match_up: MatchUp):
         """Observe the environment"""
         self.closest_opponent = match_up.get_closest_opponent(self.actor)
+        self.lasers = match_up.get_lasers(self.actor)
         self.imminent_laser = match_up.get_most_imminent_laser(self.actor)
 
     def think(self):
@@ -88,12 +131,16 @@ class DynamicController(Controller):
         self.set_optimal_move()
         self.set_optimal_attack()
         self.optimal_lead = p.get_best_aim_position(self.closest_opponent)
+        ss = self.shield_strat
 
-        if self.shield_strat == "spread":
+        if ss == ShieldStrat.SPREAD:
+
             if p.health < sb.max_health / sb.max_shield_count * p.shield_count:
                 # Use shields periodically throughout gameplay.
                 self.will_use_shield_next = True
-        elif self.shield_strat == "panic":
+
+        elif ss == ShieldStrat.PANIC:
+
             if p.health < e_sb.long_attack_damage * 3:
                 # Use shields when health is critical.
                 self.will_use_shield_next = True
