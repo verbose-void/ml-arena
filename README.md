@@ -1,6 +1,8 @@
 # ML_Arena
 Compare predictive modes &amp; predispositions to sway learning / evolutionary traits in an asteroids-like arena.
 
+## CURRENTLY UNDER REFACTORY, THIS DOCUMENTATION WILL CHANGE SOON.
+
 ### Versions:
 - Built in [python3](https://www.python.org/downloads/).
 
