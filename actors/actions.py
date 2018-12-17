@@ -2,9 +2,7 @@ from enum import Enum
 import arcade
 
 
-class PlayerActions(Enum):
-    """Defines the possible inputs for a player driven Actor."""
-
+class Actions(Enum):
     # Movement
     MOVE_LEFT = 1
     MOVE_UP = 2
@@ -20,6 +18,10 @@ class PlayerActions(Enum):
     LONG_ATTACK = 8
     USE_SHIELD = 9
 
+
+class PlayerActions(Enum):
+    """Defines the possible inputs for a player driven Actor."""
+
     # Admin
     END_GAME = 10
     END_ROUND = 11
@@ -29,17 +31,17 @@ class PlayerActions(Enum):
 
 
 DEFAULT_MAP = {
-    arcade.key.W: PlayerActions.MOVE_UP,
-    arcade.key.A: PlayerActions.MOVE_LEFT,
-    arcade.key.S: PlayerActions.MOVE_DOWN,
-    arcade.key.D: PlayerActions.MOVE_RIGHT,
+    arcade.key.W: Actions.MOVE_UP,
+    arcade.key.A: Actions.MOVE_LEFT,
+    arcade.key.S: Actions.MOVE_DOWN,
+    arcade.key.D: Actions.MOVE_RIGHT,
 
-    arcade.key.RIGHT: PlayerActions.LOOK_RIGHT,
-    arcade.key.LEFT: PlayerActions.LOOK_LEFT,
+    arcade.key.RIGHT: Actions.LOOK_RIGHT,
+    arcade.key.LEFT: Actions.LOOK_LEFT,
 
-    arcade.key.SPACE: PlayerActions.SHORT_ATTACK,
-    arcade.key.LSHIFT: PlayerActions.LONG_ATTACK,
-    arcade.key.Q: PlayerActions.USE_SHIELD,
+    arcade.key.SPACE: Actions.SHORT_ATTACK,
+    arcade.key.LSHIFT: Actions.LONG_ATTACK,
+    arcade.key.Q: Actions.USE_SHIELD,
 
     arcade.key.ESCAPE: PlayerActions.END_GAME,
     arcade.key.RETURN: PlayerActions.END_ROUND,

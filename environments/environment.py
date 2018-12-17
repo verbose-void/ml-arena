@@ -20,12 +20,8 @@ class Environment(arcade.Window):
     draw_match_connections = False
     draw_dead = False
 
-    current_gen: int = 0
     start_time: float
-    on_reset = None
     started = False
-
-    gen_based: bool = True
 
     def __init__(self, *match_ups: MatchUp):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -96,17 +92,12 @@ class Environment(arcade.Window):
                     match_up.get_best_pawn_based_on_fitness().calculate_fitness())
 
     def reset(self):
-        if self.on_reset != None:
-            self.on_reset()
-
-        print('reset')
+        """Calls reset on each MatchUp & resets start_time."""
         match_up: MatchUp
         for match_up in self.match_ups:
             match_up.reset()
 
-        if self.gen_based:
-            self.current_gen += 1
-            self.start_time = time.time()
+        self.start_time = time.time()
 
     def are_match_ups_still_going(self):
         return self.running_matches_count() > 0
@@ -121,12 +112,6 @@ class Environment(arcade.Window):
 
         return running
 
-    def set_on_reset(self, func):
-        if not callable(func):
-            raise Exception('on_reset MUST be a function.')
-
-        self.on_reset = func
-
     def on_key_press(self, symbol, modifiers):
         match_up: MatchUp
 
@@ -140,25 +125,11 @@ class Environment(arcade.Window):
             match_up.on_key_release(symbol)
 
     def __str__(self):
-        if self.best_match_up:
-            max_alive_fitness = self.best_match_up.get_best_pawn_based_on_fitness().calculate_fitness()
-        else:
-            max_alive_fitness = 0
-
         spacer = ' | '
         out = ''
 
-        out += 'Gen: %i' % self.current_gen
-        out += spacer
-
         out += 'Matches: %i/%i' % \
             (self.running_matches_count(), len(self.match_ups))
-        out += spacer
-
-        out += 'Max Alive Fitness: %i' % round(max_alive_fitness)
-        out += spacer
-
-        out += 'Max Overall Fitness: %i' % round(self.absolute_max_fitness)
         out += spacer
 
         out += 'Time Elapsed/Allotted: %i/%is' % \

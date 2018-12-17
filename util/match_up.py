@@ -1,6 +1,9 @@
 from environments.environment import *
 from actors.pawns.pawn import *
 from controllers.controller import *
+from controllers.player_controller import *
+
+DEBUG = True
 
 
 class MatchUp:
@@ -48,9 +51,18 @@ class MatchUp:
         pawn_set = self.get_alive_pawns() if not draw_dead else self.pawns
         pawn: Pawn
 
+        player_pawn: Pawn = None
+        imminent_laser: Laser = None
+
+        if DEBUG:
+            for pawn in pawn_set:
+                if issubclass(type(pawn.controller), PlayerController):
+                    player_pawn = pawn
+                    imminent_laser = self.get_most_imminent_laser(player_pawn)
+
         # Draw all lasers first
         for pawn in pawn_set:
-            pawn.draw_lasers()
+            pawn.draw_lasers(imminent_laser)
 
         # Then draw all pawn bodies
         for pawn in pawn_set:
@@ -125,11 +137,6 @@ class MatchUp:
 
                 any_on_route = True
 
-                if dist < min_dist:
-                    imminent = laser
-                    min_dist = dist
-
-            elif not any_on_route:
                 if dist < min_dist:
                     imminent = laser
                     min_dist = dist

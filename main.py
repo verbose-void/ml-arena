@@ -1,13 +1,17 @@
 from environments.environment import *
 from environments.balancing_environment import *
 from environments.freeplay_environment import *
+from environments.evolution_environment import *
 
 from util.match_up import *
+from util.population import *
 from actors.pawns.pawn import *
 from actors.actions import *
 from controllers.controller import *
 from controllers.player_controller import *
 from controllers.dynamic_controller import *
+
+from typing import Callable, Set
 
 import util.stat_biases as stat_biases
 
@@ -107,6 +111,42 @@ def build_freeplay_environment():
     return FreeplayEnvironment(match_up)
 
 
+def build_match_ups(population: Population, opponent_factory: Callable) -> Set[MatchUp]:
+    match_ups: Set[MatchUp] = set()
+
+    for i in range(population.size()):
+        creature_pawn = Pawn()
+        creature_pawn.set_controller(
+            CreatureController(
+                creature_pawn,
+                population.get(i)
+            )
+        )
+
+        match_ups.add(
+            MatchUp(
+                creature_pawn,
+                opponent_factory()
+            )
+        )
+
+    return match_ups
+
+
+def build_evolution_environment():
+    against = get_str_choice(
+        'Training Opponent', *training_opponent_types.keys()
+    )
+
+    size = get_int_choice(
+        'Population Size?', min_range=1, max_range=250
+    )
+
+    population = Population(size)
+    match_ups = build_match_ups(population, training_opponent_types[against])
+    return EvolutionEnvironment(*match_ups)
+
+
 def build_player_pawn():
     pawn = Pawn()
     pawn.set_controller(PlayerController)
@@ -131,11 +171,16 @@ pawn_types = {
     'dynamic': build_dynamic_pawn
 }
 
+training_opponent_types = {
+    'brainless': Pawn,
+    'dynamic': build_dynamic_pawn
+}
+
 if __name__ == '__main__':
     spacer()
     # Get choice of simulation
     choice = get_str_choice(
-        'What simulation would you like to run?', 'freeplay', 'balance')
+        'What simulation would you like to run?', 'freeplay', 'balance', 'evolution')
 
     env = None
 
@@ -144,6 +189,9 @@ if __name__ == '__main__':
 
     if choice == 'freeplay':
         env = build_freeplay_environment()
+
+    if choice == 'evolution':
+        env = build_evolution_environment()
 
     assert env != None, 'Environment CANNOT be NoneType.'
     env.run()

@@ -82,7 +82,7 @@ class Laser(Actor):
         if dist_squared > self.max_life_span or self.wrapX() or self.wrapY():
             self.kill()
 
-    def draw(self):
+    def draw(self, specific_color=None):
         if self.is_dead:
             return
 
@@ -91,6 +91,9 @@ class Laser(Actor):
         # If it has a min life span, color it differently when less than.
         if self.get_distance_traveled_squared() < self.min_life_span:
             color = arcade.color.RED_DEVIL
+
+        if specific_color != None:
+            color = specific_color
 
         hp = self.get_head_position()
         arcade.draw_line(self.pos[0], self.pos[1],

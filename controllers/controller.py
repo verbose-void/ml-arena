@@ -3,6 +3,7 @@ from actors.actor import *
 import arcade
 
 PA = PlayerActions
+A = Actions
 
 
 class Controller:
@@ -26,32 +27,32 @@ class Controller:
         a = self.actor
 
         # Movement
-        if action == PA.MOVE_LEFT:
+        if action == A.MOVE_LEFT:
             a.set_vel((-1, None))
 
-        elif action == PA.MOVE_RIGHT:
+        elif action == A.MOVE_RIGHT:
             a.set_vel((1, None))
 
-        elif action == PA.MOVE_UP:
+        elif action == A.MOVE_UP:
             a.set_vel((None, 1))
 
-        elif action == PA.MOVE_DOWN:
+        elif action == A.MOVE_DOWN:
             a.set_vel((None, -1))
 
         # Directional
-        elif action == PA.LOOK_LEFT:
+        elif action == A.LOOK_LEFT:
             a.set_looking(-1)
 
-        elif action == PA.LOOK_RIGHT:
+        elif action == A.LOOK_RIGHT:
             a.set_looking(1)
 
-        elif action == PA.SHORT_ATTACK:
+        elif action == A.SHORT_ATTACK:
             a.short_attack()
 
-        elif action == PA.LONG_ATTACK:
+        elif action == A.LONG_ATTACK:
             a.long_attack()
 
-        elif action == PA.USE_SHIELD:
+        elif action == A.USE_SHIELD:
             a.use_shield()
 
     def undo_action(self, action: 'PlayerActions'):
@@ -59,17 +60,17 @@ class Controller:
         a = self.actor
 
         # Movement
-        if action == PA.MOVE_LEFT or action == PA.MOVE_RIGHT:
+        if action == A.MOVE_LEFT or action == A.MOVE_RIGHT:
             a.set_vel((0, None))
 
-        elif action == PA.MOVE_UP or action == PA.MOVE_DOWN:
+        elif action == A.MOVE_UP or action == A.MOVE_DOWN:
             a.set_vel((None, 0))
 
         # Directional
-        elif action == PA.LOOK_LEFT or action == PA.LOOK_RIGHT:
+        elif action == A.LOOK_LEFT or action == A.LOOK_RIGHT:
             a.set_looking(0)
 
-        elif action == PA.SHORT_ATTACK or action == PA.LONG_ATTACK:
+        elif action == A.SHORT_ATTACK or action == A.LONG_ATTACK:
             a.clear_attack()
 
     def look(self, match_up):

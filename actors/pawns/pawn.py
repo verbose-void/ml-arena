@@ -71,8 +71,13 @@ class Pawn(actor.Actor):
         self.reset()
 
     def set_controller(self, controller: type):
-        assert issubclass(controller, Controller)
-        self.controller = controller(self)
+        assert issubclass(type(controller), Controller) or issubclass(
+            controller, Controller)
+
+        if callable(controller):
+            self.controller = controller(self)
+        else:
+            self.controller = controller
 
     def set_stat_bias(self, stat_bias: SB.StatBias):
         self.stat_bias = stat_bias
@@ -247,9 +252,13 @@ class Pawn(actor.Actor):
         arcade.draw_text(str(round(fit)),
                          self.pos[0]-100, self.pos[1]-35, arcade.color.WHITE, align="center", width=200)
 
-    def draw_lasers(self):
+    def draw_lasers(self, imminent_laser=None):
+        laser: Laser
         for laser in self.lasers:
-            laser.draw()
+            if laser == imminent_laser:
+                laser.draw(specific_color=arcade.color.GREEN)
+            else:
+                laser.draw()
 
     def update(self, match_up: 'MatchUp', delta_time) -> bool:
         """Returns False if this pawn was killed."""
