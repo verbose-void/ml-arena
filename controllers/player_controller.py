@@ -1,4 +1,7 @@
 from controllers.controller import *
+from actors.actions import *
+
+PA = PlayerActions
 
 
 class PlayerController(Controller):

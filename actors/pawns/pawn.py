@@ -14,7 +14,6 @@ import util.stat_biases as SB
 HALF_PI = math.pi / 2
 
 DEFAULT_START_POS = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-RAY_TRACES = False
 
 HEALTH_BAR_HEIGHT = 20
 HEALTH_BAR_MAX_WIDTH = 60
@@ -173,7 +172,7 @@ class Pawn(actor.Actor):
         self.shield_count -= 1
         assert self.shield_count >= 0, 'Something went terribly wrong with shields...'
 
-    def draw(self, color=arcade.color.WHITE):
+    def draw(self, color=arcade.color.WHITE, draw_tracers=False):
         """
         Creates the graphical representation for the pawn using a triangle & circle.
         Sizing is relative to the BODY_RADIUS global variable.
@@ -198,7 +197,7 @@ class Pawn(actor.Actor):
                     math.sin(temp) * LEG_BASE)
 
         # Draw Ray Traces (Debugging)
-        if RAY_TRACES:
+        if draw_tracers:
             arcade.draw_line(self.pos[0], self.pos[1], facing[0]
                              * 1000, facing[1] * 1000, arcade.color.RED_DEVIL, 3)
 

@@ -44,7 +44,7 @@ DEFAULT_MAP = {
     arcade.key.Q: Actions.USE_SHIELD,
 
     arcade.key.ESCAPE: PlayerActions.END_GAME,
-    arcade.key.RETURN: PlayerActions.END_ROUND,
+    arcade.key.BACKSPACE: PlayerActions.END_ROUND,
     arcade.key.BRACKETLEFT: PlayerActions.SHOW_ALL_MATCH_UPS,
     arcade.key.BRACKETRIGHT: PlayerActions.SHOW_CONNECTIONS,
     arcade.key.BACKSLASH: PlayerActions.SHOW_TRACERS

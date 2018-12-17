@@ -2,6 +2,9 @@
 
 import arcade
 import time
+from actors.actions import *
+
+PA = PlayerActions
 
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 600
@@ -19,6 +22,7 @@ class Environment(arcade.Window):
     draw_best = True
     draw_match_connections = False
     draw_dead = False
+    draw_tracers = False
 
     start_time: float
     started = False
@@ -48,14 +52,16 @@ class Environment(arcade.Window):
 
         if self.draw_best:
             if self.best_match_up:
-                self.best_match_up.draw()
+                self.best_match_up.draw(draw_dead=self.draw_dead,
+                                        draw_tracers=self.draw_tracers)
 
         else:
             match_up: MatchUp
 
             for match_up in self.match_ups:
                 if match_up.is_still_going():
-                    match_up.draw(draw_dead=self.draw_dead)
+                    match_up.draw(draw_dead=self.draw_dead,
+                                  draw_tracers=self.draw_tracers)
 
                     if self.draw_match_connections:
                         prev = None
@@ -113,16 +119,60 @@ class Environment(arcade.Window):
         return running
 
     def on_key_press(self, symbol, modifiers):
+        # Handle Global Keys
+        if symbol in DEFAULT_MAP:
+            action = DEFAULT_MAP.get(symbol)
+
+            if action == PA.END_GAME:
+                self.end()
+                return
+
+            elif action == PA.END_ROUND:
+                self.reset()
+                return
+
+            elif action == PA.SHOW_ALL_MATCH_UPS:
+                self.draw_best = False
+                return
+
+            elif action == PA.SHOW_CONNECTIONS:
+                self.draw_match_connections = True
+                return
+
+            elif action == PA.SHOW_TRACERS:
+                self.draw_tracers = True
+                return
+
         match_up: MatchUp
 
         for match_up in self.match_ups:
             match_up.on_key_press(symbol)
 
     def on_key_release(self, symbol, modifiers):
+        # Handle Global Keys
+        if symbol in DEFAULT_MAP:
+            action = DEFAULT_MAP.get(symbol)
+
+            if action == PA.SHOW_ALL_MATCH_UPS:
+                self.draw_best = True
+                return
+
+            elif action == PA.SHOW_CONNECTIONS:
+                self.draw_match_connections = False
+                return
+
+            elif action == PA.SHOW_TRACERS:
+                self.draw_tracers = False
+                return
+
         match_up: MatchUp
 
         for match_up in self.match_ups:
             match_up.on_key_release(symbol)
+
+    def end(self):
+        """Called on game end."""
+        exit()
 
     def __str__(self):
         spacer = ' | '

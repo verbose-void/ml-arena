@@ -45,7 +45,7 @@ class MatchUp:
         alive.remove(pawn)
         return alive
 
-    def draw(self, draw_dead=False):
+    def draw(self, draw_dead=False, draw_tracers=False):
         """Draws all pawns & lasers contained in this matchup."""
 
         pawn_set = self.get_alive_pawns() if not draw_dead else self.pawns
@@ -66,7 +66,7 @@ class MatchUp:
 
         # Then draw all pawn bodies
         for pawn in pawn_set:
-            pawn.draw()
+            pawn.draw(draw_tracers=draw_tracers)
 
         # This way, pawn bodies will always overlay lasers.
 
