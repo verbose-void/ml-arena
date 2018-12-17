@@ -8,7 +8,6 @@ WIDTH = 5
 
 
 class Laser(Actor):
-
     start_pos: Tuple[float]
     speed: float
 
@@ -20,8 +19,11 @@ class Laser(Actor):
     is_dead = False
     color: tuple
 
+    firing_actor: Actor
+
     def __init__(
         self,
+        actor: Actor,
         pos: List[float],
         direc: float,
         speed: float = 500,
@@ -39,6 +41,7 @@ class Laser(Actor):
             max_life_span (float): Maximum travel distance.
         """
 
+        self.firing_actor = actor
         self.speed = speed
         self.direc = direc
         self.pos = list(pos)

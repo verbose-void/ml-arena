@@ -14,6 +14,14 @@ from util.match_up import *
 MAX_GAME_LENGTH = 150  # 1.5 minutes
 
 
+def max_helper(match_up):
+    best = match_up.get_best_pawn_based_on_fitness()
+    if best:
+        return best.calculate_fitness()
+
+    return -1
+
+
 class Environment(arcade.Window):
     match_ups: set = None
     best_match_up: MatchUp = None
@@ -44,7 +52,7 @@ class Environment(arcade.Window):
         """Sets the 'best_match_up' property based on each pawn's fitness."""
 
         self.best_match_up = max(
-            self.match_ups, key=lambda mu: mu.get_best_pawn_based_on_fitness().calculate_fitness())
+            self.match_ups, key=max_helper)
         return self.best_match_up
 
     def on_draw(self):
@@ -91,11 +99,13 @@ class Environment(arcade.Window):
         match_up: MatchUp
         for match_up in self.match_ups:
             match_up.update(delta_time)
+            best_pawn = match_up.get_best_pawn_based_on_fitness()
 
-            # Set the absolute max fitness
-            self.absolute_max_fitness = \
-                max(self.absolute_max_fitness,
-                    match_up.get_best_pawn_based_on_fitness().calculate_fitness())
+            if best_pawn:
+                # Set the absolute max fitness
+                self.absolute_max_fitness = \
+                    max(self.absolute_max_fitness,
+                        best_pawn.calculate_fitness())
 
     def reset(self):
         """Calls reset on each MatchUp & resets start_time."""

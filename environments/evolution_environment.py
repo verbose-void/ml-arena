@@ -2,7 +2,7 @@ from environments.environment import *
 
 
 class EvolutionEnvironment(Environment):
-    current_gen: int = 0
+    current_gen: int = 1
 
     def reset(self):
         super().reset()
@@ -13,7 +13,12 @@ class EvolutionEnvironment(Environment):
         spacer = ' | '
 
         if self.best_match_up:
-            max_alive_fitness = self.best_match_up.get_best_pawn_based_on_fitness().calculate_fitness()
+            best = self.best_match_up.get_best_pawn_based_on_fitness()
+
+            if best:
+                max_alive_fitness = best.calculate_fitness()
+            else:
+                max_alive_fitness = -1
         else:
             max_alive_fitness = 0
 
@@ -27,6 +32,5 @@ class EvolutionEnvironment(Environment):
         out += spacer
 
         out += 'Max Overall Fitness: %i' % round(self.absolute_max_fitness)
-        out += spacer
 
         return out

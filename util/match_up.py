@@ -9,11 +9,12 @@ DEBUG = True
 class MatchUp:
     """Defines the structure for a set of pawns that will be aware of each other's presence."""
 
-    pawns: set = set()
-    dead_pawns: set = set()
+    pawns: set
+    dead_pawns: set
 
     def __init__(self, *pawns: Pawn):
         self.pawns = set(pawns)
+        self.dead_pawns = set()
 
     def is_still_going(self):
         """Checks if this match up has a winner yet."""
@@ -95,6 +96,9 @@ class MatchUp:
             controller.act()
 
     def get_best_pawn_based_on_fitness(self, include_dead=False):
+        if not self.is_still_going():
+            return None
+
         pawn_set = self.get_alive_pawns() if not include_dead else self.pawns
         return max(pawn_set, key=lambda p: p.calculate_fitness())
 
@@ -144,7 +148,6 @@ class MatchUp:
         return imminent
 
     def reset(self):
-        print('reset')
         self.dead_pawns.clear()
 
         pawn: Pawn

@@ -269,6 +269,7 @@ class Pawn(actor.Actor):
         for laser in enemy_lasers:
             if self.is_colliding_with_laser(laser):
                 if self.take_damage(laser.get_damage()):
+                    laser.firing_actor.log_hit()
                     return False
 
                 laser.kill()
@@ -308,6 +309,7 @@ class Pawn(actor.Actor):
         super().long_attack()
 
         laser = Laser(
+            self,
             self.pos,
             self.direc,
             speed=sb.long_attack_speed,
@@ -328,6 +330,7 @@ class Pawn(actor.Actor):
         super().short_attack()
 
         laser = Laser(
+            self,
             self.pos,
             self.direc,
             speed=sb.short_attack_speed,
@@ -377,3 +380,6 @@ class Pawn(actor.Actor):
             pos[0] + vel[0]*scalar,
             pos[1] + vel[1]*scalar
         )
+
+    def log_hit(self):
+        pass
