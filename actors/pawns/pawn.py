@@ -114,8 +114,8 @@ class Pawn(actor.Actor):
                 'Starting position type MUST be contained in the "StartTypes" map.')
 
     def calculate_fitness(self):
-        """Calculates this pawn's fitness (brainless = 0 always)."""
-        return 0
+        """Calculates this pawn's fitness (Non-FitnessPawn = -1 always)."""
+        return -1
 
     def kill(self):
         self.is_dead = True
@@ -245,7 +245,7 @@ class Pawn(actor.Actor):
 
     def draw_fitness_score(self):
         fit = self.calculate_fitness()
-        if fit <= 0:
+        if fit <= -1:
             return
 
         arcade.draw_text(str(round(fit)),
@@ -269,9 +269,9 @@ class Pawn(actor.Actor):
         for laser in enemy_lasers:
             if self.is_colliding_with_laser(laser):
                 if self.take_damage(laser.get_damage()):
-                    laser.firing_actor.log_hit()
                     return False
 
+                laser.firing_actor.log_hit()
                 laser.kill()
 
         return True
@@ -300,11 +300,12 @@ class Pawn(actor.Actor):
     def on_key_release(self, symbol):
         self.controller.on_key_release(symbol)
 
-    def long_attack(self):
+    def long_attack(self) -> bool:
+        """Returns True if laser was shot, False otherwise."""
         sb: SB.StatBias = self.stat_bias
 
         if self.check_attack_capability_and_set_cooldown(sb.long_attack_cooldown):
-            return
+            return False
 
         super().long_attack()
 
@@ -320,12 +321,14 @@ class Pawn(actor.Actor):
         )
 
         self.lasers.add(laser)
+        return True
 
     def short_attack(self):
+        """Returns True if laser was shot, False otherwise."""
         sb: SB.StatBias = self.stat_bias
 
         if self.check_attack_capability_and_set_cooldown(sb.short_attack_cooldown):
-            return
+            return False
 
         super().short_attack()
 
@@ -341,6 +344,7 @@ class Pawn(actor.Actor):
         )
 
         self.lasers.add(laser)
+        return True
 
     def check_attack_capability_and_set_cooldown(self, cool_time) -> bool:
         """Returns True if on cooldown, otherwise False."""

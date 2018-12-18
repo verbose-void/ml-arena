@@ -39,7 +39,6 @@ class Environment(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT)
         arcade.set_background_color(arcade.color.BLACK)
         self.start_time = time.time()
-
         self.match_ups = set(match_ups)
 
     def run(self):

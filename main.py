@@ -111,28 +111,6 @@ def build_freeplay_environment():
     return FreeplayEnvironment(match_up)
 
 
-def build_match_ups(population: Population, opponent_factory: Callable) -> Set[MatchUp]:
-    match_ups: Set[MatchUp] = set()
-
-    for i in range(population.size()):
-        creature_pawn = Pawn()
-        creature_pawn.set_controller(
-            CreatureController(
-                creature_pawn,
-                population.get(i)
-            )
-        )
-
-        match_ups.add(
-            MatchUp(
-                creature_pawn,
-                opponent_factory()
-            )
-        )
-
-    return match_ups
-
-
 def build_evolution_environment():
     against = get_str_choice(
         'Training Opponent', *training_opponent_types.keys()
@@ -143,8 +121,8 @@ def build_evolution_environment():
     )
 
     population = Population(size)
-    match_ups = build_match_ups(population, training_opponent_types[against])
-    return EvolutionEnvironment(*match_ups)
+    population.set_opponent_factory(training_opponent_types[against])
+    return EvolutionEnvironment(population)
 
 
 def build_player_pawn():

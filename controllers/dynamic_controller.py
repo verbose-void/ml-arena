@@ -100,11 +100,23 @@ class DynamicController(Controller):
             #     pawn.move(enemy.pos[0] - pawn.pos[0],
             #               enemy.pos[1] - pawn.pos[1])
 
-            # Move towards enemy
-            self.next_move = (
-                self.closest_opponent.get_x() - pawn.get_x(),
-                self.closest_opponent.get_y() - pawn.get_y()
-            )
+            pawns_dist = pawn.dist_squared(actor=self.closest_opponent)
+
+            if pawns_dist > 600:
+
+                # Move towards enemy
+                self.next_move = (
+                    self.closest_opponent.get_x() - pawn.get_x(),
+                    self.closest_opponent.get_y() - pawn.get_y()
+                )
+
+            else:
+
+                # Move away from enemy
+                self.next_move = (
+                    pawn.get_x() - self.closest_opponent.get_x(),
+                    pawn.get_y() - self.closest_opponent.get_y()
+                )
 
     def set_optimal_attack(self):
         dist_squared = self.actor.dist_squared(actor=self.closest_opponent)
@@ -149,7 +161,7 @@ class DynamicController(Controller):
         """Act out decision."""
         p: Pawn = self.actor
 
-        p.set_vel(self.next_move)
+        p.set_vel(self.next_move if self.next_move else (0, 0))
         p.look_towards(pos=self.optimal_lead)
 
         if self.next_attack:

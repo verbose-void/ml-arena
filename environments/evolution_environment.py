@@ -1,13 +1,41 @@
 from environments.environment import *
+from util.population import *
 
 
 class EvolutionEnvironment(Environment):
-    current_gen: int = 1
+    current_gen: int = 0
+    population: Population
 
-    def reset(self):
-        super().reset()
+    def __init__(self, population: Population):
+        self.population = population
+        self.reset()
+        super().__init__()
 
-        self.current_gen += 1
+    def reset(self, build_new_gen=False):
+        pop = self.population
+
+        if build_new_gen:
+            pop.natural_selection()
+            pop.generate_creatures()
+            self.current_gen += 1
+            super().reset()
+
+        self.match_ups = pop.build_match_ups()
+
+    def on_draw(self):
+        super().on_draw()
+
+        # Draw best neural network graphically
+        if self.draw_best:
+            if self.best_match_up != None:
+                best_creature = self.best_match_up.get_best_pawn_based_on_fitness(
+                    include_dead=True
+                )
+
+                if best_creature != None:
+                    net = self.population.get_network(best_creature)
+                    net.draw_weights()
+                    net.draw_neurons()
 
     def __str__(self):
         spacer = ' | '

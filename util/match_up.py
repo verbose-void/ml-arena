@@ -4,6 +4,7 @@ from controllers.controller import *
 from controllers.player_controller import *
 
 DEBUG = True
+FRAMES_BETWEEN_DECISIONS = 10
 
 
 class MatchUp:
@@ -11,6 +12,7 @@ class MatchUp:
 
     pawns: set
     dead_pawns: set
+    frames: int = 0
 
     def __init__(self, *pawns: Pawn):
         self.pawns = set(pawns)
@@ -76,6 +78,7 @@ class MatchUp:
         if not self.is_still_going():
             return
 
+        self.frames += 1
         pawn_set = self.get_alive_pawns() if not update_dead else self.pawns
         pawn: Pawn
         controller: Controller
@@ -89,14 +92,16 @@ class MatchUp:
             pawn.update_lasers(self, delta_time)
 
             # For now, look, think, and act every frame.
-            controller = pawn.controller
 
-            controller.look(self)
-            controller.think()
-            controller.act()
+            if self.frames % FRAMES_BETWEEN_DECISIONS == 0:
+                controller = pawn.controller
+
+                controller.look(self)
+                controller.think()
+                controller.act()
 
     def get_best_pawn_based_on_fitness(self, include_dead=False):
-        if not self.is_still_going():
+        if not self.is_still_going() and not include_dead:
             return None
 
         pawn_set = self.get_alive_pawns() if not include_dead else self.pawns
@@ -153,6 +158,8 @@ class MatchUp:
         pawn: Pawn
         for pawn in self.pawns:
             pawn.reset()
+
+        self.frames = 0
 
     def on_key_press(self, symbol):
         pawn: Pawn

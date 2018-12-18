@@ -21,7 +21,7 @@ ACTION_LIST = [
 ]
 
 INPUT_NODES = 6
-HIDDEN_NODES = 5
+HIDDEN_NODES = 12
 OUTPUT_NODES = len(ACTION_LIST)
 
 REACTION_THRESHOLD = 0.72
@@ -57,15 +57,18 @@ class CreatureController(Controller):
         imminent: Laser = match_up.get_most_imminent_laser(p)
         enemy: Pawn = match_up.get_closest_opponent(p)
 
+        max_angle = math.pi * 2
+
         self.inputs = [
-            p.dist_squared(actor=imminent) if imminent != None else -1,
-            p.angle_to(actor=imminent) if imminent != None else -1,
+            1/math.sqrt(p.dist_squared(actor=imminent)
+                        ) if imminent != None else 0,
+            p.angle_to(actor=imminent)/max_angle if imminent != None else 0,
 
-            p.dist_squared(actor=enemy) if enemy != None else -1,
-            p.angle_to(actor=enemy) if enemy != None else -1,
+            1/math.sqrt(p.dist_squared(actor=enemy)) if enemy != None else 0,
+            p.angle_to(actor=enemy)/max_angle if enemy != None else 0,
 
-            p.get_direc(),
-            p.health
+            p.get_direc()/max_angle,
+            p.health/p.stat_bias.max_health
         ]
 
     def think(self):
