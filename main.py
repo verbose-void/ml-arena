@@ -39,8 +39,9 @@ def get_str_choice(i_prompt, *acceptable):
         choice = input(prompt)
         spacer()
 
-        if choice in acceptable:
-            return choice
+        for potential in acceptable:
+            if potential.startswith(choice):
+                return potential
 
         if choice == EXIT_STR:
             print('Exiting...')

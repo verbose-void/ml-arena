@@ -262,6 +262,9 @@ class Pawn(actor.Actor):
     def update(self, match_up: 'MatchUp', delta_time) -> bool:
         """Returns False if this pawn was killed."""
 
+        if self.is_dead:
+            return True
+
         super().update(delta_time)
 
         enemy_lasers = match_up.get_lasers(self)

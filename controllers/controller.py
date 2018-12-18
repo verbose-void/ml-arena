@@ -24,7 +24,10 @@ class Controller:
 
     def submit_action(self, action: 'PlayerActions'):
         """Does the given action."""
-        a = self.actor
+        a: Pawn = self.actor
+
+        if a.is_dead:
+            return
 
         # Movement
         if action == A.MOVE_LEFT:

@@ -93,7 +93,8 @@ class Environment(arcade.Window):
 
             return self.reset()
 
-        self.calculate_best_match_up()
+        if random.random() < 0.25:
+            self.calculate_best_match_up()
 
         match_up: MatchUp
         for match_up in self.match_ups:

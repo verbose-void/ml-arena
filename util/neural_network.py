@@ -2,15 +2,28 @@ import numpy as np
 import math
 import random
 import arcade
+from enum import Enum
 from typing import List, Tuple
 from environments.environment import *
 
-NEURON_DIST = 70
-VERBOSE_NEURON_SPACING_X = 70
-VERBOSE_NEURON_SPACING_Y = 26
-VERBOSE_NEURON_RADIUS = 12
-VERBOSE_NEURON_TEXT_SIZE = 12
-VERBOSE_MAX_SYNAPSE_WEIGHT = 5
+NEURON_DIST = 50
+VERBOSE_NEURON_SPACING_X = 60
+VERBOSE_NEURON_SPACING_Y = 18
+VERBOSE_NEURON_RADIUS = 8
+VERBOSE_NEURON_TEXT_SIZE = 5
+VERBOSE_MAX_SYNAPSE_THICKNESS = 2
+NETWORK_CENTER_HEIGHT = SCREEN_HEIGHT / 4
+
+REACTION_THRESHOLD = 0.7
+
+
+class ActivationType(Enum):
+    RELU = 0
+    SIGMOID = 1
+    TANH = 2
+
+
+ACTIVATION = ActivationType.TANH
 
 
 class NeuralNetwork:
@@ -34,27 +47,40 @@ class NeuralNetwork:
 
         if dimensions:
             self.layer_weights = []
+            variance = 2/np.sum(dimensions)
+            stddev = math.sqrt(variance)
+
             for i in range(len(dimensions)-1):
+                layer = np.random.normal(
+                    loc=0,
+                    scale=stddev,
+                    size=(dimensions[i], dimensions[i+1])
+                )
+
                 self.layer_weights.append(
-                    np.random.uniform(
-                        size=(dimensions[i], dimensions[i+1])
-                    )
+                    layer
                 )
             return
 
         self.layer_weights = list(layer_weights)
 
-    def clone(self):
-        return NeuralNetwork(
-            layer_weights=self.layer_weights
-        )
-
     def sigmoid(self, x, derivative=False):
         return x*(1-x) if derivative else 1/(1+np.exp(-x))
 
+    def ReLU(self, x):
+        return x * (x > 0)
+
+    def softmax(self, x):
+        return np.exp(x) / np.sum(np.exp(x), axis=0)
+
     def activate_layer(self, layer: list):
         for x in np.nditer(layer, op_flags=['readwrite']):
-            x[...] = self.sigmoid(x)
+            if ACTIVATION == ActivationType.RELU:
+                x[...] = self.ReLU(x)
+            elif ACTIVATION == ActivationType.SIGMOID:
+                x[...] = self.sigmoid(x)
+            elif ACTIVATION == ActivationType.TANH:
+                x[...] = np.tanh(x)
 
     def output(self, inputs: list):
         """Calculates the output for the given inputs."""
@@ -66,10 +92,27 @@ class NeuralNetwork:
         self.neuron_weights.append(np.array((inputs)))
         output = inputs
 
-        for weight_layer in self.layer_weights:
-            output = np.matmul(output, weight_layer)
-            self.activate_layer(output)
+        if ACTIVATION == ActivationType.RELU:
+
+            for i, weight_layer in enumerate(self.layer_weights):
+                output = np.dot(output, weight_layer)
+
+                if i < len(self.layer_weights)-1:
+                    self.activate_layer(output)
+                    self.neuron_weights.append(output)
+                else:
+                    break
+
+            # Output layer should be activated using softmax when using ReLU
+            output = self.softmax(output)
             self.neuron_weights.append(output)
+
+        else:
+
+            for weight_layer in self.layer_weights:
+                output = np.matmul(output, weight_layer)
+                self.activate_layer(output)
+                self.neuron_weights.append(output)
 
         return output
 
@@ -82,7 +125,7 @@ class NeuralNetwork:
         self.neuron_screen_locations = []
 
         for i, layer in enumerate(self.neuron_weights):
-            y = SCREEN_HEIGHT / 2 - \
+            y = NETWORK_CENTER_HEIGHT - \
                 ((len(layer) / 2) * VERBOSE_NEURON_SPACING_Y)
 
             self.neuron_screen_locations.append([])
@@ -96,14 +139,8 @@ class NeuralNetwork:
                     x,
                     y,
                     VERBOSE_NEURON_RADIUS,
-                    arcade.color.WHITE
-                )
-
-                arcade.draw_circle_outline(
-                    x,
-                    y,
-                    VERBOSE_NEURON_RADIUS,
-                    arcade.color.WHITE
+                    arcade.color.WHITE if i < len(
+                        self.neuron_weights)-1 or weight < REACTION_THRESHOLD else arcade.color.GREEN
                 )
 
                 arcade.draw_text(
@@ -138,7 +175,8 @@ class NeuralNetwork:
                         neuron2[0],
                         neuron2[1],
                         arcade.color.WHITE,
-                        border_width=VERBOSE_MAX_SYNAPSE_WEIGHT * weight
+                        border_width=max(
+                            0.1, VERBOSE_MAX_SYNAPSE_THICKNESS * weight)
                     )
 
 

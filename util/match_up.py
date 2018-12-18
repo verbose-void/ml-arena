@@ -4,7 +4,7 @@ from controllers.controller import *
 from controllers.player_controller import *
 
 DEBUG = True
-FRAMES_BETWEEN_DECISIONS = 10
+FRAMES_BETWEEN_DECISIONS = 1
 
 
 class MatchUp:

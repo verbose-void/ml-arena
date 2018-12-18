@@ -20,11 +20,13 @@ ACTION_LIST = [
     Actions.SHORT_ATTACK
 ]
 
-INPUT_NODES = 6
-HIDDEN_NODES = 12
-OUTPUT_NODES = len(ACTION_LIST)
-
-REACTION_THRESHOLD = 0.72
+NETWORK_DIMENSIONS = (
+    6,
+    10,
+    12,
+    10,
+    len(ACTION_LIST)
+)
 
 
 class CreatureController(Controller):
@@ -41,11 +43,7 @@ class CreatureController(Controller):
 
         if neural_network == None:
 
-            self.neural_network = NeuralNetwork(
-                INPUT_NODES,
-                HIDDEN_NODES,
-                OUTPUT_NODES
-            )
+            self.neural_network = NeuralNetwork(NETWORK_DIMENSIONS)
 
         else:
             self.neural_network = neural_network
@@ -61,11 +59,11 @@ class CreatureController(Controller):
 
         self.inputs = [
             1/math.sqrt(p.dist_squared(actor=imminent)
-                        ) if imminent != None else 0,
-            p.angle_to(actor=imminent)/max_angle if imminent != None else 0,
+                        ) if imminent != None else 1,
+            p.angle_to(actor=imminent)/max_angle if imminent != None else 1,
 
-            1/math.sqrt(p.dist_squared(actor=enemy)) if enemy != None else 0,
-            p.angle_to(actor=enemy)/max_angle if enemy != None else 0,
+            1/math.sqrt(p.dist_squared(actor=enemy)) if enemy != None else 1,
+            p.angle_to(actor=enemy)/max_angle if enemy != None else 1,
 
             p.get_direc()/max_angle,
             p.health/p.stat_bias.max_health

@@ -1,5 +1,5 @@
 from typing import List
-from util.neural_network import *
+from util.evolutionary_neural_network import *
 from controllers.creature_controller import *
 from actors.pawns.fitness_pawn import *
 from util.match_up import *
@@ -8,29 +8,23 @@ import math
 import random
 
 
-def generate_random_networks(size) -> List[NeuralNetwork]:
+def generate_random_networks(size) -> List[EvoNeuralNetwork]:
     out = []
 
     for i in range(size):
         out.append(
-            NeuralNetwork(
-                (
-                    INPUT_NODES,
-                    HIDDEN_NODES,
-                    OUTPUT_NODES
-                )
-            )
+            EvoNeuralNetwork(NETWORK_DIMENSIONS)
         )
 
     return out
 
 
 class Population:
-    neural_networks = List[NeuralNetwork]
+    neural_networks = List[EvoNeuralNetwork]
     creatures_to_nets: dict
     opponent_factory: Callable = None
 
-    def __init__(self, networks: List[NeuralNetwork]):
+    def __init__(self, networks: List[EvoNeuralNetwork]):
         self.neural_networks = networks
         self.generate_creatures()
 
@@ -41,14 +35,14 @@ class Population:
     def set_opponent_factory(self, factory: Callable):
         self.opponent_factory = factory
 
-    def get(self, i: int) -> NeuralNetwork:
+    def get(self, i: int) -> EvoNeuralNetwork:
         """Returns the neural network at the given index."""
         return self.neural_networks[i]
 
     def get_network(self, creature: FitnessPawn):
         return self.creatures_to_nets[creature]
 
-    def best_network(self) -> NeuralNetwork:
+    def best_network(self) -> EvoNeuralNetwork:
         best = None
         best_fit = float('-inf')
 
@@ -60,7 +54,7 @@ class Population:
 
         return best
 
-    def pick_random(self) -> NeuralNetwork:
+    def pick_random(self) -> EvoNeuralNetwork:
         fitness_sum = 1
 
         for pawn in self.creatures_to_nets.keys():

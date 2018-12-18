@@ -8,10 +8,10 @@ class EvolutionEnvironment(Environment):
 
     def __init__(self, population: Population):
         self.population = population
-        self.reset()
+        self.reset(build_new_gen=False)
         super().__init__()
 
-    def reset(self, build_new_gen=False):
+    def reset(self, build_new_gen=True):
         pop = self.population
 
         if build_new_gen:
@@ -21,6 +21,7 @@ class EvolutionEnvironment(Environment):
             super().reset()
 
         self.match_ups = pop.build_match_ups()
+        self.calculate_best_match_up()
 
     def on_draw(self):
         super().on_draw()
