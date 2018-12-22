@@ -11,7 +11,7 @@ SCREEN_HEIGHT = 600
 
 from util.match_up import *
 
-MAX_GAME_LENGTH = 150  # 1.5 minutes
+MAX_GAME_LENGTH = 45  # 45 seconds
 
 
 def max_helper(match_up):

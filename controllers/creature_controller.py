@@ -21,8 +21,8 @@ ACTION_LIST = [
 ]
 
 NETWORK_DIMENSIONS = (
-    6,
-    8,
+    5,
+    7,
     len(ACTION_LIST)
 )
 
@@ -63,8 +63,7 @@ class CreatureController(Controller):
             1/math.sqrt(p.dist_squared(actor=enemy)) if enemy != None else 1,
             p.angle_to(actor=enemy)/max_angle if enemy != None else 1,
 
-            p.get_direc()/max_angle,
-            p.health/p.stat_bias.max_health
+            p.get_direc()/max_angle
         ]
 
     def think(self):

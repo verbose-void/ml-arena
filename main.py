@@ -11,6 +11,7 @@ from actors.actions import *
 from controllers.controller import *
 from controllers.player_controller import *
 from controllers.dynamic_controller import *
+from controllers.creature_controller import *
 
 from typing import Callable, Set
 
@@ -113,6 +114,36 @@ def build_freeplay_environment():
     return FreeplayEnvironment(match_up)
 
 
+def get_genome_to_load():
+    if len(Population.get_valid_populations()) < 1:
+        print('No populations exist.')
+        return None
+
+    print(Population.list_all_saved())
+
+    while True:
+        name = input('Choice (or exit): ')
+
+        if name == EXIT_STR:
+            print('Exiting...')
+            exit()
+
+        if Population.is_valid_population_directory(name):
+            break
+        else:
+            print('\nInvalid choice.\n')
+
+    path = os.path.join(POPULATION_DIRECTORY, name)
+
+    genome_number = get_int_choice(
+        'Which genome would you like to sample?',
+        min_range=0,
+        max_range=len(os.listdir(path))-2
+    )
+
+    return NeuralNetwork.load_from_file(os.path.join(path, '%i.npy' % genome_number))
+
+
 def get_population_to_load(prompt: str):
     if len(Population.get_valid_populations()) < 1:
         print('No populations exist.')
@@ -194,6 +225,17 @@ def build_dynamic_pawn():
     return pawn
 
 
+def build_genome_pawn():
+    pawn = Pawn()
+    controller = CreatureController(
+        pawn,
+        get_genome_to_load()
+    )
+
+    pawn.set_controller(controller)
+    return pawn
+
+
 biases = {
     'normal': stat_biases.Normal,
     'short': stat_biases.ShortRanged,
@@ -203,7 +245,8 @@ biases = {
 pawn_types = {
     'brainless': Pawn,
     'player': build_player_pawn,
-    'dynamic': build_dynamic_pawn
+    'dynamic': build_dynamic_pawn,
+    'genome': build_genome_pawn
 }
 
 training_opponent_types = {
