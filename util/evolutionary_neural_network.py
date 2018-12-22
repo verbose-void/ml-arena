@@ -4,7 +4,6 @@ import random
 
 class EvoNeuralNetwork(NeuralNetwork):
     def crossover(self, other: 'EvoNeuralNetwork'):
-
         child_layer_weights = []
 
         parentA_layer: np.ndarray
@@ -40,8 +39,12 @@ class EvoNeuralNetwork(NeuralNetwork):
             layer_weights=self.layer_weights
         )
 
-    def mutate(self, mutation_rate=0.1):
+    def mutate(self, mutation_rate=0.075):
         for layer in self.layer_weights:
             for x in np.nditer(layer, op_flags=['readwrite']):
                 if random.random() < mutation_rate:
-                    x[...] = random.random()
+                    mod = mutation_rate if random.random() < 0.5 else -mutation_rate
+                    x[...] = min(1, max(-1, x + mod * random.random()))
+
+    def load_from_file(path: str):
+        return EvoNeuralNetwork(layer_weights=NeuralNetwork.load_from_file(path).layer_weights)

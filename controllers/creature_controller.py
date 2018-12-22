@@ -22,9 +22,7 @@ ACTION_LIST = [
 
 NETWORK_DIMENSIONS = (
     6,
-    10,
-    12,
-    10,
+    8,
     len(ACTION_LIST)
 )
 

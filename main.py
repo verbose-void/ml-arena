@@ -2,6 +2,7 @@ from environments.environment import *
 from environments.balancing_environment import *
 from environments.freeplay_environment import *
 from environments.evolution_environment import *
+from environments.adversarial_evolution_environment import *
 
 from util.match_up import *
 from util.population import *
@@ -112,18 +113,73 @@ def build_freeplay_environment():
     return FreeplayEnvironment(match_up)
 
 
+def get_population_to_load(prompt: str):
+    if len(Population.get_valid_populations()) < 1:
+        print('No populations exist.')
+        return None
+
+    if get_str_choice(prompt, 'yes', 'no') == 'no':
+        return None
+
+    print(Population.list_all_saved())
+
+    while True:
+        name = input('Choice (or exit): ')
+
+        if name == EXIT_STR:
+            print('Exiting...')
+            exit()
+
+        if Population.is_valid_population_directory(name):
+            break
+        else:
+            print('\nInvalid choice.\n')
+
+    return Population.load_from_dir(name)
+
+
 def build_evolution_environment():
-    against = get_str_choice(
-        'Training Opponent', *training_opponent_types.keys()
-    )
+    sim_type = get_str_choice('Training Type?', 'adversarial', 'other')
 
-    size = get_int_choice(
-        'Population Size?', min_range=1, max_range=250
-    )
+    if sim_type == 'other':
 
-    population = Population(size)
-    population.set_opponent_factory(training_opponent_types[against])
-    return EvolutionEnvironment(population)
+        population = get_population_to_load('Load from file?')
+
+        if population == None:
+            size = get_int_choice(
+                'New Population Size?', min_range=1, max_range=250
+            )
+
+            population = Population(input('New Population Name?: '), size=size)
+
+        against = get_str_choice(
+            'Training Opponent', *training_opponent_types.keys()
+        )
+
+        population.set_opponent_factory(training_opponent_types[against])
+        return EvolutionEnvironment(population)
+
+    population1 = get_population_to_load('Load first population from file?')
+    size = -1
+
+    if population1 == None:
+        size = get_int_choice(
+            'Population Size?', min_range=1, max_range=125
+        )
+
+        population1 = Population(input('First Population Name?: '), size=size)
+
+    population2 = get_population_to_load('Load second population from file?')
+
+    if population2 == None:
+        population2 = Population(
+            input('\n\n\n\n\n\n\nSecond Population Name?: '), size=population1.size())
+
+    if population1.size() != population2.size():
+        print('\n\nPopulation sizes MUST be the same.')
+        exit()
+
+    return AdversarialEvolutionEnvironment(population1, population2)
 
 
 def build_player_pawn():

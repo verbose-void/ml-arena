@@ -192,7 +192,7 @@ class Environment(arcade.Window):
             (self.running_matches_count(), len(self.match_ups))
         out += spacer
 
-        out += 'Time Elapsed/Allotted: %i/%is' % \
+        out += 'Time: %i/%is' % \
             (round(time.time() - self.start_time), MAX_GAME_LENGTH)
 
         return out

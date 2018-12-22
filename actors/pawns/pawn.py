@@ -271,10 +271,12 @@ class Pawn(actor.Actor):
         laser: Laser
         for laser in enemy_lasers:
             if self.is_colliding_with_laser(laser):
-                if self.take_damage(laser.get_damage()):
-                    return False
 
-                laser.firing_actor.log_hit()
+                if laser.get_damage() > 0:
+                    if self.take_damage(laser.get_damage()):
+                        return False
+                    laser.firing_actor.log_hit()
+
                 laser.kill()
 
         return True

@@ -43,14 +43,15 @@ class NeuralNetwork:
         dimensions[i] = neurons at layer i.
         """
 
-        assert dimensions or layer_weights, 'Neural Network must be initialized with either dimensions or weights'
+        assert dimensions != None or layer_weights != None, 'Neural Network must be initialized with either dimensions or weights'
 
         if dimensions:
             self.layer_weights = []
-            variance = 2/np.sum(dimensions)
-            stddev = math.sqrt(variance)
 
             for i in range(len(dimensions)-1):
+                variance = 2/(dimensions[i] + dimensions[i+1])
+                stddev = math.sqrt(variance)
+
                 layer = np.random.normal(
                     loc=0,
                     scale=stddev,
@@ -116,17 +117,18 @@ class NeuralNetwork:
 
         return output
 
-    def draw_neurons(self):
+    def draw_neurons(self, offset_x=0, offset_y=0):
         if self.neuron_weights == None:
             return
 
-        x = SCREEN_WIDTH - len(self.neuron_weights) * VERBOSE_NEURON_SPACING_X
+        x = SCREEN_WIDTH - len(self.neuron_weights) * \
+            VERBOSE_NEURON_SPACING_X + offset_x
 
         self.neuron_screen_locations = []
 
         for i, layer in enumerate(self.neuron_weights):
             y = NETWORK_CENTER_HEIGHT - \
-                ((len(layer) / 2) * VERBOSE_NEURON_SPACING_Y)
+                ((len(layer) / 2) * VERBOSE_NEURON_SPACING_Y) + offset_y
 
             self.neuron_screen_locations.append([])
 
@@ -178,6 +180,17 @@ class NeuralNetwork:
                         border_width=max(
                             0.1, VERBOSE_MAX_SYNAPSE_THICKNESS * weight)
                     )
+
+    def save_to_file(self, path: str):
+        """
+        Args:
+            path (str): Extension not required. (.npy)
+        """
+
+        np.save(path, self.layer_weights)
+
+    def load_from_file(path: str):
+        return NeuralNetwork(layer_weights=np.load(path))
 
 
 if __name__ == '__main__':

@@ -3,21 +3,22 @@ from util.population import *
 
 
 class EvolutionEnvironment(Environment):
-    current_gen: int = 0
-    population: Population
+    population1: Population
 
-    def __init__(self, population: Population):
-        self.population = population
+    def __init__(self, population1: Population):
+        self.population1 = population1
         self.reset(build_new_gen=False)
         super().__init__()
 
     def reset(self, build_new_gen=True):
-        pop = self.population
+        pop = self.population1
 
         if build_new_gen:
             pop.natural_selection()
             pop.generate_creatures()
-            self.current_gen += 1
+            pop.current_gen += 1
+            if pop.current_gen % 5 == 0:
+                pop.save_to_dir()
             super().reset()
 
         self.match_ups = pop.build_match_ups()
@@ -34,9 +35,15 @@ class EvolutionEnvironment(Environment):
                 )
 
                 if best_creature != None:
-                    net = self.population.get_network(best_creature)
-                    net.draw_weights()
-                    net.draw_neurons()
+                    net = self.population1.get_network(best_creature)
+                    if net != None:
+                        net.draw_weights()
+                        net.draw_neurons()
+
+    def end(self):
+        arcade.close_window()
+        self.population1.save_to_dir()
+        Environment.end(self)
 
     def __str__(self):
         spacer = ' | '
@@ -51,10 +58,10 @@ class EvolutionEnvironment(Environment):
         else:
             max_alive_fitness = 0
 
-        out = 'Generation: %i' % self.current_gen
+        out = 'Generation: %i' % self.population1.current_gen
         out += spacer
 
-        out += super().__str__()
+        out += Environment.__str__(self)
         out += spacer
 
         out += 'Max Alive Fitness: %i' % round(max_alive_fitness)
