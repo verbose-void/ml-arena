@@ -35,11 +35,16 @@ class Environment(arcade.Window):
     start_time: float
     started = False
 
+    frame_count: int = 0
+    print_str: str = ''
+
     def __init__(self, *match_ups: MatchUp):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT)
         arcade.set_background_color(arcade.color.BLACK)
         self.start_time = time.time()
         self.match_ups = set(match_ups)
+        self.calculate_best_match_up()
+        self.print_str = self.__str__()
 
     def run(self):
         if self.started:
@@ -81,7 +86,7 @@ class Environment(arcade.Window):
                             prev = pawn
 
         arcade.draw_text(
-            self.__str__(),
+            self.print_str,
             10,
             SCREEN_HEIGHT - 20,
             arcade.color.WHITE
@@ -93,8 +98,11 @@ class Environment(arcade.Window):
 
             return self.reset()
 
-        if random.random() < 0.25:
+        self.frame_count += 1
+
+        if self.frame_count % 60 == 0:
             self.calculate_best_match_up()
+            self.print_str = self.__str__()
 
         match_up: MatchUp
         for match_up in self.match_ups:
@@ -114,6 +122,7 @@ class Environment(arcade.Window):
             match_up.reset()
 
         self.start_time = time.time()
+        self.frame_count = 0
 
     def are_match_ups_still_going(self):
         return self.running_matches_count() > 0

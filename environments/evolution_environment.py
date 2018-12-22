@@ -8,7 +8,7 @@ class EvolutionEnvironment(Environment):
     def __init__(self, population1: Population):
         self.population1 = population1
         self.reset(build_new_gen=False)
-        super().__init__()
+        super().__init__(*self.match_ups)
 
     def reset(self, build_new_gen=True):
         pop = self.population1
