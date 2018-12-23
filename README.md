@@ -44,8 +44,8 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 |OPEN-BRACKET|Draw all pawns in every match|All Types|
 |CLOSE-BRACKET|Show connections between all on-screen pawns|All Types|
 |BACK-SLASH|Show pawn directional tracers|All Types|
-|ESCAPE|End training session and prompt to save progress|Evolutionary Training|
-|BACKSPACE|Force end the current generation|Evolutionary Training|
+|ESCAPE|End simulation, if Evolutionary: Save populations under their names|All Types|
+|BACKSPACE|Force reset the environment. If Evolutionary: End the current generation|All Types|
 
 
 ## Showcase:
