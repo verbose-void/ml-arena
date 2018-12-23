@@ -5,6 +5,7 @@ import arcade
 from enum import Enum
 from typing import List, Tuple
 from environments.environment import *
+from actors.actions import Actions
 
 NEURON_DIST = 50
 VERBOSE_NEURON_SPACING_X = 60
@@ -15,6 +16,35 @@ VERBOSE_MAX_SYNAPSE_THICKNESS = 2
 NETWORK_CENTER_HEIGHT = SCREEN_HEIGHT / 4
 
 REACTION_THRESHOLD = 0.7
+
+DRAW_NEURON_LABELS = True
+
+INPUT_NEURON_LABELS = [
+    'Laser Distance',
+    'Angle to Laser',
+    'Enemy Distance',
+    'Angle to Enemy',
+    'Current Angle'
+]
+
+# Reason for redefinition: __dict__ is not constant ordering
+ACTION_LIST = [
+    Actions.MOVE_LEFT,
+    Actions.MOVE_RIGHT,
+    Actions.MOVE_UP,
+    Actions.MOVE_DOWN,
+
+    Actions.LOOK_LEFT,
+    Actions.LOOK_RIGHT,
+
+    Actions.USE_SHIELD,
+
+    Actions.LONG_ATTACK,
+    Actions.SHORT_ATTACK
+]
+
+OUTPUT_NEURON_LABELS = [a.name for a in ACTION_LIST]
+print(OUTPUT_NEURON_LABELS)
 
 
 class ActivationType(Enum):
@@ -117,7 +147,7 @@ class NeuralNetwork:
 
         return output
 
-    def draw_neurons(self, offset_x=0, offset_y=0):
+    def draw_neurons(self, offset_x=-70, offset_y=0):
         if self.neuron_weights == None:
             return
 
@@ -133,7 +163,31 @@ class NeuralNetwork:
             self.neuron_screen_locations.append([])
 
             # All weights will be normalized. Use radial representation.
-            for weight in np.nditer(layer, op_flags=['readwrite']):
+            for j, weight in enumerate(np.nditer(layer, op_flags=['readwrite'])):
+                if DRAW_NEURON_LABELS:
+                    if i == 0:  # input layer
+                        text = INPUT_NEURON_LABELS[j]
+                        arcade.draw_text(
+                            text,
+                            x-VERBOSE_NEURON_RADIUS * 2.5 -
+                            len(text) * (VERBOSE_NEURON_TEXT_SIZE/2.5),
+                            y,
+                            arcade.color.WHITE,
+                            font_size=VERBOSE_NEURON_TEXT_SIZE*1.5,
+                            align='center',
+                            anchor_x='center',
+                            anchor_y='center'
+                        )
+                    elif i == len(self.neuron_weights) - 1:  # output layer
+                        text = OUTPUT_NEURON_LABELS[j]
+                        arcade.draw_text(
+                            text,
+                            x+VERBOSE_NEURON_RADIUS * 2.5,
+                            y,
+                            arcade.color.WHITE,
+                            font_size=VERBOSE_NEURON_TEXT_SIZE*1.5,
+                            anchor_y='center'
+                        )
 
                 self.neuron_screen_locations[i].append((x, y))
 

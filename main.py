@@ -83,20 +83,28 @@ def build_balancing_environment():
     # P1 stat bias choice
     p1_stat_choice = get_str_choice(
         'P1 bias choice', *biases.keys())
-    p1_stat_choice = biases[p1_stat_choice]
+    p1_stat_choice = biases[p1_stat_choice]()
 
     # P2 stat bias choice
     p2_stat_choice = get_str_choice(
         'P2 bias choice', *biases.keys())
-    p2_stat_choice = biases[p2_stat_choice]
+    p2_stat_choice = biases[p2_stat_choice]()
 
     concurrent = get_int_choice(
         'How many concurrent matches?', min_range=1, max_range=250)
 
+    match_ups = []
+
     # Build matchups
     for _ in range(concurrent):
-        # TODO
-        pass
+        match_ups.append(
+            MatchUp(
+                build_dynamic_pawn(p1_stat_choice),
+                build_dynamic_pawn(p2_stat_choice)
+            )
+        )
+
+    return BalancingEnvironment(*match_ups)
 
 
 def build_freeplay_environment():
@@ -219,8 +227,12 @@ def build_player_pawn():
     return pawn
 
 
-def build_dynamic_pawn():
+def build_dynamic_pawn(stat_bias=None):
     pawn = Pawn()
+
+    if stat_bias != None:
+        pawn.set_stat_bias(stat_bias)
+
     pawn.set_controller(DynamicController)
     return pawn
 

@@ -11,8 +11,6 @@ SCREEN_HEIGHT = 600
 
 from util.match_up import *
 
-MAX_GAME_LENGTH = 45  # 45 seconds
-
 
 def max_helper(match_up):
     best = match_up.get_best_pawn_based_on_fitness()
@@ -34,6 +32,8 @@ class Environment(arcade.Window):
 
     start_time: float
     started = False
+
+    max_game_length: int = 45  # 45 seconds
 
     frame_count: int = 0
     print_str: str = ''
@@ -94,7 +94,7 @@ class Environment(arcade.Window):
 
     def on_update(self, delta_time):
         if (not self.are_match_ups_still_going()) or \
-                time.time() - self.start_time > MAX_GAME_LENGTH:
+                (self.max_game_length > 0 and time.time() - self.start_time > self.max_game_length):
 
             return self.reset()
 
@@ -202,7 +202,7 @@ class Environment(arcade.Window):
         out += spacer
 
         out += 'Time: %i/%is' % \
-            (round(time.time() - self.start_time), MAX_GAME_LENGTH)
+            (round(time.time() - self.start_time), self.max_game_length)
 
         return out
 
