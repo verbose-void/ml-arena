@@ -34,6 +34,8 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 - Blue Laser: Short distance laser.
 - Green Laser (Debug): A laser is highlighted green if it is the 'imminent laser' of the current player pawn.
 
+<br>
+
 |Key(s)|Description|Context|
 |---|---|---|
 |W, A, S, D|Movement|Player Controlled Pawn|
@@ -47,16 +49,11 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 |ESCAPE|End simulation, if Evolutionary: Save populations under their names|All Types|
 |BACKSPACE|Force reset the environment. If Evolutionary: End the current generation|All Types|
 
-
 ## Showcase:
-#### Custom Neural Network Visualization:
-![https://i.gyazo.com/f195e68ad0dd832195a073d5bc401795.png](https://i.gyazo.com/f195e68ad0dd832195a073d5bc401795.png)
 
-#### Freeplay:
-![https://i.gyazo.com/0baf14ecd33ec3a7668972bf08dd7f24.gif](https://i.gyazo.com/0baf14ecd33ec3a7668972bf08dd7f24.gif)
-
-#### Evolutionary Training:
-![https://i.gyazo.com/7948da19c26cd46e7455a111098f4259.gif](https://i.gyazo.com/7948da19c26cd46e7455a111098f4259.gif)
-
-### Stat Bias Balancing:
-![https://i.gyazo.com/c40352df2597a940ba28a381384ed303.gif](https://i.gyazo.com/c40352df2597a940ba28a381384ed303.gif)
+|||
+|:-------------------------:|:-------------------------:|
+|**Custom Network Visualization**|**Freeplay**|
+|<img width="1604" alt="1" src="https://i.gyazo.com/f195e68ad0dd832195a073d5bc401795.png">|<img width="1604" alt="1" src="https://i.gyazo.com/0baf14ecd33ec3a7668972bf08dd7f24.gif">|
+|**Evolutionary Training**|**Statistical Bias Balancing**|
+|<img width="1604" alt="1" src="https://i.gyazo.com/7948da19c26cd46e7455a111098f4259.gif">|<img width="1604" alt="1" src="https://i.gyazo.com/c40352df2597a940ba28a381384ed303.gif">|
