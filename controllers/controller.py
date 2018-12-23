@@ -9,10 +9,12 @@ A = Actions
 class Controller:
     """Default controller class"""
     actor: Actor
+    active_actions: set = None
 
     def __init__(self, actor: Actor):
         assert actor != None, 'Actor must NOT be NoneType.'
         self.actor = actor
+        self.active_actions = set()
 
     def on_key_press(self, symbol):
         """Does nothing for a basic controller."""
@@ -58,6 +60,8 @@ class Controller:
         elif action == A.USE_SHIELD:
             a.use_shield()
 
+        self.active_actions.add(action)
+
     def undo_action(self, action: 'PlayerActions'):
         """Undoes the given action."""
         a = self.actor
@@ -75,6 +79,8 @@ class Controller:
 
         elif action == A.SHORT_ATTACK or action == A.LONG_ATTACK:
             a.clear_attack()
+
+        self.active_actions.discard(action)
 
     def look(self, match_up):
         """Observes data from the environment."""

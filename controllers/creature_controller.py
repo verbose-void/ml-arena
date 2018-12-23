@@ -4,24 +4,9 @@ from util.neural_network import *
 from util.match_up import *
 from actors.actions import *
 
-# Reason for redefinition: __dict__ is not constant ordering
-ACTION_LIST = [
-    Actions.MOVE_LEFT,
-    Actions.MOVE_RIGHT,
-    Actions.MOVE_UP,
-    Actions.MOVE_DOWN,
-
-    Actions.LOOK_LEFT,
-    Actions.LOOK_RIGHT,
-
-    Actions.USE_SHIELD,
-
-    Actions.LONG_ATTACK,
-    Actions.SHORT_ATTACK
-]
-
 NETWORK_DIMENSIONS = (
     5,
+    6,
     7,
     len(ACTION_LIST)
 )
@@ -75,4 +60,29 @@ class CreatureController(Controller):
             if self.outputs[i] > REACTION_THRESHOLD:
                 self.submit_action(action)
             else:
-                self.undo_action(action)
+                if action == Actions.MOVE_LEFT:
+                    if Actions.MOVE_RIGHT not in self.active_actions:
+                        self.undo_action(action)
+
+                elif action == Actions.MOVE_RIGHT:
+                    if Actions.MOVE_LEFT not in self.active_actions:
+                        self.undo_action(action)
+
+                elif action == Actions.MOVE_UP:
+                    if Actions.MOVE_DOWN not in self.active_actions:
+                        self.undo_action(action)
+
+                elif action == Actions.MOVE_DOWN:
+                    if Actions.MOVE_UP not in self.active_actions:
+                        self.undo_action(action)
+
+                elif action == Actions.LOOK_LEFT:
+                    if Actions.LOOK_RIGHT not in self.active_actions:
+                        self.undo_action(action)
+
+                elif action == Actions.LOOK_RIGHT:
+                    if Actions.LOOK_LEFT not in self.active_actions:
+                        self.undo_action(action)
+
+                else:
+                    self.undo_action(action)
