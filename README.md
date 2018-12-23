@@ -1,8 +1,6 @@
 # ML_Arena
 Compare predictive modes &amp; predispositions to sway learning / evolutionary traits in an asteroids-like arena.
 
-## CURRENTLY UNDER REFACTORY, THIS DOCUMENTATION WILL CHANGE SOON.
-
 ### Versions:
 - Built in [python3](https://www.python.org/downloads/).
 
@@ -12,13 +10,29 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 
 ### Usage:
 - Clone this repository. `git clone https://github.com/McCrearyD/ML_Arena.git`
-- To test functionality of the **dynamically scripted pawn** or **player controlled pawn**, run the "environment.py" file with python. `python3 -u environment.py`.
-- To create, load, and train **evolutionary neural network** populations, run the "evolve.py" file with python. `python3 -u evolve.py`.
+- To run any simulation, run `python3 -u main.py` inside the main directory.
+- Follow the terminal instructions to run any type of simulation.
 
-#### *Note: When you run these files, the console will prompt you with directions for creating, loading, & saving populations.*
+### Simulation Types:
+- **Freeplay**: Freeplay allows you to create a single matchup using any type of pawn controller you'd like.
+- **Evolution**: 
+    - ***Adversarial***: Train a random (or load previous) population against another.
+    - ***Other***: Train a random (or load previous) population against another pawn type (ie. dynamic or brainless).
+- **Balance**: Run a balancing simulation for pawn statistical biases. Runs `x` match iterations concurrently and reports win/loss results for each bias.
 
-<br>
-<br>
+### Indicators:
+- Blue Pawn: If a pawn's color is blue, this means they have enabled their shield.
+- Red Pawn: If they are red, this means their health is 0.
+- Number Below Pawn: If a pawn has a number, this means they are a FitnessPawn. A fitness pawn is typically assigned to a neural network in order to judge how good they are. The higher = the better.
+- Bar Above Pawn: Every pawn has a bar above their head that displays their health percentage. 
+    - Green = +75%
+    - Yellow = +50%
+    - Red = -50%
+- Red Laser: Long distance laser.
+  - Lighter Red: Hasn't reached the minimum distance yet, if it collides with an enemy, they won't be damaged.
+  - Darker Red: Fully charged laser, upon impact it will deal damage.
+- Blue Laser: Short distance laser.
+- Green Laser (Debug): A laser is highlighted green if it is the 'imminent laser' of the current player pawn.
 
 |Key(s)|Description|Context|
 |---|---|---|
@@ -29,13 +43,20 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 |SPACE|Short-range laser|Player Controlled Pawn|
 |OPEN-BRACKET|Draw all pawns in every match|All Types|
 |CLOSE-BRACKET|Show connections between all on-screen pawns|All Types|
+|BACK-SLASH|Show pawn directional tracers|All Types|
 |ESCAPE|End training session and prompt to save progress|Evolutionary Training|
 |BACKSPACE|Force end the current generation|Evolutionary Training|
 
 
 ## Showcase:
-#### Base Gameplay:
-![https://i.gyazo.com/b2fd1b4b7dbb1044a2218b12d565b063.gif](https://i.gyazo.com/b2fd1b4b7dbb1044a2218b12d565b063.gif)
+#### Custom Neural Network Visualization:
+![https://i.gyazo.com/f195e68ad0dd832195a073d5bc401795.png](https://i.gyazo.com/f195e68ad0dd832195a073d5bc401795.png)
+
+#### Freeplay:
+![https://i.gyazo.com/0baf14ecd33ec3a7668972bf08dd7f24.gif](https://i.gyazo.com/0baf14ecd33ec3a7668972bf08dd7f24.gif)
 
 #### Evolutionary Training:
-![https://i.gyazo.com/c8d974d828994b937921119e4ebde1ed.gif](https://i.gyazo.com/c8d974d828994b937921119e4ebde1ed.gif)
+![https://i.gyazo.com/7948da19c26cd46e7455a111098f4259.gif](https://i.gyazo.com/7948da19c26cd46e7455a111098f4259.gif)
+
+### Stat Bias Balancing:
+![https://i.gyazo.com/c40352df2597a940ba28a381384ed303.gif](https://i.gyazo.com/c40352df2597a940ba28a381384ed303.gif)
