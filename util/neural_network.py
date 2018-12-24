@@ -44,7 +44,6 @@ ACTION_LIST = [
 ]
 
 OUTPUT_NEURON_LABELS = [a.name for a in ACTION_LIST]
-print(OUTPUT_NEURON_LABELS)
 
 
 class ActivationType(Enum):
