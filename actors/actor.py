@@ -162,7 +162,7 @@ class Actor:
             self.pos[1] - position[1]
         )
 
-        d = math.atan2(vec[1], vec[0])
+        d = math.atan2(vec[1], vec[0]) + (math.pi)
 
         if d < 0:
             # Convert to [0, 2pi] range
