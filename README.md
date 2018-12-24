@@ -38,22 +38,22 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 
 |Key(s)|Description|Context|
 |---|---|---|
-|W, A, S, D|Movement|Player Controlled Pawn|
-|LEFT, UP, RIGHT, DOWN|Directional movement|Player Controlled Pawn|
-|Q|Shield|Player Controlled Pawn|
-|SHIFT|Long-range laser|Player Controlled Pawn|
-|SPACE|Short-range laser|Player Controlled Pawn|
-|OPEN-BRACKET|Draw all pawns in every match|All Types|
-|CLOSE-BRACKET|Show connections between all on-screen pawns|All Types|
-|BACK-SLASH|Show pawn directional tracers|All Types|
-|ESCAPE|End simulation, if Evolutionary: Save populations under their names|All Types|
-|BACKSPACE|Force reset the environment. If Evolutionary: End the current generation|All Types|
+|W, A, S, D|Movement|Player|
+|LEFT, UP, RIGHT, DOWN|Directional movement|Player|
+|Q|Shield|Player|
+|SHIFT|Long-range laser|Player|
+|SPACE|Short-range laser|Player|
+|OPEN-BRACKET|Draw all pawns in every match|Global|
+|CLOSE-BRACKET|Show connections between all on-screen pawns|Global|
+|BACK-SLASH|Show pawn directional tracers|Global|
+|ESCAPE|End simulation, if Evolutionary: Save populations under their names|Global|
+|BACKSPACE|Force reset the environment. If Evolutionary: End the current generation|Global|
 
 ## Showcase:
 
 |||
 |:-------------------------:|:-------------------------:|
 |**Custom Network Visualization**|**Freeplay**|
-|<img width="1604" alt="1" src="https://i.gyazo.com/f195e68ad0dd832195a073d5bc401795.png">|<img width="1604" alt="1" src="https://i.gyazo.com/0baf14ecd33ec3a7668972bf08dd7f24.gif">|
+|<img width="1604" alt="1" src="https://i.gyazo.com/17d1f8366c614b86c0c5fce5269027b7.png">|<img width="1604" alt="1" src="https://i.gyazo.com/0baf14ecd33ec3a7668972bf08dd7f24.gif">|
 |**Evolutionary Training**|**Statistical Bias Balancing**|
 |<img width="1604" alt="1" src="https://i.gyazo.com/7948da19c26cd46e7455a111098f4259.gif">|<img width="1604" alt="1" src="https://i.gyazo.com/c40352df2597a940ba28a381384ed303.gif">|
