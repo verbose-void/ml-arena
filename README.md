@@ -38,16 +38,16 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 
 |Key(s)|Description|Context|
 |---|---|---|
-|W, A, S, D|Movement|Player Controlled Pawn|
-|LEFT, UP, RIGHT, DOWN|Directional movement|Player Controlled Pawn|
-|Q|Shield|Player Controlled Pawn|
-|SHIFT|Long-range laser|Player Controlled Pawn|
-|SPACE|Short-range laser|Player Controlled Pawn|
+|W, A, S, D|Movement|Player|
+|LEFT, UP, RIGHT, DOWN|Directional movement|Player|
+|Q|Shield|Player|
+|SHIFT|Long-range laser|Player|
+|SPACE|Short-range laser|Player|
 |OPEN-BRACKET|Draw all pawns in every match|All Types|
-|CLOSE-BRACKET|Show connections between all on-screen pawns|All Types|
-|BACK-SLASH|Show pawn directional tracers|All Types|
-|ESCAPE|End simulation, if Evolutionary: Save populations under their names|All Types|
-|BACKSPACE|Force reset the environment. If Evolutionary: End the current generation|All Types|
+|CLOSE-BRACKET|Show connections between all on-screen pawns|Global|
+|BACK-SLASH|Show pawn directional tracers|Global|
+|ESCAPE|End simulation, if Evolutionary: Save populations under their names|Global|
+|BACKSPACE|Force reset the environment. If Evolutionary: End the current generation|Global|
 
 ## Showcase:
 
