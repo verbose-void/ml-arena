@@ -43,7 +43,7 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 |Q|Shield|Player|
 |SHIFT|Long-range laser|Player|
 |SPACE|Short-range laser|Player|
-|OPEN-BRACKET|Draw all pawns in every match|All Types|
+|OPEN-BRACKET|Draw all pawns in every match|Global|
 |CLOSE-BRACKET|Show connections between all on-screen pawns|Global|
 |BACK-SLASH|Show pawn directional tracers|Global|
 |ESCAPE|End simulation, if Evolutionary: Save populations under their names|Global|
