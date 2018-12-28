@@ -48,7 +48,7 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 |BACK-SLASH|Show pawn directional tracers|Global|
 |ESCAPE|End simulation, if Evolutionary: Save populations under their names|Global|
 |BACKSPACE|Force reset the environment. If Evolutionary: End the current generation|Global|
-|N|Visually display the currently focused creature(s) Neural Networks|Evolution|
+|N|(Toggle) Visually display the currently focused creature(s) Neural Networks|Evolution|
 
 ## Showcase:
 
