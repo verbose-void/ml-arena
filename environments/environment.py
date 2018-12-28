@@ -151,7 +151,7 @@ class Environment(arcade.Window):
                 return
 
             if action == PA.SHOW_NETWORKS:
-                self.draw_networks = True
+                self.draw_networks = not self.draw_networks
                 return
 
             elif action == PA.END_ROUND:
@@ -182,10 +182,6 @@ class Environment(arcade.Window):
 
             if action == PA.SHOW_ALL_MATCH_UPS:
                 self.draw_best = True
-                return
-
-            if action == PA.SHOW_NETWORKS:
-                self.draw_networks = False
                 return
 
             elif action == PA.SHOW_CONNECTIONS:
