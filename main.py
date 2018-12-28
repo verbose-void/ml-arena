@@ -21,7 +21,7 @@ EXIT_STR = 'exit'
 
 
 def spacer():
-    print('\n\n\n\n\n\n\n\n\n\n\n')
+    print('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n')
 
 
 def get_str_choice(i_prompt, *acceptable):
@@ -211,8 +211,9 @@ def build_evolution_environment():
     population2 = get_population_to_load('Load second population from file?')
 
     if population2 == None:
+        spacer()
         population2 = Population(
-            input('\n\n\n\n\n\n\nSecond Population Name?: '), size=population1.size())
+            input('Second Population Name?: '), size=population1.size())
 
     if population1.size() != population2.size():
         print('\n\nPopulation sizes MUST be the same.')
