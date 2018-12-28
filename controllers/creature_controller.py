@@ -7,9 +7,11 @@ from actors.actions import *
 NETWORK_DIMENSIONS = (
     5,
     6,
-    7,
     len(ACTION_LIST)
 )
+
+MAX_DIST = math.sqrt(SCREEN_WIDTH ** 2 + SCREEN_HEIGHT ** 2)
+MAX_ANGLE = math.pi * 2
 
 
 class CreatureController(Controller):
@@ -38,17 +40,16 @@ class CreatureController(Controller):
         imminent: Laser = match_up.get_most_imminent_laser(p)
         enemy: Pawn = match_up.get_closest_opponent(p)
 
-        max_angle = math.pi * 2
-
         self.inputs = [
-            1/math.sqrt(p.dist_squared(actor=imminent)
-                        ) if imminent != None else 1,
-            p.angle_to(actor=imminent)/max_angle if imminent != None else 1,
+            math.sqrt(p.dist_squared(actor=imminent)) /
+            MAX_DIST if imminent != None else 1,
+            p.angle_to(actor=imminent)/MAX_ANGLE if imminent != None else 1,
 
-            1/math.sqrt(p.dist_squared(actor=enemy)) if enemy != None else 1,
-            p.angle_to(actor=enemy)/max_angle if enemy != None else 1,
+            math.sqrt(p.dist_squared(actor=enemy)) /
+            MAX_DIST if enemy != None else 1,
+            p.angle_to(actor=enemy)/MAX_ANGLE if enemy != None else 1,
 
-            p.get_direc()/max_angle
+            p.get_direc()/MAX_ANGLE
         ]
 
     def think(self):

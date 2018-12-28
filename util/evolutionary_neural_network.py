@@ -1,5 +1,6 @@
 from util.neural_network import *
 import random
+import numpy as np
 
 
 class EvoNeuralNetwork(NeuralNetwork):
@@ -36,15 +37,17 @@ class EvoNeuralNetwork(NeuralNetwork):
 
     def clone(self):
         return EvoNeuralNetwork(
-            layer_weights=self.layer_weights
+            layer_weights=np.copy(self.layer_weights)
         )
 
-    def mutate(self, mutation_rate=0.075):
+    def mutate(self, mutation_rate=0.1):
         for layer in self.layer_weights:
             for x in np.nditer(layer, op_flags=['readwrite']):
                 if random.random() < mutation_rate:
-                    mod = mutation_rate if random.random() < 0.5 else -mutation_rate
-                    x[...] = min(1, max(-1, x + mod * random.random()))
+                    x[...] = np.random.normal(
+                        loc=0,
+                        scale=1
+                    )
 
     def load_from_file(path: str):
         return EvoNeuralNetwork(layer_weights=NeuralNetwork.load_from_file(path).layer_weights)

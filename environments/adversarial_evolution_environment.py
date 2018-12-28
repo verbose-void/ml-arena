@@ -38,22 +38,23 @@ class AdversarialEvolutionEnvironment(EvolutionEnvironment):
         self.calculate_best_match_up()
 
     def on_draw(self):
-        super().on_draw()
+        Environment.on_draw(self)
 
-        # Draw best neural network graphically
-        if self.draw_best:
-            if self.best_match_up != None:
-                for pawn in self.best_match_up.pawns:
+        if self.draw_networks:
+            # Draw best neural network graphically
+            if self.draw_best:
+                if self.best_match_up != None:
+                    for pawn in self.best_match_up.pawns:
 
-                    net1 = self.population1.get_network(pawn)
-                    if net1 != None:
-                        net1.draw_weights()
-                        net1.draw_neurons(offset_y=SCREEN_HEIGHT/2)
+                        net1 = self.population1.get_network(pawn)
+                        if net1 != None:
+                            net1.draw_weights()
+                            net1.draw_neurons(offset_y=SCREEN_HEIGHT/2)
 
-                    net2 = self.population2.get_network(pawn)
-                    if net2 != None:
-                        net2.draw_weights()
-                        net2.draw_neurons()
+                        net2 = self.population2.get_network(pawn)
+                        if net2 != None:
+                            net2.draw_weights()
+                            net2.draw_neurons()
 
     def end(self):
         arcade.close_window()

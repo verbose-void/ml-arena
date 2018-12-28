@@ -19,14 +19,6 @@ REACTION_THRESHOLD = 0.7
 
 DRAW_NEURON_LABELS = True
 
-INPUT_NEURON_LABELS = [
-    'Laser Distance',
-    'Angle to Laser',
-    'Enemy Distance',
-    'Angle to Enemy',
-    'Current Angle'
-]
-
 # Reason for redefinition: __dict__ is not constant ordering
 ACTION_LIST = [
     Actions.MOVE_LEFT,
@@ -43,8 +35,6 @@ ACTION_LIST = [
     Actions.SHORT_ATTACK
 ]
 
-OUTPUT_NEURON_LABELS = [a.name for a in ACTION_LIST]
-
 
 class ActivationType(Enum):
     RELU = 0
@@ -56,6 +46,16 @@ ACTIVATION = ActivationType.TANH
 
 
 class NeuralNetwork:
+    input_neuron_labels = [
+        'Laser Distance',
+        'Angle to Laser',
+        'Enemy Distance',
+        'Angle to Enemy',
+        'Current Angle'
+    ]
+
+    output_neuron_labels = [a.name for a in ACTION_LIST]
+
     layer_weights: list
     neuron_weights: list = None  # Stored here for verbose
     neuron_screen_locations: list = None
@@ -139,9 +139,14 @@ class NeuralNetwork:
 
         else:
 
-            for weight_layer in self.layer_weights:
+            l = len(self.layer_weights)-1
+            for i, weight_layer in enumerate(self.layer_weights):
                 output = np.matmul(output, weight_layer)
-                self.activate_layer(output)
+
+                # Do not activate the last layer.
+                if i != l:
+                    self.activate_layer(output)
+
                 self.neuron_weights.append(output)
 
         return output
@@ -165,7 +170,7 @@ class NeuralNetwork:
             for j, weight in enumerate(np.nditer(layer, op_flags=['readwrite'])):
                 if DRAW_NEURON_LABELS:
                     if i == 0:  # input layer
-                        text = INPUT_NEURON_LABELS[j]
+                        text = self.input_neuron_labels[j]
                         arcade.draw_text(
                             text,
                             x-VERBOSE_NEURON_RADIUS * 2.5 -
@@ -178,7 +183,7 @@ class NeuralNetwork:
                             anchor_y='center'
                         )
                     elif i == len(self.neuron_weights) - 1:  # output layer
-                        text = OUTPUT_NEURON_LABELS[j]
+                        text = self.output_neuron_labels[j]
                         arcade.draw_text(
                             text,
                             x+VERBOSE_NEURON_RADIUS * 2.5,

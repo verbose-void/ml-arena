@@ -20,6 +20,9 @@ def max_helper(match_up):
     return -1
 
 
+USE_DELTA_TIME = True
+
+
 class Environment(arcade.Window):
     match_ups: set = None
     best_match_up: MatchUp = None
@@ -29,6 +32,7 @@ class Environment(arcade.Window):
     draw_match_connections = False
     draw_dead = False
     draw_tracers = False
+    draw_networks = False
 
     start_time: float
     started = False
@@ -106,7 +110,7 @@ class Environment(arcade.Window):
 
         match_up: MatchUp
         for match_up in self.match_ups:
-            match_up.update(delta_time)
+            match_up.update(delta_time if USE_DELTA_TIME else 1)
             best_pawn = match_up.get_best_pawn_based_on_fitness()
 
             if best_pawn:
@@ -146,6 +150,10 @@ class Environment(arcade.Window):
                 self.end()
                 return
 
+            if action == PA.SHOW_NETWORKS:
+                self.draw_networks = True
+                return
+
             elif action == PA.END_ROUND:
                 self.reset()
                 return
@@ -174,6 +182,10 @@ class Environment(arcade.Window):
 
             if action == PA.SHOW_ALL_MATCH_UPS:
                 self.draw_best = True
+                return
+
+            if action == PA.SHOW_NETWORKS:
+                self.draw_networks = False
                 return
 
             elif action == PA.SHOW_CONNECTIONS:

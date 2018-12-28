@@ -27,18 +27,19 @@ class EvolutionEnvironment(Environment):
     def on_draw(self):
         super().on_draw()
 
-        # Draw best neural network graphically
-        if self.draw_best:
-            if self.best_match_up != None:
-                best_creature = self.best_match_up.get_best_pawn_based_on_fitness(
-                    include_dead=True
-                )
+        if self.draw_networks:
+            # Draw best neural network graphically
+            if self.draw_best:
+                if self.best_match_up != None:
+                    best_creature = self.best_match_up.get_best_pawn_based_on_fitness(
+                        include_dead=True
+                    )
 
-                if best_creature != None:
-                    net = self.population1.get_network(best_creature)
-                    if net != None:
-                        net.draw_weights()
-                        net.draw_neurons()
+                    if best_creature != None:
+                        net = self.population1.get_network(best_creature)
+                        if net != None:
+                            net.draw_weights()
+                            net.draw_neurons()
 
     def end(self):
         arcade.close_window()

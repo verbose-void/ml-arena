@@ -120,22 +120,31 @@ class Population:
 
     def natural_selection(self):
         """Uses natural selection to alter the current Neural Network population."""
-        # Get best net without any mutations
+
+        # Get neural nets sorted from best to worst
+        s = sorted(
+            self.creatures_to_nets.keys(),
+            reverse=True,
+            key=lambda c: c.calculate_fitness()
+        )[0:math.floor(self.size()/2)]
+
+        s = [self.creatures_to_nets[c] for c in s]
+
         new_nets = [self.best_network()]
 
-        for i in range(len(self.neural_networks)-1):
-            new_net = None
+        # Take the top 50% and use them as parents for 50% of the next population.
+        # Mutate lightly
+        for i in range(len(s)-1):
+            child = s[i].crossover(s[i+1])
+            child.mutate()
+            new_nets.append(child)
+
+        # For the rest, pick a random net (based on fitness).
+        # Mutate moderately
+        for i in range(len(self.neural_networks)-len(s)):
             random_clone = self.pick_random().clone()
-
-            if i < self.size() / 2:
-                new_net = random_clone
-            else:
-                new_net = random_clone.crossover(
-                    self.pick_random().clone())
-
-            # Mutate & Reset Neural Network
-            new_net.mutate()
-            new_nets.append(new_net)
+            random_clone.mutate(0.18)
+            new_nets.append(random_clone)
 
         self.neural_networks = new_nets
 
