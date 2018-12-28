@@ -28,6 +28,7 @@ class PlayerActions(Enum):
     SHOW_ALL_MATCH_UPS = 12
     SHOW_CONNECTIONS = 13
     SHOW_TRACERS = 14
+    SHOW_NETWORKS = 15
 
 
 DEFAULT_MAP = {
@@ -47,5 +48,6 @@ DEFAULT_MAP = {
     arcade.key.BACKSPACE: PlayerActions.END_ROUND,
     arcade.key.BRACKETLEFT: PlayerActions.SHOW_ALL_MATCH_UPS,
     arcade.key.BRACKETRIGHT: PlayerActions.SHOW_CONNECTIONS,
-    arcade.key.BACKSLASH: PlayerActions.SHOW_TRACERS
+    arcade.key.BACKSLASH: PlayerActions.SHOW_TRACERS,
+    arcade.key.N: PlayerActions.SHOW_NETWORKS
 }
