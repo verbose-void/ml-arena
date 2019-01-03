@@ -47,6 +47,7 @@ ACTIVATION = ActivationType.TANH
 
 class NeuralNetwork:
     input_neuron_labels = [
+        'bias',
         'Laser Distance',
         'Angle to Laser',
         'Enemy Distance',
@@ -77,14 +78,24 @@ class NeuralNetwork:
         if dimensions:
             self.layer_weights = []
 
-            for i in range(len(dimensions)-1):
+            midx = len(dimensions)-1
+            for i in range(midx):
                 variance = 2/(dimensions[i] + dimensions[i+1])
                 stddev = math.sqrt(variance)
+
+                d1 = dimensions[i] + 1
+                d2 = dimensions[i+1] + 1
+
+                if i + 1 >= midx:
+                    d2 -= 1
 
                 layer = np.random.normal(
                     loc=0,
                     scale=stddev,
-                    size=(dimensions[i], dimensions[i+1])
+                    size=(
+                        d1,
+                        d2
+                    )
                 )
 
                 self.layer_weights.append(
@@ -115,9 +126,7 @@ class NeuralNetwork:
     def output(self, inputs: list):
         """Calculates the output for the given inputs."""
 
-        # Column matrix
-        # inputs = np.reshape(inputs, (len(inputs), 1))
-
+        inputs.append(1)  # add bias
         self.neuron_weights = []
         self.neuron_weights.append(np.array((inputs)))
         output = inputs
@@ -142,11 +151,7 @@ class NeuralNetwork:
             l = len(self.layer_weights)-1
             for i, weight_layer in enumerate(self.layer_weights):
                 output = np.matmul(output, weight_layer)
-
-                # Do not activate the last layer.
-                if i != l:
-                    self.activate_layer(output)
-
+                self.activate_layer(output)
                 self.neuron_weights.append(output)
 
         return output
