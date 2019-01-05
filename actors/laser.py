@@ -21,6 +21,8 @@ class Laser(Actor):
     is_dead = False
     color: tuple
 
+    traveled = 0
+
     firing_actor: Actor
 
     def __init__(
@@ -48,17 +50,10 @@ class Laser(Actor):
         self.direc = direc
         self.pos = list(pos)
         self.start_pos = (pos[0], pos[1])
-        self.min_life_span = min_life_span ** 2
-        self.max_life_span = max_life_span ** 2
+        self.min_life_span = min_life_span
+        self.max_life_span = max_life_span
         self.damage = damage
         self.color = color
-
-    def get_distance_traveled_squared(self):
-        dist = self.dist_squared(pos=self.start_pos)
-        # Wrapping penalty
-        if self.wrapped:
-            dist *= 1.8
-        return dist
 
     def get_damage(self):
         """
@@ -67,7 +62,7 @@ class Laser(Actor):
         Returns 0 if not within active range
         """
 
-        if self.get_distance_traveled_squared() < self.min_life_span:
+        if self.traveled < self.min_life_span:
             return 0
 
         return self.damage
@@ -83,17 +78,20 @@ class Laser(Actor):
         if self.is_dead:
             return
 
-        self.pos[0] += math.cos(self.direc) * self.speed * delta_time
-        self.pos[1] += math.sin(self.direc) * self.speed * delta_time
+        dx = math.cos(self.direc) * (self.speed * delta_time)
+        dy = math.sin(self.direc) * (self.speed * delta_time)
 
-        dist_squared = self.get_distance_traveled_squared()
+        self.traveled += math.sqrt(dx ** 2 + dy ** 2)
+
+        self.pos[0] += dx
+        self.pos[1] += dy
 
         if self.wrapX():
             self.wrapped = True
         if self.wrapY():
             self.wrapped = True
 
-        if dist_squared > self.max_life_span:
+        if self.traveled > self.max_life_span:
             self.kill()
 
     def draw(self, specific_color=None):
@@ -103,7 +101,7 @@ class Laser(Actor):
         color = self.color
 
         # If it has a min life span, color it differently when less than.
-        if self.get_distance_traveled_squared() < self.min_life_span:
+        if self.traveled < self.min_life_span:
             color = arcade.color.RED_DEVIL
 
         if specific_color != None:
