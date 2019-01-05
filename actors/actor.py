@@ -165,9 +165,6 @@ class Actor:
         raw_dist = self.raw_dist_squared(pos, actor)
         alt_dist = abs(max(SCREEN_WIDTH, SCREEN_HEIGHT) ** 2 - raw_dist)
 
-        if alt_dist < raw_dist:
-            print('alt')
-
         return min(raw_dist, alt_dist)
 
     def angle_to(self, pos: Tuple[int] = None, actor: 'Actor' = None):
