@@ -11,6 +11,8 @@ class Laser(Actor):
     start_pos: Tuple[float]
     speed: float
 
+    wrapped = False
+
     min_life_span: float
     max_life_span: float
 
@@ -52,7 +54,11 @@ class Laser(Actor):
         self.color = color
 
     def get_distance_traveled_squared(self):
-        return self.dist_squared(pos=self.start_pos)
+        dist = self.dist_squared(pos=self.start_pos)
+        # Wrapping penalty
+        if self.wrapped:
+            dist *= 1.8
+        return dist
 
     def get_damage(self):
         """
@@ -82,7 +88,12 @@ class Laser(Actor):
 
         dist_squared = self.get_distance_traveled_squared()
 
-        if dist_squared > self.max_life_span or self.wrapX() or self.wrapY():
+        if self.wrapX():
+            self.wrapped = True
+        if self.wrapY():
+            self.wrapped = True
+
+        if dist_squared > self.max_life_span:
             self.kill()
 
     def draw(self, specific_color=None):

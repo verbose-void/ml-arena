@@ -11,6 +11,19 @@ BODY_RADIUS = 20
 BODY_RADIUS_SQUARED = BODY_RADIUS ** 2
 
 
+def find_intersection(x1, y1, x2, y2, x3, y3, x4, y4):
+    px = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4)) / \
+        ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4))
+    py = ((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4)) / \
+        ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4))
+    return [px, py]
+
+
+def dist_squared(p1, p2):
+    return math.pow(p1[0]-p2[0], 2) + \
+        math.pow(p1[1]-p2[1], 2)
+
+
 class Actor:
 
     pos: List[float] = None
@@ -136,15 +149,26 @@ class Actor:
         """Adds the given 'updater' to the direction & normalizes the value."""
         self.set_direc(self.direc + updater)
 
-    def dist_squared(self, pos: Tuple[int] = None, actor: 'Actor' = None):
-        """Returns the distance squared between this Actor & the given position / Actor."""
+    def raw_dist_squared(self, pos: Tuple[int] = None, actor: 'Actor' = None):
+        """Returns the raw distance squared between this Actor & the given position / Actor."""
 
         assert pos != None or actor != None, 'Can\'t compute the distance between None & None.'
         assert not(pos != None and actor !=
                    None), 'Can only compute the distance between a position or an actor, not both.'
 
         position = pos if pos != None else actor.get_pos()
-        return math.pow(self.pos[0]-position[0], 2) + math.pow(self.pos[1]-position[1], 2)
+
+        return dist_squared(self.pos, position)
+
+    def dist_squared(self, pos: Tuple[int] = None, actor: 'Actor' = None):
+        """Returns the donut-compensated distance squared between this Actor & the given position / Actor."""
+        raw_dist = self.raw_dist_squared(pos, actor)
+        alt_dist = abs(max(SCREEN_WIDTH, SCREEN_HEIGHT) ** 2 - raw_dist)
+
+        if alt_dist < raw_dist:
+            print('alt')
+
+        return min(raw_dist, alt_dist)
 
     def angle_to(self, pos: Tuple[int] = None, actor: 'Actor' = None):
         """
@@ -168,7 +192,13 @@ class Actor:
             # Convert to [0, 2pi] range
             d = math.pi + (-d)
 
-        return d
+        raw_dist = self.raw_dist_squared(pos, actor)
+        alt_dist = max(SCREEN_WIDTH, SCREEN_HEIGHT) ** 2 - raw_dist
+
+        if alt_dist < raw_dist:
+            d += math.pi
+
+        return d % (2*math.pi)
 
     def update(self, delta_time) -> float:
         """
@@ -241,9 +271,16 @@ class Actor:
 
         looking: int = 0
 
-        if d > 0.505:
-            looking = -1
-        elif d < 0.505:
-            looking = 1
+        if self.dist_squared(pos=pos) < self.raw_dist_squared(pos=pos):
+            if d < 0.505:
+                looking = -1
+            elif d > 0.505:
+                looking = 1
+
+        else:
+            if d > 0.505:
+                looking = -1
+            elif d < 0.505:
+                looking = 1
 
         self.set_looking(looking)

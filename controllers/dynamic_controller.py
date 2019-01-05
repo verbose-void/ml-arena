@@ -101,54 +101,39 @@ class DynamicController(Controller):
             #               enemy.pos[1] - pawn.pos[1])
 
             pawns_dist = pawn.dist_squared(actor=self.closest_opponent)
+            pawns_raw_dist = pawn.raw_dist_squared(actor=self.closest_opponent)
 
             if pawns_dist > 600:
 
                 # Move towards enemy
+                pawns_dist = pawn.dist_squared(actor=self.closest_opponent)
 
-                # Get raw distance
-                raw_dist = pawn.dist_squared(actor=self.closest_opponent)
-                raw_move = (
-                    self.closest_opponent.get_x() - pawn.get_x(),
-                    self.closest_opponent.get_y() - pawn.get_y()
-                )
+                if pawns_dist < pawns_raw_dist:
+                    self.next_move = (
+                        pawn.get_x() - self.closest_opponent.get_x(),
+                        pawn.get_y() - self.closest_opponent.get_y()
+                    )
 
-                # Get world wrap distance
-                wrap_dist = float('inf')
-                wrap_move = (0, 0)
-                for i in range(2):
-                    for j in range(2):
-                        dist = pawn.dist_squared(pos=(
-                            SCREEN_WIDTH * i,
-                            SCREEN_HEIGHT * j
-                        ))
-
-                        dist += self.closest_opponent.dist_squared(pos=(
-                            SCREEN_WIDTH * j,
-                            SCREEN_HEIGHT * i
-                        ))
-
-                        if dist < wrap_dist:
-                            wrap_dist = dist
-
-                            xv = SCREEN_WIDTH * i
-                            yv = SCREEN_HEIGHT * j
-
-                            wrap_move = (
-                                xv if xv > 0 else -1,
-                                yv if yv > 0 else -1
-                            )
-
-                # Set next move to closest
-                self.next_move = raw_move if raw_dist <= wrap_dist else wrap_move
+                else:
+                    self.next_move = (
+                        self.closest_opponent.get_x() - pawn.get_x(),
+                        self.closest_opponent.get_y() - pawn.get_y()
+                    )
 
             else:
 
                 # Move away from enemy
-                self.next_move = (
-                    pawn.get_x() - self.closest_opponent.get_x(),
-                    pawn.get_y() - self.closest_opponent.get_y()
-                )
+                if pawns_dist < pawns_raw_dist:
+                    self.next_move = (
+                        self.closest_opponent.get_x() - pawn.get_x(),
+                        self.closest_opponent.get_y() - pawn.get_y()
+                    )
+
+                else:
+                    self.next_move = (
+                        pawn.get_x() - self.closest_opponent.get_x(),
+                        pawn.get_y() - self.closest_opponent.get_y()
+                    )
 
     def set_optimal_attack(self):
         dist_squared = self.actor.dist_squared(actor=self.closest_opponent)
