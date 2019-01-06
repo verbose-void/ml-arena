@@ -82,18 +82,20 @@ class NeuralNetwork:
         dimensions[i] = neurons at layer i.
         """
 
-        assert len(self.input_neuron_labels) == dimensions[0] + 1, \
-            'Input labels must match neuron count. Got %i labels, expected %i.' % (
-                len(self.input_neuron_labels),
-                dimensions[0] + 1
-        )
-
-        assert len(self.output_neuron_labels) == dimensions[len(dimensions)-1], \
-            'Output labels must match neuron count. Got %i labels, expected %i.' % (
-                len(self.output_neuron_labels),
-                dimensions[len(dimensions)-1] + 1
-        )
         assert dimensions != None or layer_weights != None, 'Neural Network must be initialized with either dimensions or weights'
+
+        if dimensions != None:
+            assert len(self.input_neuron_labels) == dimensions[0] + 1, \
+                'Input labels must match neuron count. Got %i labels, expected %i.' % (
+                    len(self.input_neuron_labels),
+                    dimensions[0] + 1
+            )
+
+            assert len(self.output_neuron_labels) == dimensions[len(dimensions)-1], \
+                'Output labels must match neuron count. Got %i labels, expected %i.' % (
+                    len(self.output_neuron_labels),
+                    dimensions[len(dimensions)-1] + 1
+            )
 
         if dimensions:
             self.layer_weights = []
