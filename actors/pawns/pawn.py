@@ -84,6 +84,7 @@ class Pawn(actor.Actor):
         self.stat_bias = stat_bias
 
     def reset(self):
+        self.controller.act_cycles = 0
         self.frame = 0
         self.laser_cooldown = None
         sb: SB.StatBias = self.stat_bias
