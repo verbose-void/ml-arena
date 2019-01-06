@@ -37,6 +37,7 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 
 <br>
 
+# Main Simulation Keys
 |Key(s)|Description|Context|
 |---|---|---|
 |W, A, S, D|Movement|Player|
@@ -51,6 +52,12 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 |BACKSPACE|Force reset the environment. If Evolutionary: End the current generation|Global|
 |N|(Toggle) Visually display the currently focused creature(s) Neural Networks|Evolution|
 |P|(Toggle) Speed up all gameplay. Updates per frame can be changed in `environment.py > class Environment > var('speed_up_cycles')`|Global|
+
+# Test Environment Keys
+|Key(s)|Description|
+|---|---|
+|BACKSPACE|Next generation|
+|ESCAPE|Randomize goal location|
 
 ## Showcase:
 
