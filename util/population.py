@@ -25,6 +25,7 @@ def generate_random_networks(size) -> List[EvoNeuralNetwork]:
 
 
 class Population:
+    controller_class = CreatureController
     neural_networks = List[EvoNeuralNetwork]
     creatures_to_nets: dict = None
     opponent_factory: Callable = None
@@ -109,7 +110,7 @@ class Population:
             # Create a new creature for this Neural Network.
             new_creature = FitnessPawn()
             new_creature.set_controller(
-                CreatureController(
+                self.controller_class(
                     new_creature,
                     neural_network
                 )
