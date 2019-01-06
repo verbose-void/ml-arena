@@ -47,12 +47,21 @@ ACTIVATION = ActivationType.TANH
 
 class NeuralNetwork:
     input_neuron_labels = [
-        'bias',
+        'Movement Speed',
+        'Long Speed',
+        'Short Speed',
+        'Long RangeX',
+        'Long RangeY',
+        'Short RangeX',
+        'Short RangeY',
+        'Enemy Movement Speed',
         'Laser Distance',
         'Angle to Laser',
+        'Laser Speed',
         'Enemy Distance',
         'Angle to Enemy',
-        'Current Angle'
+        'Current Angle',
+        'Bias'
     ]
 
     output_neuron_labels = [a.name for a in ACTION_LIST]
@@ -73,6 +82,17 @@ class NeuralNetwork:
         dimensions[i] = neurons at layer i.
         """
 
+        assert len(self.input_neuron_labels) == dimensions[0] + 1, \
+            'Input labels must match neuron count. Got %i labels, expected %i.' % (
+                len(self.input_neuron_labels),
+                dimensions[0] + 1
+        )
+
+        assert len(self.output_neuron_labels) == dimensions[len(dimensions)-1], \
+            'Output labels must match neuron count. Got %i labels, expected %i.' % (
+                len(self.output_neuron_labels),
+                dimensions[len(dimensions)-1] + 1
+        )
         assert dimensions != None or layer_weights != None, 'Neural Network must be initialized with either dimensions or weights'
 
         if dimensions:

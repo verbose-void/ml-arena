@@ -4,10 +4,14 @@ from util.neural_network import *
 from util.match_up import *
 from actors.actions import *
 
+INPUT_NODES = 14
+OUTPUT_NODES = len(ACTION_LIST)
+
 NETWORK_DIMENSIONS = (
-    5,
-    6,
-    len(ACTION_LIST)
+    INPUT_NODES,
+    # for simplicity, hidden node count = mean of input nodes to output nodes
+    round((INPUT_NODES + OUTPUT_NODES) / 2),
+    OUTPUT_NODES
 )
 
 MAX_DIST = math.sqrt(SCREEN_WIDTH ** 2 + SCREEN_HEIGHT ** 2)
@@ -36,19 +40,39 @@ class CreatureController(Controller):
     def look(self, match_up: MatchUp):
         """Create neural net inputs"""
         p: Pawn = self.pawn
+        sb: StatBias = p.stat_bias
 
         imminent: Laser = match_up.get_most_imminent_laser(p)
         enemy: Pawn = match_up.get_closest_opponent(p)
+        esb: StatBias = enemy.stat_bias
 
         self.inputs = [
+            # Self-Stats
+            sb.movement_speed / MAX_DIST,
+            sb.long_attack_speed / MAX_DIST,
+            sb.short_attack_speed / MAX_DIST,
+            sb.long_attack_range[0] / MAX_DIST,
+            sb.long_attack_range[1] / MAX_DIST,
+            sb.short_attack_range[0] / MAX_DIST,
+            sb.short_attack_range[1] / MAX_DIST,
+
+            # Enemy-Stats
+            esb.movement_speed / MAX_DIST if esb != None else 0,
+
+            # Imminent Laser Spacial Data
             math.sqrt(p.dist_squared(actor=imminent)) /
             MAX_DIST if imminent != None else 1,
             p.angle_to(actor=imminent)/MAX_ANGLE if imminent != None else 1,
 
+            # Imminent Laser Stats
+            imminent.speed / MAX_DIST if imminent != None else 0,
+
+            # Closest Enemy Spacial Data
             math.sqrt(p.dist_squared(actor=enemy)) /
             MAX_DIST if enemy != None else 1,
             p.angle_to(actor=enemy)/MAX_ANGLE if enemy != None else 1,
 
+            # Personal Data
             p.get_direc()/MAX_ANGLE
         ]
 
