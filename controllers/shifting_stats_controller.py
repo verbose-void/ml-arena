@@ -9,7 +9,7 @@ STAT_BIASES = [
 ]
 
 
-DEBUG = True
+DEBUG = False
 
 
 class ShiftingStatsController(Controller):
