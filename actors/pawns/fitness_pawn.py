@@ -10,7 +10,11 @@ class FitnessPawn(Pawn):
     death_time: int = None
 
     def calculate_fitness(self):
-        return self.total_hits ** 2 / math.sqrt(self.total_hits_taken)
+        # attacks_missed = self.total_attacks - self.total_hits
+        # numerator = self.total_hits ** 2
+        # denominator = 7 * (self.total_hits_taken + attacks_missed)
+        # return numerator / denominator
+        return max(0, self.total_hits - (((self.total_hits_taken + self.total_attacks) / 2) * 0.1))
 
     def log_hit(self):
         self.total_hits += 1
