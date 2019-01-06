@@ -53,11 +53,15 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 |N|(Toggle) Visually display the currently focused creature(s) Neural Networks|Evolution|
 |P|(Toggle) Speed up all gameplay. Updates per frame can be changed in `environment.py > class Environment > var('speed_up_cycles')`|Global|
 
+<br>
+
 # Test Environment Keys
 |Key(s)|Description|
 |---|---|
 |BACKSPACE|Next generation|
 |ESCAPE|Randomize goal location|
+
+<br>
 
 ## Showcase:
 
