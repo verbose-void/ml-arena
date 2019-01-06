@@ -12,6 +12,8 @@ from controllers.controller import *
 from controllers.player_controller import *
 from controllers.dynamic_controller import *
 from controllers.creature_controller import *
+from controllers.dynamic_shifting_stats_controller import *
+from controllers.creature_shifting_stats_controller import *
 
 from typing import Callable, Set
 
@@ -179,6 +181,16 @@ def get_population_to_load(prompt: str):
 
 def build_evolution_environment():
     sim_type = get_str_choice('Training Type?', 'adversarial', 'other')
+    creature_controller_type = get_str_choice(
+        'What type of genome controller?',
+        'normal',
+        'shifting'
+    )
+
+    if creature_controller_type == 'normal':
+        controller_class = CreatureController
+    else:
+        controller_class = CreatureShiftingController
 
     if sim_type == 'other':
 
@@ -196,6 +208,7 @@ def build_evolution_environment():
         )
 
         population.set_opponent_factory(training_opponent_types[against])
+        population.controller_class = controller_class
         return EvolutionEnvironment(population)
 
     population1 = get_population_to_load('Load first population from file?')
@@ -219,6 +232,9 @@ def build_evolution_environment():
         print('\n\nPopulation sizes MUST be the same.')
         exit()
 
+    population1.controller_class = controller_class
+    population2.controller_class = controller_class
+
     return AdversarialEvolutionEnvironment(population1, population2)
 
 
@@ -238,12 +254,34 @@ def build_dynamic_pawn(stat_bias=None):
     return pawn
 
 
+def build_shifting_dynamic_pawn():
+    pawn = Pawn()
+    pawn.set_stat_bias(stat_biases.Normal)  # Start with normal stat bias
+    pawn.set_controller(DynamicShiftingStatsController)
+    return pawn
+
+
 def build_genome_pawn():
     pawn = Pawn()
-    controller = CreatureController(
-        pawn,
-        get_genome_to_load()
+
+    t = get_str_choice(
+        'What type of genome controller?',
+        'normal',
+        'shifting'
     )
+
+    genome = get_genome_to_load()
+
+    if t == 'shifting':
+        controller = CreatureShiftingController(
+            pawn,
+            genome
+        )
+    else:
+        controller = CreatureController(
+            pawn,
+            genome
+        )
 
     pawn.set_controller(controller)
     return pawn
@@ -259,12 +297,14 @@ pawn_types = {
     'brainless': Pawn,
     'player': build_player_pawn,
     'dynamic': build_dynamic_pawn,
+    'shift_dynamic': build_shifting_dynamic_pawn,
     'genome': build_genome_pawn
 }
 
 training_opponent_types = {
     'brainless': Pawn,
-    'dynamic': build_dynamic_pawn
+    'dynamic': build_dynamic_pawn,
+    'shift_dynamic': build_shifting_dynamic_pawn
 }
 
 if __name__ == '__main__':
