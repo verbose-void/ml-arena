@@ -33,7 +33,7 @@ class AdversarialEvolutionEnvironment(EvolutionEnvironment):
             if pop2.current_gen % 5 == 0:
                 pop2.save_to_dir()
 
-        self.start_time = time.time()
+        self.frame_count = 0
         self.match_ups = pop.build_match_ups(other_population=pop2)
         self.calculate_best_match_up()
 
@@ -86,9 +86,9 @@ class AdversarialEvolutionEnvironment(EvolutionEnvironment):
         out += Environment.__str__(self)
         out += spacer
 
-        out += 'Max Alive Fitness: %i' % round(max_alive_fitness)
+        out += 'Max Alive Fitness: %.1f' % max_alive_fitness
         out += spacer
 
-        out += 'Max Overall Fitness: %i' % round(self.absolute_max_fitness)
+        out += 'Max Overall Fitness: %.1f' % self.absolute_max_fitness
 
         return out

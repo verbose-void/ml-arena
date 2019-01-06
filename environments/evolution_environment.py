@@ -65,9 +65,9 @@ class EvolutionEnvironment(Environment):
         out += Environment.__str__(self)
         out += spacer
 
-        out += 'Max Alive Fitness: %i' % round(max_alive_fitness)
+        out += 'Max Alive Fitness: %.1f' % max_alive_fitness
         out += spacer
 
-        out += 'Max Overall Fitness: %i' % round(self.absolute_max_fitness)
+        out += 'Max Overall Fitness: %.1f' % self.absolute_max_fitness
 
         return out

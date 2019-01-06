@@ -36,6 +36,8 @@ class Pawn(actor.Actor):
     start_direc: float
     start_pos_type = None
 
+    frame = 0
+
     is_dead: bool = False
     health: float = 0
 
@@ -82,6 +84,8 @@ class Pawn(actor.Actor):
         self.stat_bias = stat_bias
 
     def reset(self):
+        self.frame = 0
+        self.laser_cooldown = None
         sb: SB.StatBias = self.stat_bias
 
         self.vel = [0, 0]
@@ -266,6 +270,7 @@ class Pawn(actor.Actor):
             return True
 
         super().update(delta_time)
+        self.frame += 1
 
         enemy_lasers = match_up.get_lasers(self)
         laser: Laser
@@ -357,11 +362,11 @@ class Pawn(actor.Actor):
         if self.laser_cooldown == None:
             self.laser_cooldown = Cooldown(cool_time)
 
-        if self.laser_cooldown.on_cooldown():
+        if self.laser_cooldown.on_cooldown(self.frame):
             return True
 
         self.laser_cooldown.set_cooldown_time(cool_time)
-        self.laser_cooldown.reset()
+        self.laser_cooldown.reset(self.frame)
         return False
 
     def get_lasers(self):

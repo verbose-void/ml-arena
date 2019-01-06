@@ -9,12 +9,12 @@ class Cooldown:
         self.set_cooldown_time(cooldown_length_in_seconds)
         self.start = -10000
 
-    def reset(self):
-        self.start = time.time()
+    def reset(self, frame):
+        self.start = frame
 
-    def set_cooldown_time(self, cooldown_length_in_seconds: float):
-        assert cooldown_length_in_seconds > 0, 'Cooldown length MUST be positive.'
-        self.length = cooldown_length_in_seconds
+    def set_cooldown_time(self, cooldown_length_in_frames: float):
+        assert cooldown_length_in_frames > 0, 'Cooldown length MUST be positive.'
+        self.length = cooldown_length_in_frames
 
-    def on_cooldown(self) -> bool:
-        return time.time() - self.start < self.length
+    def on_cooldown(self, frame) -> bool:
+        return frame - self.start < self.length

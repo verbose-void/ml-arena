@@ -4,7 +4,7 @@ from environments.environment import *
 
 # Base Stats
 BASE_MOVEMENT_SPEED = 100
-BASE_DIRECTIONAL_SPEED = 2
+BASE_DIRECTIONAL_SPEED = 3
 
 # Determines how large the body will be.
 BODY_RADIUS = 20
@@ -214,8 +214,8 @@ class Actor:
                         ))
 
         # Direction
-        self.set_direc(self.direc + (self.get_directional_speed()
-                                     * delta_time * (-self.looking)))
+        self.set_direc(
+            self.direc + (self.get_directional_speed() * (-self.looking)) * delta_time)
 
         if self.current_attack != None:
             self.current_attack()

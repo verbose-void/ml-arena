@@ -6,8 +6,8 @@ from actors.actions import *
 
 PA = PlayerActions
 
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 800
 
 from util.match_up import *
 
@@ -33,11 +33,11 @@ class Environment(arcade.Window):
     draw_dead = False
     draw_tracers = False
     draw_networks = False
-
-    start_time: float
     started = False
 
-    max_game_length: int = 45  # 45 seconds
+    speed_up = False
+    speed_up_cycles = 10
+    max_game_length: int = 2700  # 45 seconds if 1 second = 60 frames
 
     frame_count: int = 0
     print_str: str = ''
@@ -45,7 +45,6 @@ class Environment(arcade.Window):
     def __init__(self, *match_ups: MatchUp):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT)
         arcade.set_background_color(arcade.color.BLACK)
-        self.start_time = time.time()
         self.match_ups = set(match_ups)
         self.calculate_best_match_up()
         self.print_str = self.__str__()
@@ -64,6 +63,10 @@ class Environment(arcade.Window):
         return self.best_match_up
 
     def on_draw(self):
+        if self.frame_count % 60 == 0:
+            self.calculate_best_match_up()
+
+        self.print_str = self.__str__()
         arcade.start_render()
 
         if self.draw_best:
@@ -97,27 +100,25 @@ class Environment(arcade.Window):
         )
 
     def on_update(self, delta_time):
-        if (not self.are_match_ups_still_going()) or \
-                (self.max_game_length > 0 and time.time() - self.start_time > self.max_game_length):
+        for i in range(1 if not self.speed_up else self.speed_up_cycles):
+            self.frame_count += 1
+            if (not self.are_match_ups_still_going()):
+                return self.reset()
 
-            return self.reset()
+            if self.speed_up:
+                if self.max_game_length > 0 and self.frame_count > self.max_game_length:
+                    return self.reset()
 
-        self.frame_count += 1
+            match_up: MatchUp
+            for match_up in self.match_ups:
+                match_up.update(delta_time if USE_DELTA_TIME else 1)
+                best_pawn = match_up.get_best_pawn_based_on_fitness()
 
-        if self.frame_count % 60 == 0:
-            self.calculate_best_match_up()
-            self.print_str = self.__str__()
-
-        match_up: MatchUp
-        for match_up in self.match_ups:
-            match_up.update(delta_time if USE_DELTA_TIME else 1)
-            best_pawn = match_up.get_best_pawn_based_on_fitness()
-
-            if best_pawn:
-                # Set the absolute max fitness
-                self.absolute_max_fitness = \
-                    max(self.absolute_max_fitness,
-                        best_pawn.calculate_fitness())
+                if best_pawn:
+                    # Set the absolute max fitness
+                    self.absolute_max_fitness = \
+                        max(self.absolute_max_fitness,
+                            best_pawn.calculate_fitness())
 
     def reset(self):
         """Calls reset on each MatchUp & resets start_time."""
@@ -125,7 +126,6 @@ class Environment(arcade.Window):
         for match_up in self.match_ups:
             match_up.reset()
 
-        self.start_time = time.time()
         self.frame_count = 0
 
     def are_match_ups_still_going(self):
@@ -148,6 +148,10 @@ class Environment(arcade.Window):
 
             if action == PA.END_GAME:
                 self.end()
+                return
+
+            elif action == PA.SPEED_UP:
+                self.speed_up = not self.speed_up
                 return
 
             if action == PA.SHOW_NETWORKS:
@@ -210,7 +214,8 @@ class Environment(arcade.Window):
         out += spacer
 
         out += 'Time: %i/%is' % \
-            (round(time.time() - self.start_time), self.max_game_length)
+            (round(self.frame_count / 60),
+             round(self.max_game_length / 60))
 
         return out
 

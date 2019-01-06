@@ -5,7 +5,7 @@ class FreeplayEnvironment(Environment):
     gen_based: bool = False
 
     def __str__(self):
-        return 'Time Elapsed/Allotted: %is' % round(time.time() - self.start_time)
+        return 'Time Elapsed: %is' % round(self.frame_count / 60)
 
     def on_reset(self):
         """No resets."""
