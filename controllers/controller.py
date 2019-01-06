@@ -10,6 +10,7 @@ class Controller:
     """Default controller class"""
     actor: Actor
     active_actions: set = None
+    act_cycles = 0
 
     def __init__(self, actor: Actor):
         assert actor != None, 'Actor must NOT be NoneType.'
@@ -92,4 +93,4 @@ class Controller:
 
     def act(self):
         """Acts on decision."""
-        pass
+        self.act_cycles += 1

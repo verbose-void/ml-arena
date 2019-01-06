@@ -18,7 +18,6 @@ class ShieldStrat(Enum):
 
 
 class DynamicController(Controller):
-
     shield_strat: ShieldStrat
 
     imminent_laser: Laser = None
