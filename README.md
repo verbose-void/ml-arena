@@ -12,6 +12,7 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 - Clone this repository. `git clone https://github.com/McCrearyD/ML_Arena.git`
 - To run any simulation, run `python3 -u main.py` inside the main directory.
 - Follow the terminal instructions to run any type of simulation.
+- To run all test assertions & test environment, run `python3 -u test.py` inside the main directory.
 
 ### Simulation Types:
 - **Freeplay**: Freeplay allows you to create a single matchup using any type of pawn controller you'd like.
@@ -49,6 +50,7 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 |ESCAPE|End simulation, if Evolutionary: Save populations under their names|Global|
 |BACKSPACE|Force reset the environment. If Evolutionary: End the current generation|Global|
 |N|(Toggle) Visually display the currently focused creature(s) Neural Networks|Evolution|
+|P|(Toggle) Speed up all gameplay. Updates per frame can be changed in `environment.py > class Environment > var('speed_up_cycles')`|Global|
 
 ## Showcase:
 
