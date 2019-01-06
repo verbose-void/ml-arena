@@ -60,3 +60,5 @@ Compare predictive modes &amp; predispositions to sway learning / evolutionary t
 |<img width="1604" alt="1" src="https://i.gyazo.com/17d1f8366c614b86c0c5fce5269027b7.png">|<img width="1604" alt="1" src="https://i.gyazo.com/0baf14ecd33ec3a7668972bf08dd7f24.gif">|
 |**Evolutionary Training**|**Statistical Bias Balancing**|
 |<img width="1604" alt="1" src="https://i.gyazo.com/7948da19c26cd46e7455a111098f4259.gif">|<img width="1604" alt="1" src="https://i.gyazo.com/c40352df2597a940ba28a381384ed303.gif">|
+|**Testing**|
+|<img width="1604" alt="1" src="https://i.gyazo.com/21c3eb000d70a10994b19016745e5595.gif">|
