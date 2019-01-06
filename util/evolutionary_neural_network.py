@@ -47,9 +47,16 @@ class EvoNeuralNetwork(NeuralNetwork):
         )
 
     def clone(self):
-        return EvoNeuralNetwork(
-            layer_weights=np.copy(self.layer_weights)
+        copied_weights = []
+
+        for layer in self.layer_weights:
+            copied_weights.append(np.copy(layer))
+
+        out = EvoNeuralNetwork(
+            layer_weights=copied_weights
         )
+
+        return out
 
     def mutate(self, mutation_rate=0.1):
         for layer in self.layer_weights:
