@@ -27,6 +27,7 @@ class Environment(arcade.Window):
     match_ups: set = None
     best_match_up: MatchUp = None
     absolute_max_fitness: float = 0
+    current_gen_max_fitness: float = 0
 
     draw_best = True
     draw_match_connections = False
@@ -41,6 +42,8 @@ class Environment(arcade.Window):
 
     frame_count: int = 0
     print_str: str = ''
+
+    all_dead = False
 
     graphical = False
 
@@ -112,6 +115,7 @@ class Environment(arcade.Window):
     def do_logic(self, delta_time=0.01796913):
         self.frame_count += 1
         if (not self.are_match_ups_still_going()):
+            self.all_dead = True
             return self.reset()
 
         if self.max_game_length > 0 and self.frame_count > self.max_game_length:
@@ -123,9 +127,13 @@ class Environment(arcade.Window):
             best_pawn = match_up.get_best_pawn_based_on_fitness()
 
             if best_pawn:
-                    # Set the absolute max fitness
+                # Set the absolute max fitness
                 self.absolute_max_fitness = \
                     max(self.absolute_max_fitness,
+                        best_pawn.calculate_fitness())
+
+                self.current_gen_max_fitness = \
+                    max(self.current_gen_max_fitness,
                         best_pawn.calculate_fitness())
 
     def on_update(self, delta_time):
@@ -139,6 +147,8 @@ class Environment(arcade.Window):
             match_up.reset()
 
         self.frame_count = 0
+        self.all_dead = False
+        self.current_gen_max_fitness = -1
 
     def are_match_ups_still_going(self):
         return self.running_matches_count() > 0

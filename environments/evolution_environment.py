@@ -16,9 +16,8 @@ class EvolutionEnvironment(Environment):
         pop = self.population1
 
         if build_new_gen:
-            p_str = str(self)
-            pop.natural_selection()
-            pop.generate_creatures()
+
+            # Verbose
             print()
             print('Building new population...')
             print('Current Iteration: %i/%i (%.1f' % (
@@ -26,10 +25,34 @@ class EvolutionEnvironment(Environment):
                 self.max_iterations,
                 self.current_session_generation_count/self.max_iterations*100
             ) + '%' + ' complete!)')
-            print(p_str)
+            if self.all_dead:
+                dr = 'All Dead'
+            else:
+                c = self.running_matches_count()
+                l = len(self.match_ups)
+                dr = 'Time Limit Reached. Alive: %i/%i' % (
+                    c,
+                    l
+                )
+
+                dr += ' (%.1f' % (c/l*100) + '%' + ')'
+            g = 'Generation: %i' % pop.current_gen
+            try:
+                g += '-' % self.population2.current_gen
+            except:
+                pass
+            print(g)
+            print('Termination Reason: %s' % dr)
+            print('Max Overall Fitness: %i' % self.absolute_max_fitness)
+            print('Generational Max Fitness: %i' %
+                  self.current_gen_max_fitness)
+
             self.current_session_generation_count += 1
             if pop.current_gen > 0 and pop.current_gen % 5 == 0:
                 pop.save_to_dir()
+
+            pop.natural_selection()
+            pop.generate_creatures()
             pop.current_gen += 1
             super().reset()
 
@@ -43,7 +66,7 @@ class EvolutionEnvironment(Environment):
 
         assert generations > 0, 'Generation count MUST be larger than 0.'
         self.max_iterations = generations
-        print('Running Sim Non-Graphically.')
+        print('Running Sim Non-Graphically For %i Generations.' % generations)
         # Run manual sim
         while self.current_session_generation_count <= generations:
             if self.frame_count > self.max_game_length and self.frame_count % 5000 == 0:
