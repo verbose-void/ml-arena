@@ -12,12 +12,10 @@ class FitnessPawn(Pawn):
         # denominator = 7 * (self.total_hits_taken + attacks_missed)
         # return numerator / denominator
 
-        # hits_weighted = self.total_hits_taken * 0.7
-        # attacks_weighted = self.total_attacks * 0.3
-        # detriment = hits_weighted + attacks_weighted
-        # return max(0, self.total_hits - detriment)
-
-        return max(0, self.total_hits - (self.total_hits_taken * 0.2))
+        hits_weighted = self.total_hits_taken * 0.7
+        attacks_weighted = self.total_attacks * 0.3
+        detriment = hits_weighted + attacks_weighted
+        return max(0, self.total_hits - detriment)
 
     def log_hit(self):
         self.total_hits += 1
