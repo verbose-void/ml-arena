@@ -334,7 +334,5 @@ if __name__ == '__main__':
     if graphical == 'yes':
         env.init_graphics()
 
-    else:
-        iterations = get_int_choice('How many iterations?', 1, 5000)
-
+    iterations = get_int_choice('How many iterations?', 1, 5000)
     env.run(generations=iterations)
