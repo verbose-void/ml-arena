@@ -1,15 +1,21 @@
 from environments.environment import *
 from util.population import *
+import matplotlib.pyplot as plt
 
 
 class EvolutionEnvironment(Environment):
     population1: Population
     current_session_generation_count = 0
-    max_iterations = None
+    max_iterations = 1
+
+    generational_fitnesses = None
+    alive_after_time = None
 
     def __init__(self, population1: Population):
         self.population1 = population1
         self.reset(build_new_gen=False)
+        self.generational_fitnesses = []
+        self.alive_after_time = []
         super().__init__(*self.match_ups)
 
     def reset(self, build_new_gen=True):
@@ -27,8 +33,10 @@ class EvolutionEnvironment(Environment):
             ) + '%' + ' complete!)')
             if self.all_dead:
                 dr = 'All Dead'
+                self.alive_after_time.append(0)
             else:
                 c = self.running_matches_count()
+                self.alive_after_time.append(c)
                 l = len(self.match_ups)
                 dr = 'Time Limit Reached. Alive: %i/%i' % (
                     c,
@@ -46,6 +54,9 @@ class EvolutionEnvironment(Environment):
             print('Max Overall Fitness: %i' % self.absolute_max_fitness)
             print('Generational Max Fitness: %i' %
                   self.current_gen_max_fitness)
+
+            # Graph data
+            self.generational_fitnesses.append(self.current_gen_max_fitness)
 
             self.current_session_generation_count += 1
             if pop.current_gen > 0 and pop.current_gen % 5 == 0:
@@ -75,6 +86,23 @@ class EvolutionEnvironment(Environment):
             self.do_logic()
 
         print('\nTraining Session Complete!')
+
+        # Graph data
+        plt.plot(self.alive_after_time)
+        plt.xlabel('Alive Amount')
+        plt.ylabel('Generation')
+        plt.figtext(.02, .02,
+                    '\n\nDepicts the amount of creatures that survived any given generation.\n\n')
+        plt.legend()
+        plt.show()
+
+        plt.plot(self.generational_fitnesses, label='Generational Fitnesses')
+        plt.xlabel('Max Generational Fitness')
+        plt.ylabel('Generation')
+        plt.figtext(.02, .02,
+                    '\n\nDepicts the highest scoring creature per generation.\n\n')
+        plt.legend()
+        plt.show()
 
     def on_draw(self):
         super().on_draw()
