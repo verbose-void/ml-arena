@@ -277,15 +277,15 @@ class Actor:
         looking: int = 0
 
         if self.dist_squared(pos=pos) < self.raw_dist_squared(pos=pos):
-            if d < 0.505:
+            if d < 0.55:
                 looking = -1
-            elif d > 0.505:
+            elif d > 0.55:
                 looking = 1
 
         else:
-            if d > 0.505:
+            if d > 0.55:
                 looking = -1
-            elif d < 0.505:
+            elif d < 0.55:
                 looking = 1
 
         self.set_looking(looking)

@@ -42,18 +42,28 @@ class Environment(arcade.Window):
     frame_count: int = 0
     print_str: str = ''
 
+    graphical = False
+
     def __init__(self, *match_ups: MatchUp):
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT)
-        arcade.set_background_color(arcade.color.BLACK)
         self.match_ups = set(match_ups)
         self.calculate_best_match_up()
         self.print_str = self.__str__()
 
-    def run(self):
+    def init_graphics(self):
+        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT)
+        arcade.set_background_color(arcade.color.BLACK)
+        self.graphical = True
+
+    def run(self, iterations=None):
         if self.started:
             raise Exception('Environment has already begun.')
         self.started = True
-        arcade.run()
+
+        if self.graphical:
+            arcade.run()
+            return True
+
+        return False
 
     def calculate_best_match_up(self):
         """Sets the 'best_match_up' property based on each pawn's fitness."""
@@ -99,26 +109,28 @@ class Environment(arcade.Window):
             arcade.color.WHITE
         )
 
+    def do_logic(self, delta_time=0.01796913):
+        self.frame_count += 1
+        if (not self.are_match_ups_still_going()):
+            return self.reset()
+
+        if self.max_game_length > 0 and self.frame_count > self.max_game_length:
+            return self.reset()
+
+        match_up: MatchUp
+        for match_up in self.match_ups:
+            match_up.update(delta_time if USE_DELTA_TIME else 1)
+            best_pawn = match_up.get_best_pawn_based_on_fitness()
+
+            if best_pawn:
+                    # Set the absolute max fitness
+                self.absolute_max_fitness = \
+                    max(self.absolute_max_fitness,
+                        best_pawn.calculate_fitness())
+
     def on_update(self, delta_time):
         for i in range(1 if not self.speed_up else self.speed_up_cycles):
-            self.frame_count += 1
-            if (not self.are_match_ups_still_going()):
-                return self.reset()
-
-            if self.speed_up:
-                if self.max_game_length > 0 and self.frame_count > self.max_game_length:
-                    return self.reset()
-
-            match_up: MatchUp
-            for match_up in self.match_ups:
-                match_up.update(delta_time if USE_DELTA_TIME else 1)
-                best_pawn = match_up.get_best_pawn_based_on_fitness()
-
-                if best_pawn:
-                    # Set the absolute max fitness
-                    self.absolute_max_fitness = \
-                        max(self.absolute_max_fitness,
-                            best_pawn.calculate_fitness())
+            self.do_logic(delta_time)
 
     def reset(self):
         """Calls reset on each MatchUp & resets start_time."""

@@ -73,11 +73,12 @@ class Population:
             fitness_sum += pawn.calculate_fitness()
 
         r = random.randrange(start=0, stop=math.floor(fitness_sum))
-        running_sum = 1
+        pawns = list(self.creatures_to_nets.keys())
+        np.random.shuffle(pawns)
 
-        for pawn in self.creatures_to_nets.keys():
-            running_sum += pawn.calculate_fitness()
-            if r < running_sum:
+        for pawn in pawns:
+            r -= pawn.calculate_fitness()
+            if r <= 1:
                 return self.creatures_to_nets[pawn]
 
         raise Exception('This shouldn\'t be possible..')
@@ -137,9 +138,10 @@ class Population:
             new_nets.extend(children)
 
         self.neural_networks = new_nets
-        print(self.size())
 
     def save_to_dir(self, path: str = None):
+        print('\nSaving Population \"%s\"...' % self.dir_name)
+
         if path == None:
             path = os.path.join(POPULATION_DIRECTORY, self.dir_name)
         else:
@@ -159,6 +161,8 @@ class Population:
             json.dump({
                 'current_gen': self.current_gen
             }, outfile)
+
+        print('Success!')
 
     def list_all_saved():
         """Returns a string describing all of the saved populations."""

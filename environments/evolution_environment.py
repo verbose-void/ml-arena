@@ -4,6 +4,8 @@ from util.population import *
 
 class EvolutionEnvironment(Environment):
     population1: Population
+    current_session_generation_count = 0
+    max_iterations = None
 
     def __init__(self, population1: Population):
         self.population1 = population1
@@ -14,15 +16,42 @@ class EvolutionEnvironment(Environment):
         pop = self.population1
 
         if build_new_gen:
+            p_str = str(self)
             pop.natural_selection()
             pop.generate_creatures()
-            pop.current_gen += 1
-            if pop.current_gen % 5 == 0:
+            print()
+            print('Building new population...')
+            print('Current Iteration: %i/%i (%.1f' % (
+                self.current_session_generation_count,
+                self.max_iterations,
+                self.current_session_generation_count/self.max_iterations*100
+            ) + '%' + ' complete!)')
+            print(p_str)
+            self.current_session_generation_count += 1
+            if pop.current_gen > 0 and pop.current_gen % 5 == 0:
                 pop.save_to_dir()
+            pop.current_gen += 1
             super().reset()
 
         self.match_ups = pop.build_match_ups()
         self.calculate_best_match_up()
+
+    def run(self, generations=10):
+        res = Environment.run(self)
+        if res:
+            return
+
+        assert generations > 0, 'Generation count MUST be larger than 0.'
+        self.max_iterations = generations
+        print('Running Sim Non-Graphically.')
+        # Run manual sim
+        while self.current_session_generation_count <= generations:
+            if self.frame_count > self.max_game_length and self.frame_count % 5000 == 0:
+                print('Exceeded max game length... Frame count: %i' %
+                      self.frame_count)
+            self.do_logic()
+
+        print('\nTraining Session Complete!')
 
     def on_draw(self):
         super().on_draw()

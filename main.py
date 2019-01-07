@@ -315,14 +315,26 @@ if __name__ == '__main__':
 
     env = None
 
+    graphical = 'yes'
+
     if choice == 'balance':
         env = build_balancing_environment()
+        graphical = get_str_choice('Run graphically?', 'yes', 'no')
 
     if choice == 'freeplay':
         env = build_freeplay_environment()
 
     if choice == 'evolution':
         env = build_evolution_environment()
+        graphical = get_str_choice('Run graphically?', 'yes', 'no')
 
     assert env != None, 'Environment CANNOT be NoneType.'
-    env.run()
+
+    iterations = 10
+    if graphical == 'yes':
+        env.init_graphics()
+
+    else:
+        iterations = get_int_choice('How many iterations?', 1, 5000)
+
+    env.run(generations=iterations)
