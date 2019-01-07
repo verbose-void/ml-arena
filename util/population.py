@@ -137,7 +137,12 @@ class Population:
             [child.mutate() for child in children]  # mutate all (2) children
             new_nets.extend(children)
 
-        assert self.size() == len(new_nets), 'Inconsistent population size.'
+        # assert self.size() == len(new_nets), \
+        #     'Inconsistent population size. Start: %i End: %i' % (
+        #         self.size(),
+        #         len(new_nets)
+        # )
+
         self.neural_networks = new_nets
 
     def save_to_dir(self, path: str = None):

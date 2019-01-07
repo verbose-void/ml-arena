@@ -23,20 +23,20 @@ class EvoNeuralNetwork(NeuralNetwork):
             child1_layer = np.zeros((rows, cols))
             child2_layer = np.zeros((rows, cols))
 
-            for i in range(rows):
-                for j in range(cols):
+            for j in range(rows):
+                for k in range(cols):
 
                     # This will copy all nodes from parent 1 until the cutoff is reached,
                     # then it will switch over to parent 2.
                     # does this for both children, which will effectively have the inverse of
                     # each other's genes with respect to the parents.
 
-                    if i < cutoff[0] or (i == cutoff[0] and j <= cutoff[1]):
-                        child1_layer[i, j] = parentA_layer[i, j]
-                        child2_layer[i, j] = parentB_layer[i, j]
+                    if j < cutoff[0] or (j == cutoff[0] and k <= cutoff[1]):
+                        child1_layer[j, k] = parentA_layer[j, k]
+                        child2_layer[j, k] = parentB_layer[j, k]
                     else:
-                        child1_layer[i, j] = parentB_layer[i, j]
-                        child2_layer[i, j] = parentA_layer[i, j]
+                        child1_layer[j, k] = parentB_layer[j, k]
+                        child2_layer[j, k] = parentA_layer[j, k]
 
             child1_layers.append(child1_layer)
             child2_layers.append(child2_layer)
