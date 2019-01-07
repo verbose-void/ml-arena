@@ -40,11 +40,9 @@ class GenomePopulation:
     def size(self):
         return len(self.genomes)
 
-    def pick_random(self) -> Genome:
-        fitness_sum = 1
-
-        for genome in self.genomes:
-            fitness_sum += genome.calculate_fitness()
+    def pick_random(self, fitness_sum) -> Genome:
+        if fitness_sum <= 0:
+            return random.choice(self.genomes)
 
         r = random.randrange(start=0, stop=math.floor(fitness_sum))
         running_sum = 1
@@ -71,9 +69,12 @@ class GenomePopulation:
             new_best.clone().mutate()
         ]
 
+        fit_sum = np.sum([genome.calculate_fitness()
+                          for genome in self.genomes])
+
         for i in range(round(len(self.genomes) / 2 - 1)):
-            parentA = self.pick_random()
-            parentB = self.pick_random()
+            parentA = self.pick_random(fit_sum)
+            parentB = self.pick_random(fit_sum)
 
             children = parentA.crossover(parentB)
             [child.mutate() for child in children]
