@@ -10,6 +10,10 @@ BASE_DIRECTIONAL_SPEED = 3
 BODY_RADIUS = 20
 BODY_RADIUS_SQUARED = BODY_RADIUS ** 2
 
+MAP_RADIUS_SQUARED = (min(SCREEN_HEIGHT, SCREEN_WIDTH) / 2) ** 2
+SCREEN_CENTER_X = SCREEN_WIDTH / 2
+SCREEN_CENTER_Y = SCREEN_HEIGHT / 2
+
 
 def find_intersection(x1, y1, x2, y2, x3, y3, x4, y4):
     px = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4)) / \
@@ -84,9 +88,11 @@ class Actor:
 
         if self.pos[0] < -self.max_outward_bound:
             self.pos[0] = SCREEN_WIDTH + self.max_outward_bound
+            self.pos[1] = SCREEN_HEIGHT - self.pos[1]
             return True
         elif self.pos[0] > SCREEN_WIDTH + self.max_outward_bound:
             self.pos[0] = -self.max_outward_bound
+            self.pos[1] = SCREEN_HEIGHT - self.pos[1]
             return True
 
         return False
@@ -96,9 +102,11 @@ class Actor:
 
         if self.pos[1] < -self.max_outward_bound:
             self.pos[1] = SCREEN_HEIGHT + self.max_outward_bound
+            self.pos[0] = SCREEN_WIDTH - self.pos[0]
             return True
         elif self.pos[1] > SCREEN_HEIGHT + self.max_outward_bound:
             self.pos[1] = -self.max_outward_bound
+            self.pos[0] = SCREEN_WIDTH - self.pos[0]
             return True
 
         return False
