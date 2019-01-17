@@ -42,7 +42,7 @@ class ActivationType(Enum):
     TANH = 2
 
 
-ACTIVATION = ActivationType.TANH
+ACTIVATION = ActivationType.SIGMOID
 
 
 class NeuralNetwork:
@@ -84,18 +84,18 @@ class NeuralNetwork:
 
         assert dimensions != None or layer_weights != None, 'Neural Network must be initialized with either dimensions or weights'
 
-        if dimensions != None:
-            assert len(self.input_neuron_labels) == dimensions[0] + 1, \
-                'Input labels must match neuron count. Got %i labels, expected %i.' % (
-                    len(self.input_neuron_labels),
-                    dimensions[0] + 1
-            )
+        # if dimensions != None:
+        # assert len(self.input_neuron_labels) == dimensions[0] + 1, \
+        #     'Input labels must match neuron count. Got %i labels, expected %i.' % (
+        #         len(self.input_neuron_labels),
+        #         dimensions[0] + 1
+        # )
 
-            assert len(self.output_neuron_labels) == dimensions[len(dimensions)-1], \
-                'Output labels must match neuron count. Got %i labels, expected %i.' % (
-                    len(self.output_neuron_labels),
-                    dimensions[len(dimensions)-1] + 1
-            )
+        # assert len(self.output_neuron_labels) == dimensions[len(dimensions)-1], \
+        #     'Output labels must match neuron count. Got %i labels, expected %i.' % (
+        #         len(self.output_neuron_labels),
+        #         dimensions[len(dimensions)-1] + 1
+        # )
 
         if dimensions:
             self.layer_weights = []
@@ -105,18 +105,18 @@ class NeuralNetwork:
                 variance = 2/(dimensions[i] + dimensions[i+1])
                 stddev = math.sqrt(variance)
 
-                d1 = dimensions[i] + 1
-                d2 = dimensions[i+1] + 1
+                cols = dimensions[i+1] + 1
+                rows = dimensions[i] + 1
 
                 if i + 1 >= midx:
-                    d2 -= 1
+                    cols -= 1
 
                 layer = np.random.normal(
                     loc=0,
                     scale=stddev,
                     size=(
-                        d1,
-                        d2
+                        cols,
+                        rows
                     )
                 )
 
@@ -127,54 +127,59 @@ class NeuralNetwork:
 
         self.layer_weights = list(layer_weights)
 
-    def sigmoid(self, x, derivative=False):
+    def sigmoid(x, derivative=False):
         return x*(1-x) if derivative else 1/(1+np.exp(-x))
 
-    def ReLU(self, x):
+    def ReLU(x):
         return x * (x > 0)
 
     def softmax(self, x):
         return np.exp(x) / np.sum(np.exp(x), axis=0)
 
-    def activate_layer(self, layer: list):
+    def activate_layer(layer: list):
         for x in np.nditer(layer, op_flags=['readwrite']):
             if ACTIVATION == ActivationType.RELU:
-                x[...] = self.ReLU(x)
+                x[...] = NeuralNetwork.ReLU(x)
             elif ACTIVATION == ActivationType.SIGMOID:
-                x[...] = self.sigmoid(x)
+                x[...] = NeuralNetwork.sigmoid(x)
             elif ACTIVATION == ActivationType.TANH:
                 x[...] = np.tanh(x)
 
     def output(self, inputs: list):
-        """Calculates the output for the given inputs."""
+        """
+        Calculates the output for the given inputs.
+        Automatically appends bias term.
+        Automatically turns array into column matrix.
+        """
 
-        inputs.append(1)  # add bias
+        inputs.append(1)  # add bias to beginning
+        output = np.array(inputs)
+        output.reshape((len(inputs), 1))
         self.neuron_weights = []
-        self.neuron_weights.append(np.array((inputs)))
-        output = inputs
+        self.neuron_weights.append(np.copy(output).flatten())
 
         if ACTIVATION == ActivationType.RELU:
 
             for i, weight_layer in enumerate(self.layer_weights):
-                output = np.dot(output, weight_layer)
+                output = weight_layer.dot(output)
 
                 if i < len(self.layer_weights)-1:
-                    self.activate_layer(output)
+                    NeuralNetwork.activate_layer(output)
                     self.neuron_weights.append(output)
                 else:
                     break
 
             # Output layer should be activated using softmax when using ReLU
             output = self.softmax(output)
-            self.neuron_weights.append(output)
+            self.neuron_weights.append(np.copy(output).flatten())
 
         else:
 
             l = len(self.layer_weights)-1
-            for i, weight_layer in enumerate(self.layer_weights):
-                output = np.matmul(output, weight_layer)
-                self.activate_layer(output)
-                self.neuron_weights.append(output)
+            for weight_layer in self.layer_weights:
+                output = weight_layer.dot(output)
+                NeuralNetwork.activate_layer(output)
+                self.neuron_weights.append(np.copy(output).flatten())
 
         return output
 
@@ -247,6 +252,7 @@ class NeuralNetwork:
             return
 
         for i, layer_weight_set in enumerate(self.layer_weights):
+            layer_weight_set = layer_weight_set.T
             layer1_neuron_locations = self.neuron_screen_locations[i]
             layer2_neuron_locations = self.neuron_screen_locations[i+1]
 

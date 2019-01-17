@@ -40,6 +40,38 @@ net2_children = net2.crossover(net2_clone)
 assert_near_equal(net2_children[0], net2_children[1], inverse=True)
 print('Assertion passed for children being different.')
 
+
+W = np.array([
+    [-1.58686978,  1.40257049,  0.06003039, -0.36521968],
+    [-2.20114997, -0.6549252, -0.32541635, -1.12067112],
+    [0.6381669,  0.48953871, -0.38381631, -1.49400033]
+])
+
+# Test outputs of networks.
+net1 = EvoNeuralNetwork(
+    layer_weights=[np.copy(W)]
+)
+
+Xb = np.array([[-2.14874928],
+               [0.44031005],
+               [0.74149018],
+               [1]])  # bias
+
+X = [-2.14874928,  # no bias
+     0.44031005,
+     0.74149018]
+
+Y = np.array([-4.84501693, -1.76813063, -1.69051381])
+
+EvoNeuralNetwork.activate_layer(Y)
+Yhat = net1.output(X)
+YhatActual = W.dot(Xb).flatten()
+EvoNeuralNetwork.activate_layer(YhatActual)
+
+assert np.allclose(
+    YhatActual, Yhat, 0.0001), 'Fixed predictions & Lib Net predictions MUST be equal.'
+
+
 # ----------------------------------------
 #             End Assertions
 # ----------------------------------------
@@ -66,3 +98,16 @@ env = PathEnvironment(
 )
 
 arcade.run()
+
+# parentA = EvoNeuralNetwork((3, 1))
+# parentB = EvoNeuralNetwork((3, 1))
+
+# children = parentA.crossover(parentB)
+# print()
+# print(parentA.layer_weights)
+# print()
+# print(parentB.layer_weights)
+# print()
+# print(children[0].layer_weights)
+# print()
+# print(children[1].layer_weights)

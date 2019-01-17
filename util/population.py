@@ -198,9 +198,10 @@ class Population:
     def get_valid_populations():
         out = []
 
-        for f in os.listdir(POPULATION_DIRECTORY):
-            if os.path.isdir(os.path.join(POPULATION_DIRECTORY, f)):
-                out.append(f)
+        if os.path.isdir(POPULATION_DIRECTORY):
+            for f in os.listdir(POPULATION_DIRECTORY):
+                if os.path.isdir(os.path.join(POPULATION_DIRECTORY, f)):
+                    out.append(f)
 
         return out
 

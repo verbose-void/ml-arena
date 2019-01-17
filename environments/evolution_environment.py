@@ -18,46 +18,49 @@ class EvolutionEnvironment(Environment):
         self.alive_after_time = []
         super().__init__(*self.match_ups)
 
+    def verbose(self):
+        pop = self.population1
+
+        print()
+        print('Building new population...')
+        print('Current Iteration: %i/%i (%.1f' % (
+            self.current_session_generation_count,
+            self.max_iterations,
+            self.current_session_generation_count/self.max_iterations*100
+        ) + '%' + ' complete!)')
+
+        if self.all_dead:
+            dr = 'All Dead'
+            self.alive_after_time.append(0)
+        else:
+            c = self.running_matches_count()
+            self.alive_after_time.append(c)
+            l = len(self.match_ups)
+            dr = 'Time Limit Reached. Alive: %i/%i' % (
+                c,
+                l
+            )
+            dr += ' (%.1f' % (c/l*100) + '%' + ')'
+
+        g = 'Generation: %i' % pop.current_gen
+        try:
+            g += '-' % self.population2.current_gen
+        except:
+            pass
+        print(g)
+        print('Termination Reason: %s' % dr)
+        print('Max Overall Fitness: %i' % self.absolute_max_fitness)
+        print('Generational Max Fitness: %i' %
+              self.current_gen_max_fitness)
+
+        # Graph data
+        self.generational_fitnesses.append(self.current_gen_max_fitness)
+
     def reset(self, build_new_gen=True):
         pop = self.population1
 
         if build_new_gen:
-
-            # Verbose
-            print()
-            print('Building new population...')
-            print('Current Iteration: %i/%i (%.1f' % (
-                self.current_session_generation_count,
-                self.max_iterations,
-                self.current_session_generation_count/self.max_iterations*100
-            ) + '%' + ' complete!)')
-            if self.all_dead:
-                dr = 'All Dead'
-                self.alive_after_time.append(0)
-            else:
-                c = self.running_matches_count()
-                self.alive_after_time.append(c)
-                l = len(self.match_ups)
-                dr = 'Time Limit Reached. Alive: %i/%i' % (
-                    c,
-                    l
-                )
-
-                dr += ' (%.1f' % (c/l*100) + '%' + ')'
-            g = 'Generation: %i' % pop.current_gen
-            try:
-                g += '-' % self.population2.current_gen
-            except:
-                pass
-            print(g)
-            print('Termination Reason: %s' % dr)
-            print('Max Overall Fitness: %i' % self.absolute_max_fitness)
-            print('Generational Max Fitness: %i' %
-                  self.current_gen_max_fitness)
-
-            # Graph data
-            self.generational_fitnesses.append(self.current_gen_max_fitness)
-
+            self.verbose()
             self.current_session_generation_count += 1
             if pop.current_gen > 0 and pop.current_gen % 5 == 0:
                 pop.save_to_dir()
@@ -92,7 +95,7 @@ class EvolutionEnvironment(Environment):
         plt.xlabel('Alive Amount')
         plt.ylabel('Generation')
         plt.figtext(.02, .02,
-                    '\n\nDepicts the amount of creatures that survived any given generation.\n\n')
+                    'Depicts the amount of creatures that survived any given generation.')
         plt.legend()
         plt.show()
 
@@ -100,7 +103,7 @@ class EvolutionEnvironment(Environment):
         plt.xlabel('Max Generational Fitness')
         plt.ylabel('Generation')
         plt.figtext(.02, .02,
-                    '\n\nDepicts the highest scoring creature per generation.\n\n')
+                    'Depicts the highest scoring creature per generation.')
         plt.legend()
         plt.show()
 

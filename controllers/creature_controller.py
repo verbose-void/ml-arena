@@ -6,11 +6,13 @@ from actors.actions import *
 
 INPUT_NODES = 14
 OUTPUT_NODES = len(ACTION_LIST)
+HIDDEN_NODES = round((INPUT_NODES + OUTPUT_NODES) / 2)
 
 NETWORK_DIMENSIONS = (
     INPUT_NODES,
     # for simplicity, hidden node count = mean of input nodes to output nodes
-    round((INPUT_NODES + OUTPUT_NODES) / 2),
+    HIDDEN_NODES,
+    HIDDEN_NODES - 2,
     OUTPUT_NODES
 )
 

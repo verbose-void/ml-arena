@@ -45,11 +45,10 @@ class GenomePopulation:
             return random.choice(self.genomes)
 
         r = random.randrange(start=0, stop=math.floor(fitness_sum))
-        running_sum = 1
 
         for genome in self.genomes:
-            running_sum += genome.calculate_fitness()
-            if r < running_sum:
+            r -= genome.calculate_fitness()
+            if r < 1:
                 return genome
 
         raise Exception('This shouldn\'t be possible..')
