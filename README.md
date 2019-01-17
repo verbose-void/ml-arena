@@ -1,5 +1,5 @@
 # ML_Arena
-Compare predictive modes &amp; predispositions to sway learning / evolutionary traits in an asteroids-like arena.
+A fully custom simulation environment that interchangeably compares reinforcement learning models. Has a full blown API for modularity of algorithms, built in general genetic neural network library, and other utilities for training and testing.
 
 ### Versions:
 - Built in [python3](https://www.python.org/downloads/).
