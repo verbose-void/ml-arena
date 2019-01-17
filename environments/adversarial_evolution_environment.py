@@ -20,6 +20,9 @@ class AdversarialEvolutionEnvironment(EvolutionEnvironment):
 
         if build_new_gen:
             self.verbose()
+            print('----------------------------------')
+            print(self.build_population_report(pop2))
+
             pop.natural_selection()
             pop.generate_creatures()
             pop.current_gen += 1

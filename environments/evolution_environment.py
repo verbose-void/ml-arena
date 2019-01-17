@@ -18,40 +18,32 @@ class EvolutionEnvironment(Environment):
         self.alive_after_time = []
         super().__init__(*self.match_ups)
 
-    def verbose(self):
-        pop = self.population1
-
-        print()
-        print('Building new population...')
-        print('Current Iteration: %i/%i (%.1f' % (
+    def build_iteration_report(self):
+        s = 'Current Iteration: %i/%i (%.1f' % (
             self.current_session_generation_count,
             self.max_iterations,
             self.current_session_generation_count/self.max_iterations*100
-        ) + '%' + ' complete!)')
+        ) + '%' + ' complete!)'
 
-        if self.all_dead:
-            dr = 'All Dead'
-            self.alive_after_time.append(0)
-        else:
-            c = self.running_matches_count()
-            self.alive_after_time.append(c)
-            l = len(self.match_ups)
-            dr = 'Time Limit Reached. Alive: %i/%i' % (
-                c,
-                l
-            )
-            dr += ' (%.1f' % (c/l*100) + '%' + ')'
+        s += '\nMax Overall Fitness: %i' % self.absolute_max_fitness
+        s += '\nGenerational Max Fitness: %i' % \
+            self.current_gen_max_fitness
 
-        g = 'Generation: %i' % pop.current_gen
-        try:
-            g += '-' % self.population2.current_gen
-        except:
-            pass
-        print(g)
-        print('Termination Reason: %s' % dr)
-        print('Max Overall Fitness: %i' % self.absolute_max_fitness)
-        print('Generational Max Fitness: %i' %
-              self.current_gen_max_fitness)
+        return s
+
+    def build_population_report(self, pop):
+        s = 'Building new population for \"%s\".' % pop.dir_name
+        s += '\nGeneration: %i' % pop.current_gen
+        s += '\nAlive: %i' % pop.count_alive()
+
+        return s
+
+    def verbose(self):
+        pop = self.population1
+        print()
+        print(self.build_iteration_report())
+        print('----------------------------------')
+        print(self.build_population_report(pop))
 
         # Graph data
         self.generational_fitnesses.append(self.current_gen_max_fitness)
@@ -73,16 +65,16 @@ class EvolutionEnvironment(Environment):
         self.match_ups = pop.build_match_ups()
         self.calculate_best_match_up()
 
-    def run(self, generations=10):
+    def run(self, iterations=10):
         res = Environment.run(self)
         if res:
             return
 
-        assert generations > 0, 'Generation count MUST be larger than 0.'
-        self.max_iterations = generations
-        print('Running Sim Non-Graphically For %i Generations.' % generations)
+        assert iterations > 0, 'Generation count MUST be larger than 0.'
+        self.max_iterations = iterations
+        print('Running Sim Non-Graphically For %i iterations.' % iterations)
         # Run manual sim
-        while self.current_session_generation_count <= generations:
+        while self.current_session_generation_count <= iterations:
             if self.frame_count > self.max_game_length and self.frame_count % 5000 == 0:
                 print('Exceeded max game length... Frame count: %i' %
                       self.frame_count)

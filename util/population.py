@@ -51,6 +51,15 @@ class Population:
         """Returns the neural network at the given index."""
         return self.neural_networks[i]
 
+    def count_alive(self):
+        c = 0
+
+        for creature in self.creatures_to_nets.keys():
+            if not creature.is_dead:
+                c += 1
+
+        return c
+
     def get_network(self, creature: FitnessPawn):
         return self.creatures_to_nets.get(creature)
 

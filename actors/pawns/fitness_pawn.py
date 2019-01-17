@@ -12,8 +12,8 @@ class FitnessPawn(Pawn):
         # denominator = 7 * (self.total_hits_taken + attacks_missed)
         # return numerator / denominator
 
-        hits_weighted = self.total_hits_taken * 0.7
-        attacks_weighted = self.total_attacks * 0.3
+        hits_weighted = self.total_hits_taken * 0.3
+        attacks_weighted = self.total_attacks * 0.2
         detriment = hits_weighted + attacks_weighted
         return max(0, self.total_hits - detriment)
 
