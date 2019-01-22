@@ -384,12 +384,12 @@ class Pawn(actor.Actor):
 
         pos = pawn.get_pos()
         vel = pawn.get_vel()
-        dist = math.sqrt(self.dist_squared(actor=pawn))
+        dist = self.dist_squared(actor=pawn)
 
         if dist < sb.short_attack_range[1]:
-            scalar = dist / sb.short_attack_speed * bias
+            scalar = dist / sb.short_attack_speed ** 2 * bias
         else:
-            scalar = dist / sb.long_attack_speed * bias
+            scalar = dist / sb.long_attack_speed ** 2 * bias
 
         return (
             pos[0] + vel[0]*scalar,
