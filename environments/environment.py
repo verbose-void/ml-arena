@@ -38,7 +38,7 @@ class Environment(arcade.Window):
 
     speed_up = False
     speed_up_cycles = 10
-    max_game_length: int = 2700  # 45 seconds if 1 second = 60 frames
+    max_game_length: int = 1500  # 45 seconds if 1 second = 60 frames
 
     frame_count: int = 0
     print_str: str = ''
