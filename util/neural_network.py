@@ -42,7 +42,7 @@ class ActivationType(Enum):
     TANH = 2
 
 
-ACTIVATION = ActivationType.SIGMOID
+ACTIVATION = ActivationType.RELU
 
 
 class NeuralNetwork:
@@ -102,8 +102,9 @@ class NeuralNetwork:
 
             midx = len(dimensions)-1
             for i in range(midx):
-                variance = 2/(dimensions[i] + dimensions[i+1])
-                stddev = math.sqrt(variance)
+                # variance = 2/(dimensions[i] + dimensions[i+1])
+                # stddev = math.sqrt(variance)
+                stddev = math.sqrt(2 / dimensions[i])
 
                 cols = dimensions[i+1] + 1
                 rows = dimensions[i] + 1
@@ -131,7 +132,7 @@ class NeuralNetwork:
         return x*(1-x) if derivative else 1/(1+np.exp(-x))
 
     def ReLU(x):
-        return x * (x > 0)
+        return max(0, x)
 
     def softmax(self, x):
         return np.exp(x) / np.sum(np.exp(x), axis=0)
@@ -145,43 +146,40 @@ class NeuralNetwork:
             elif ACTIVATION == ActivationType.TANH:
                 x[...] = np.tanh(x)
 
-    def output(self, inputs: list):
-        """
-        Calculates the output for the given inputs.
-        Automatically appends bias term.
-        Automatically turns array into column matrix.
-        """
+    def output(self, X):
+        # Z = np.copy(X)
 
-        inputs.append(1)  # add bias to beginning
-        output = np.array(inputs)
-        output.reshape((len(inputs), 1))
+        # if return_all:
+        #     Zs = []
+
+        # for i in range(len(self.W) - 1):
+        #     Z = self.activation(Z.dot(self.W[i]) + self.B[i])
+
+        #     if return_all:
+        #         Zs.append(np.copy(Z))
+
+        # Z = ClassificationNeuralNetwork.softmax(Z.dot(self.W[-1]) + self.B[-1])
+
+        # if return_all:
+        #     return Zs + [Z]
+
+        # return Z
+
+        X.append(1)
+        Z = np.array(X)
+
         self.neuron_weights = []
-        self.neuron_weights.append(np.copy(output).flatten())
+        self.neuron_weights.append(np.copy(Z))
 
-        if ACTIVATION == ActivationType.RELU:
+        for weight_layer in self.layer_weights[:-1]:
+            Z = weight_layer.dot(Z)
+            NeuralNetwork.activate_layer(Z)
+            self.neuron_weights.append(np.copy(Z))
 
-            for i, weight_layer in enumerate(self.layer_weights):
-                output = weight_layer.dot(output)
+        Z = self.layer_weights[-1].dot(Z)
+        self.neuron_weights.append(np.copy(Z))
 
-                if i < len(self.layer_weights)-1:
-                    NeuralNetwork.activate_layer(output)
-                    self.neuron_weights.append(output)
-                else:
-                    break
-
-            # Output layer should be activated using softmax when using ReLU
-            output = self.softmax(output)
-            self.neuron_weights.append(np.copy(output).flatten())
-
-        else:
-
-            l = len(self.layer_weights)-1
-            for weight_layer in self.layer_weights:
-                output = weight_layer.dot(output)
-                NeuralNetwork.activate_layer(output)
-                self.neuron_weights.append(np.copy(output).flatten())
-
-        return output
+        return Z
 
     def draw_neurons(self, offset_x=-70, offset_y=0):
         if self.neuron_weights == None:
