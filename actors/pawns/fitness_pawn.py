@@ -1,4 +1,7 @@
 from actors.pawns.pawn import *
+import math
+
+HIT_RATE_COEFFICIENT = 2
 
 
 class FitnessPawn(Pawn):
@@ -7,15 +10,9 @@ class FitnessPawn(Pawn):
     total_hits_taken: int = 1
 
     def calculate_fitness(self):
-        # attacks_missed = self.total_attacks - self.total_hits
-        # numerator = self.total_hits ** 2
-        # denominator = 7 * (self.total_hits_taken + attacks_missed)
-        # return numerator / denominator
-
-        hits_weighted = self.total_hits_taken * 0.3
-        attacks_weighted = self.total_attacks * 0.2
-        detriment = hits_weighted + attacks_weighted
-        return max(0, self.total_hits - detriment)
+        hit_rate = self.total_hits / (math.log(self.total_attacks) + 0.1)
+        fit = hit_rate * HIT_RATE_COEFFICIENT - math.log(self.total_hits_taken)
+        return max(0, fit)
 
     def log_hit(self):
         self.total_hits += 1
