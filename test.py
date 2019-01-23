@@ -61,12 +61,15 @@ X = [-2.14874928,  # no bias
      0.44031005,
      0.74149018]
 
-Y = np.array([-4.84501693, -1.76813063, -1.69051381])
+Y = np.array([-4.84501693, -1.76813063, -1.69051381])  # non-relu
+# Y = np.array([-4.84501693, -1.76813063, 0])  # relu
 
 EvoNeuralNetwork.activate_layer(Y)
 Yhat = net1.output(X)
 YhatActual = W.dot(Xb).flatten()
-EvoNeuralNetwork.activate_layer(YhatActual)
+# EvoNeuralNetwork.activate_layer(YhatActual) # don't activate last layer
+
+print(Yhat, YhatActual)
 
 assert np.allclose(
     YhatActual, Yhat, 0.0001), 'Fixed predictions & Lib Net predictions MUST be equal.'
