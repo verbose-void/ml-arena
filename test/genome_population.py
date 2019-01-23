@@ -71,12 +71,24 @@ class GenomePopulation:
         fit_sum = np.sum([genome.calculate_fitness()
                           for genome in self.genomes])
 
-        for i in range(round(len(self.genomes) / 2 - 1)):
-            parentA = self.pick_random(fit_sum)
-            parentB = self.pick_random(fit_sum)
+        l = round(len(self.genomes) / 2 - 1)
 
-            children = parentA.crossover(parentB)
-            [child.mutate() for child in children]
-            new_genomes.extend(children)
+        for i in range(l):
+
+            if i < l / 2:
+                parentA = self.pick_random(fit_sum)
+                parentB = self.pick_random(fit_sum)
+
+                children = parentA.crossover(parentB)
+                [child.mutate() for child in children]
+                new_genomes.extend(children)
+
+            else:
+                genomes = (
+                    self.pick_random(fit_sum).clone(),
+                    self.pick_random(fit_sum).clone()
+                )
+                genomes[0].mutate()
+                new_genomes.extend(genomes)
 
         self.genomes = new_genomes
