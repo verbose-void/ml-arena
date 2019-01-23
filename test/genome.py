@@ -39,7 +39,7 @@ class Genome(EvoNeuralNetwork):
 
         self.start_pos = (start_x, start_y)
         self.pos = list(self.start_pos)
-        super().__init__((1, 4))
+        super().__init__((1, 5, 4))
 
     def reset(self):
         self.pos = list(self.start_pos)
