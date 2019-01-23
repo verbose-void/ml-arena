@@ -71,5 +71,5 @@ A fully custom simulation environment that interchangeably compares reinforcemen
 |<img alt="1" src="https://i.gyazo.com/17d1f8366c614b86c0c5fce5269027b7.png">|<img alt="1" src="https://i.gyazo.com/0baf14ecd33ec3a7668972bf08dd7f24.gif">|
 |**Evolutionary Training**|**Statistical Bias Balancing**|
 |<img alt="1" src="https://i.gyazo.com/7948da19c26cd46e7455a111098f4259.gif">|<img alt="1" src="https://i.gyazo.com/c40352df2597a940ba28a381384ed303.gif">|
-|**Test Environment**|**Non-Graphical Simulation**|
-|<img alt="1" src="https://i.gyazo.com/21c3eb000d70a10994b19016745e5595.gif">|<img alt="1" src="https://i.gyazo.com/5c4c7b51ef348ec85f72df229313b5c3.gif">
+|**Test Environment**|**Non-Graphical Simulation w/ Generational Reports**|
+|<img alt="1" src="https://i.gyazo.com/21c3eb000d70a10994b19016745e5595.gif">|<img alt="1" src="https://i.gyazo.com/c4e94273f0df16d01337c6bbabe590d6.gif">
