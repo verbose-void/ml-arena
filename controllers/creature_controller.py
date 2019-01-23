@@ -16,7 +16,7 @@ NETWORK_DIMENSIONS = (
     OUTPUT_NODES
 )
 
-MAX_DIST = math.sqrt(SCREEN_WIDTH ** 2 + SCREEN_HEIGHT ** 2)
+MAX_DIST = SCREEN_WIDTH ** 2 + SCREEN_HEIGHT ** 2
 MAX_ANGLE = math.pi * 2
 
 
@@ -62,7 +62,7 @@ class CreatureController(Controller):
             esb.movement_speed / MAX_DIST if esb != None else 0,
 
             # Imminent Laser Spacial Data
-            math.sqrt(p.dist_squared(actor=imminent)) /
+            p.dist_squared(actor=imminent) /
             MAX_DIST if imminent != None else 1,
             p.angle_to(actor=imminent)/MAX_ANGLE if imminent != None else 1,
 
@@ -70,7 +70,7 @@ class CreatureController(Controller):
             imminent.speed / MAX_DIST if imminent != None else 0,
 
             # Closest Enemy Spacial Data
-            math.sqrt(p.dist_squared(actor=enemy)) /
+            p.dist_squared(actor=enemy) /
             MAX_DIST if enemy != None else 1,
             p.angle_to(actor=enemy)/MAX_ANGLE if enemy != None else 1,
 
