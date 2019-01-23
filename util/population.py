@@ -32,6 +32,9 @@ class Population:
     current_gen: int = 0
     dir_name: str
 
+    max_overall_fitness = 0
+    generational_fitnesses = None
+
     def __init__(self, name: str, size: int = -1, networks: List[EvoNeuralNetwork] = None):
         assert size > 0 or networks != None, 'Populations MUST be initialized with either a size or networks.'
         assert name != None, 'Population MUST have a name.'
@@ -43,6 +46,7 @@ class Population:
 
         self.dir_name = name
         self.generate_creatures()
+        self.generational_fitnesses = self.load_generational_fitnesses()
 
     def set_opponent_factory(self, factory: Callable):
         self.opponent_factory = factory
@@ -132,19 +136,42 @@ class Population:
     def natural_selection(self):
         """Uses natural selection to alter the current Neural Network population."""
 
+        gen_max = max(
+            [c.calculate_fitness() for c in self.creatures_to_nets.keys()]
+        )
+
+        # Log data
+        self.max_overall_fitness = \
+            max(self.max_overall_fitness, gen_max)
+        self.generational_fitnesses.append(gen_max)
+
         # Save best network unmutated AND get the best with mutations.
+        best = self.best_network()
         new_nets = [
-            self.best_network().clone(),
-            self.best_network().clone().mutate()
+            best.clone(),
+            best.clone().mutate()
         ]
 
+        l = round(self.size() / 2) - 1
+
         # For the rest, cross them over.
-        for i in range(round(self.size() / 2) - 1):
-            parentA = self.pick_random()
-            parentB = self.pick_random()
-            children = parentA.crossover(parentB)
-            [child.mutate() for child in children]  # mutate all (2) children
-            new_nets.extend(children)
+        for i in range(l):
+
+            if i < l / 2:
+                parentA = self.pick_random()
+                parentB = self.pick_random()
+                children = parentA.crossover(parentB)
+                [child.mutate() for child in children]  # mutate all (2) children
+                new_nets.extend(children)
+
+            else:
+                cr = (
+                    self.pick_random().clone(),
+                    self.pick_random().clone()
+                )
+
+                cr[1].mutate()
+                new_nets.extend(cr)
 
         # assert self.size() == len(new_nets), \
         #     'Inconsistent population size. Start: %i End: %i' % (
@@ -171,11 +198,19 @@ class Population:
         for i, net in enumerate(self.neural_networks):
             net.save_to_file('%s/%i' % (path, i))
 
+        if not os.path.isdir('%s/data' % path):
+            os.makedirs('%s/data' % path)
+
         # Save extra data
-        with open('%s/data.json' % path, 'w') as outfile:
+        with open('%s/data/data.json' % path, 'w') as outfile:
             json.dump({
-                'current_gen': self.current_gen
+                'current_gen': self.current_gen,
+                'max_overall_fitness': self.max_overall_fitness
             }, outfile)
+
+        generational_fitnesses = np.array(self.generational_fitnesses)
+        np.save('%s/data/generational_fitnesses.npy' %
+                path, generational_fitnesses)
 
         print('Success!')
 
@@ -189,7 +224,7 @@ class Population:
             p = os.path.join(POPULATION_DIRECTORY, pop_name)
             if os.path.isdir(p):
 
-                with open(os.path.join(p, 'data.json')) as f:
+                with open(os.path.join(p, 'data/data.json')) as f:
                     data: dict = json.load(f)
 
                     out += '\"%s\": size: %s gens: %s\n' % (
@@ -234,9 +269,22 @@ class Population:
                     )
 
         population = Population(name=name, networks=networks)
-        with open(os.path.join(path, 'data.json')) as f:
+        with open(os.path.join(path, 'data/data.json')) as f:
             j: dict = json.load(f)
             for key in j.keys():
                 population.__dict__[key] = j[key]
 
         return population
+
+    def load_generational_fitnesses(self, path: str = None):
+        if path == None:
+            path = os.path.join(POPULATION_DIRECTORY, self.dir_name)
+        else:
+            path = os.path.join(POPULATION_DIRECTORY, path)
+
+        path = '%s/data/generational_fitnesses.npy' % path
+
+        if os.path.isfile(path):
+            return np.load(path).tolist()
+
+        return []

@@ -14,15 +14,27 @@ class AdversarialEvolutionEnvironment(EvolutionEnvironment):
         super().__init__(population1)
         self.reset(build_new_gen=False)
 
+    def plot_data(self):
+        plt.plot(
+            self.population1.generational_fitnesses,
+            label='1: %s' % self.population1.dir_name
+        )
+
+        plt.plot(
+            self.population2.generational_fitnesses,
+            label='2: %s' % self.population2.dir_name
+        )
+
+        plt.xlabel('Generation')
+        plt.ylabel('Max Fitness')
+        plt.legend()
+        plt.show()
+
     def reset(self, build_new_gen=True):
         pop = self.population1
         pop2 = self.population2
 
         if build_new_gen:
-            self.verbose()
-            print('----------------------------------')
-            print(self.build_population_report(pop2))
-
             pop.natural_selection()
             pop.generate_creatures()
             pop.current_gen += 1
@@ -37,9 +49,14 @@ class AdversarialEvolutionEnvironment(EvolutionEnvironment):
             if pop2.current_gen % 5 == 0:
                 pop2.save_to_dir()
 
+            self.verbose()
+            print('----------------------------------')
+            print(self.build_population_report(pop2))
+
         self.frame_count = 0
         self.match_ups = pop.build_match_ups(other_population=pop2)
         self.calculate_best_match_up()
+        self.start_generation_time = time.time()
 
     def on_draw(self):
         Environment.on_draw(self)
@@ -93,6 +110,10 @@ class AdversarialEvolutionEnvironment(EvolutionEnvironment):
         out += 'Max Alive Fitness: %.1f' % max_alive_fitness
         out += spacer
 
-        out += 'Max Overall Fitness: %.1f' % self.absolute_max_fitness
+        p1 = self.population1
+        p2 = self.population2
+
+        out += '%s Max Fit: %.1f' % (p1.dir_name, p1.max_overall_fitness)
+        out += '%s Max Fit: %.1f' % (p2.dir_name, p2.max_overall_fitness)
 
         return out

@@ -29,10 +29,8 @@ class EvolutionEnvironment(Environment):
             self.max_iterations,
             self.current_session_generation_count/self.max_iterations*100
         ) + '%' + ' complete!)'
-        s += '\nMax Overall Fitness: %i' % self.absolute_max_fitness
-        s += '\nGenerational Max Fitness: %i' % \
-            self.current_gen_max_fitness
-        s += '\nTotal Time Elapsed: %.1fs' % (time.time() - self.start_time)
+        s += '\nTotal Time Elapsed: %.1f minutes' % (
+            (time.time() - self.start_time) / 60)
         gt = time.time() - self.start_generation_time
         s += '\nTotal Generation Time: %.1fs' % gt
         s += '\nETA: %.1f minutes' % ((self.max_iterations -
@@ -44,6 +42,9 @@ class EvolutionEnvironment(Environment):
         s = 'Building new population for \"%s\".' % pop.dir_name
         s += '\nGeneration: %i' % pop.current_gen
         s += '\nAlive: %i' % pop.count_alive()
+        s += '\nMax Overall Fitness: %i' % pop.max_overall_fitness
+        s += '\nGenerational Max Fitness: %i' % \
+            pop.generational_fitnesses[-1]
 
         return s
 
@@ -54,9 +55,6 @@ class EvolutionEnvironment(Environment):
         print('----------------------------------')
         print(self.build_population_report(pop))
 
-        # Graph data
-        self.generational_fitnesses.append(self.current_gen_max_fitness)
-
     def plot_data(self):
         # plt.plot(self.alive_after_time)
         # plt.xlabel('Alive Amount')
@@ -64,9 +62,13 @@ class EvolutionEnvironment(Environment):
         # plt.legend()
         # plt.show()
 
-        plt.plot(self.generational_fitnesses, label='Generational Fitnesses')
+        plt.plot(
+            self.population1.generational_fitnesses,
+            label=self.population1.dir_name
+        )
+
         plt.xlabel('Generation')
-        plt.ylabel('Max Generational Fitness')
+        plt.ylabel('Max Fitness')
         plt.legend()
         plt.show()
 
@@ -74,7 +76,6 @@ class EvolutionEnvironment(Environment):
         pop = self.population1
 
         if build_new_gen:
-            self.verbose()
             self.current_session_generation_count += 1
             if pop.current_gen > 0 and pop.current_gen % 5 == 0:
                 pop.save_to_dir()
@@ -83,6 +84,7 @@ class EvolutionEnvironment(Environment):
             pop.generate_creatures()
             pop.current_gen += 1
             super().reset()
+            self.verbose()
 
         self.match_ups = pop.build_match_ups()
         self.calculate_best_match_up()
@@ -149,6 +151,6 @@ class EvolutionEnvironment(Environment):
         out += 'Max Alive Fitness: %.1f' % max_alive_fitness
         out += spacer
 
-        out += 'Max Overall Fitness: %.1f' % self.absolute_max_fitness
+        out += 'Max Overall Fitness: %.1f' % self.population1.max_overall_fitness
 
         return out
