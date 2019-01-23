@@ -13,6 +13,7 @@ A fully custom simulation environment that interchangeably compares reinforcemen
 - To run any simulation, run `python3 -u main.py` inside the main directory.
 - Follow the terminal instructions to run any type of simulation.
 - To run all test assertions & test environment, run `python3 -u test.py` inside the main directory.
+- To view a graph for any saved population, run `python3 -u visualize.py` inside the main directory.
 
 ### Simulation Types:
 - **Freeplay**: Freeplay allows you to create a single matchup using any type of pawn controller you'd like.
@@ -73,3 +74,5 @@ A fully custom simulation environment that interchangeably compares reinforcemen
 |<img alt="1" src="https://i.gyazo.com/7948da19c26cd46e7455a111098f4259.gif">|<img alt="1" src="https://i.gyazo.com/c40352df2597a940ba28a381384ed303.gif">|
 |**Test Environment**|**Non-Graphical Simulation w/ Generational Reports**|
 |<img alt="1" src="https://i.gyazo.com/21c3eb000d70a10994b19016745e5595.gif">|<img alt="1" src="https://i.gyazo.com/c4e94273f0df16d01337c6bbabe590d6.gif">
+|**Saved Population Visualization**||
+|<img alt="1" src="https://i.gyazo.com/dbca70f374a4d88d5a80f88e6c93c78b.gif">||
