@@ -6,6 +6,22 @@ A fully custom simulation environment that interchangeably compares reinforcemen
 ### Fitness Evaluation:
 > After experimenting with Fixed-Topology Neuro-Evolution within this environment, I've found that neglecting to discount detrimental fitness factors, it will fail to develop any sort of effective policy. After hours of trial and error, passing detriment values under a logarithm seems to suffice as it asserts that the detriments don't have such a serious impact on it's overall score, but rather it heavyily rewards minimizing it. You can view the actual method inside [Fitness Pawn](https://github.com/McCrearyD/ML_Arena/blob/master/actors/pawns/fitness_pawn.py) class under "calculate_fitness".
 
+### Tendencies:
+> With the default hyper parameters I have set in place, on average about 1200 generations the mean seems to hover around a fitness score of ~7 with a standard deviation of around 0.5-1. However, the next 250 generations show major improvements in max generational scores: jumping to a mean of ~13, allbeit with a larger standard deviation of around 2.5-3.
+
+#### Figure 1: Generations 1100 - 1350
+![Figure 1](https://i.gyazo.com/cf601cfb0f92e99e294d13effddb1adf.png)
+
+> After another 100 generations, it is apparent there is yet another jump in performance, from the previous mean of ~13 to a peak of ~22, where it eventually hovered for another 1000 generations making no further policy improvements.
+
+#### Figure 2: Generations 1350 - 1450
+![Figure 2](https://i.gyazo.com/cc616901b93c1ec8ce6cd88bec089b75.png)
+
+#### Figure 3: Generations 1350 - 2900
+![Figure 3](https://i.gyazo.com/cc1236ba78da193eb5e11cdae0b94d80.png)
+
+> The model seems to cap out around 23 in this simulation, however 23 is not the max fitness we've had so far, which was an unrecorded 28, but the highest recorded would be back on figure 1, where we had the big spike at 25. Further modifications & research into the policy improvement is still being done.
+
 # General Info
 
 ### Versions:
