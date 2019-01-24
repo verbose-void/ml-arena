@@ -1,6 +1,8 @@
 # ML_Arena
 A fully custom simulation environment that interchangeably compares reinforcement learning models. Has a full blown API for modularity of algorithms, built in general genetic neural network library, and other utilities for training and testing.
 
+### **NOTE: If you would like to skip the write up portion of the readme, click [here](#general-info).**
+
 # Training Process
 
 ### Fitness Evaluation:
