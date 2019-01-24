@@ -1,7 +1,7 @@
 # ML_Arena
 A fully custom simulation environment that interchangeably compares reinforcement learning models. Has a full blown API for modularity of algorithms, built in general genetic neural network library, and other utilities for training and testing.
 
-# Training Process:
+# Training Process
 
 ### Fitness Evaluation:
 > After experimenting with Fixed-Topology Neuro-Evolution within this environment, I've found that neglecting to discount detrimental fitness factors, it will fail to develop any sort of effective policy. After hours of trial and error, passing detriment values under a logarithm seems to suffice as it asserts that the detriments don't have such a serious impact on it's overall score, but rather it heavyily rewards minimizing it. You can view the actual method inside [Fitness Pawn](https://github.com/McCrearyD/ML_Arena/blob/master/actors/pawns/fitness_pawn.py) class under "calculate_fitness".
@@ -71,7 +71,7 @@ A fully custom simulation environment that interchangeably compares reinforcemen
 
 <br>
 
-## Showcase:
+# Showcase
 
 |||
 |:-------------------------:|:-------------------------:|
